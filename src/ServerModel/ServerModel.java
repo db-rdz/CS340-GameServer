@@ -14,24 +14,24 @@ import java.util.Map;
  */
 public class ServerModel implements iModel {
 
-    private List<iGame> _availableGames;
-    private List<iGame> _activeGames;
-
-
-    private Map<String, Game> _idToGame = new HashMap();
     @Override
-    public List<iGame> getAvailableGames() {
-        return null;
+    public List<Game> getAvailableGames() {
+        return Game.get_allAvailableGames();
     }
 
     @Override
-    public List<iGame> getActiveGames() {
-        return null;
+    public List<Game> getStartedGames() {
+        return Game.get_allStartedGames();
     }
 
     @Override
-    public List<iGame> getAllGames() {
-        return null;
+    public List<Game> getAllGames() {
+        return Game.getAllGames();
+    }
+
+    @Override
+    public List<Game> getUserJoinedGames( int userId ){
+        return User.getUserWithID(userId).getJoinedGames();
     }
 
     @Override
@@ -47,12 +47,12 @@ public class ServerModel implements iModel {
 
     @Override
     public Boolean removePlayerFromGame(int userID, int gameID) {
-        return null;
+        return Game.getGameWithId(gameID).removePlayer(userID);
     }
 
     @Override
-    public Boolean removeAllPlayersFromGame(int gameID) {
-        return null;
+    public void removeAllPlayersFromGame(int gameID) {
+        Game.getGameWithId(gameID).removeAllPlayer();
     }
 
     @Override
@@ -61,7 +61,7 @@ public class ServerModel implements iModel {
     }
 
     @Override
-    public Boolean addLoggedInUserToModel(iUser loggedUser) {
-        return null;
+    public Boolean addLoggedInUserToModel(int userId) {
+        return User.addLoggedInUser(userId);
     }
 }

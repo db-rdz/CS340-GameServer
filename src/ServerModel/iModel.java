@@ -1,5 +1,6 @@
 package ServerModel;
 
+import ServerModel.GameModels.Game;
 import ServerModel.GameModels.iGame;
 import ServerModel.UserModel.iUser;
 
@@ -27,19 +28,26 @@ public interface iModel {
      * getAvailableGames:
      *      Returns a list of games that haven't started yet.
      */
-    public List<iGame> getAvailableGames();
+    public List<Game> getAvailableGames();
 
     /**
      * getActiveGames:
      *      Returns a list of games that have started.
      */
-    public List<iGame> getActiveGames();
+    public List<Game> getStartedGames();
 
     /**
      *  getAllGames:
      *      Returns a list of all games.
      */
-    public List<iGame> getAllGames();
+    public List<Game> getAllGames();
+
+    /**
+     *  Gets the list of games of a specific player.
+     *
+     */
+
+    public List<Game> getUserJoinedGames( int userId );
 
     /**
      *  addPlayerToGame:
@@ -57,7 +65,7 @@ public interface iModel {
      *  removeAllPlayersFromGame:
      *      Removes all players from a game (useful if the user hosting the game cancels it)
      */
-    public Boolean removeAllPlayersFromGame(int gameID);
+    public void removeAllPlayersFromGame(int gameID);
 
     /**
      *
@@ -70,6 +78,6 @@ public interface iModel {
 
     //-------------------------------
 
-    public Boolean addLoggedInUserToModel(iUser loggedUser);
+    public Boolean addLoggedInUserToModel(int userId);
 
 }

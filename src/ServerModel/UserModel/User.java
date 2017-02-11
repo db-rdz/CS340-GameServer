@@ -1,5 +1,7 @@
 package ServerModel.UserModel;
 
+import Database.DAO;
+import ServerModel.GameModels.Game;
 import com.sun.org.apache.xpath.internal.operations.Bool;
 
 import java.util.ArrayList;
@@ -12,9 +14,15 @@ import java.util.Map;
  */
 public class User implements iUser {
 
-    //-----------------------------------------CLASS VARIALBES-------------------------------------------------//
+    //-----------------------------------------CLASS VARIABLES-------------------------------------------------//
     private int _i_ID = -1;
     private Boolean _B_isInGame = false;
+    private List<Game> _L_joinedGames = new ArrayList<>();
+
+    //_________________________________________________________________________________________________________//
+
+
+
 
     //-----------------------------------------STATIC VARIABLES------------------------------------------------//
     /**Maps a string () to a user*/
@@ -22,10 +30,27 @@ public class User implements iUser {
     private static List<User> _L_listOfAllUsers = new ArrayList<>();
     private static Map<Integer, User> _M_idToUser = new HashMap();
 
+    //_________________________________________________________________________________________________________//
+
+
+
     //-----------------------------------------STATIC FUNCTIONS------------------------------------------------//
-    public static User getUserWithID(int id){
-        return _M_idToUser.get(id);
+    public static User getUserWithID(int id){ return _M_idToUser.get(id); }
+
+    public static Boolean addLoggedInUser(int userId){
+        User loggedUser = DAO._SINGLETON.getUserFromId(userId);
+        mapIdToUser(userId, loggedUser);
+        return true;
     }
+
+    public static Boolean mapIdToUser(int id, User user){
+        _M_idToUser.put(id, user);
+        return true;
+    }
+
+    //________________________________________________________________________________________________________//
+
+
 
 
     //-----------------------------------------SETTERS AND GETTERS---------------------------------------------//
@@ -36,7 +61,20 @@ public class User implements iUser {
     public Boolean isUserInGame() { return _B_isInGame; }
     public void set_UserGameStatus(Boolean _B_isInGame) { this._B_isInGame = _B_isInGame; }
 
-        //_____________________________________________________________________________________________________//
+    public List<Game> getJoinedGames() { return _L_joinedGames; }
+    public void setJoinedGameList(List<Game> _L_joinedGames) { this._L_joinedGames = _L_joinedGames; }
+
+
+    //________________________________________________________________________________________________________//
+
+
+    //------------------------------------------CLASS FUNCTIONS-----------------------------------------------//
+    public void updateUserModel(){
+
+    }
+
+
+
 
 
 
