@@ -15,6 +15,10 @@ import static com.sun.org.apache.xerces.internal.impl.xpath.regex.CaseInsensitiv
 public class Game implements iGame {
 
 
+    Game(int gameDBId){
+
+    }
+
     //-----------------------------------------STATIC VARIABLES----------------------------------------//
     /** _M_idToGame maps a game id to a game. */
     private static Map<Integer, Game> _M_idToGame = new HashMap();
@@ -63,6 +67,27 @@ public class Game implements iGame {
     /** Returns the list of all games */
     public static List<Game> getAllGames(){
         return (List<Game>) _M_idToGame.values();
+    }
+
+
+    /** Adds an already created game in the available games list and maps it to its Id */
+    public static Boolean addGame(Game game, int gameId){
+        mapGameToId(game, gameId);
+        insertInAvailableGames(game);
+        return true;
+    }
+
+
+    /** Maps the game to its game id */
+    public static Boolean mapGameToId(Game game, int gameId){
+        _M_idToGame.put(gameId, game);
+        return true;
+    }
+
+    /** Adds the game to the available game list. */
+    public static Boolean insertInAvailableGames(Game game){
+        _L_listOfAvailableGames.add(game);
+        return true;
     }
 
     /** updates the Server Game model */

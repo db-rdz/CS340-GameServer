@@ -1,5 +1,6 @@
 package Database;
 
+import ServerModel.GameModels.Game;
 import ServerModel.UserModel.User;
 
 /**
@@ -8,5 +9,7 @@ import ServerModel.UserModel.User;
 public interface iDAO {
 
     public User getUserFromId(int userId);
+
+    public Game getGameFromId(int gameId);
 
 }

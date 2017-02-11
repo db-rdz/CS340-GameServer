@@ -73,6 +73,19 @@ public class User implements iUser {
 
     }
 
+    public Boolean initializeGame(int gameId ){
+        Game createdGame = DAO._SINGLETON.getGameFromId( gameId );
+        Game.addGame(createdGame, gameId);
+        addGameToJoinedGames(createdGame);
+        return true;
+
+    }
+
+    public Boolean addGameToJoinedGames( Game game ){
+        _L_joinedGames.add( game );
+        return true;
+    }
+
 
 
 

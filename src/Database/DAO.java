@@ -1,5 +1,6 @@
 package Database;
 
+import ServerModel.GameModels.Game;
 import ServerModel.UserModel.User;
 
 /**
@@ -11,6 +12,11 @@ public class DAO implements iDAO {
 
     @Override
     public User getUserFromId(int userId) {
+        return null;
+    }
+
+    @Override
+    public Game getGameFromId(int gameId){
         return null;
     }
 

@@ -1,5 +1,6 @@
 package ServerModel;
 
+import Database.DAO;
 import ServerModel.GameModels.Game;
 import ServerModel.GameModels.iGame;
 import ServerModel.UserModel.User;
@@ -35,6 +36,12 @@ public class ServerModel implements iModel {
     }
 
     @Override
+    public Boolean initializeGameFromDB( int userId, int gameId ){
+        User.getUserWithID(userId).initializeGame(gameId);
+        return true;
+    }
+
+    @Override
     public Boolean addPlayerToGame(int userID, int gameID) {
         if(Game.isUserInGame(userID, gameID)){
             return false;
@@ -42,6 +49,9 @@ public class ServerModel implements iModel {
         if(Game.isGameFull(gameID)){
             return false;
         }
+
+        Game game = Game.getGameWithId(gameID);
+        User.getUserWithID(userID).addGameToJoinedGames(game);
         return true;
     }
 
@@ -61,7 +71,12 @@ public class ServerModel implements iModel {
     }
 
     @Override
-    public Boolean addLoggedInUserToModel(int userId) {
+    public Boolean logIn(int userId) {
         return User.addLoggedInUser(userId);
+    }
+
+    @Override
+    public Boolean logOut(int userId){
+        return false;
     }
 }
