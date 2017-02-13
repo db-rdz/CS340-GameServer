@@ -28,7 +28,6 @@ public class User implements iUser {
     //-----------------------------------------STATIC VARIABLES------------------------------------------------//
     /**Maps a string () to a user*/
     /** Note: The function of finding a user with a determined id I think should be done here to keep us organized */
-    private static List<User> _L_listOfAllUsers = new ArrayList<>();
     private static Map<String, User> _M_idToUser = new HashMap();
 
     //_________________________________________________________________________________________________________//
@@ -39,9 +38,14 @@ public class User implements iUser {
     public static User getUserWithUsername(String username){ return _M_idToUser.get(username); }
 
     public static Boolean addLoggedInUser(String username){
-        User loggedUser = DAO._SINGLETON.getUserByUserName(username);
-        mapIdToUser(username, loggedUser);
-        return true;
+        try {
+            User loggedUser = DAO._SINGLETON.getUserByUserName(username);
+            mapIdToUser(username, loggedUser);
+            return true;
+        }
+        catch (Exception e){
+            return false;
+        }
     }
 
     public static Boolean mapIdToUser(String username, User user){
