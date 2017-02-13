@@ -44,7 +44,7 @@ public class DAO implements iDAO {
         User dbUser = getUserByUserName(userName);
         if(dbUser == null)
             return false;
-        if(password.equals(dbUser.get_Password()))
+        if(password.equals(dbUser.get_S_password()))
         {
             updateUserToken(userName);
             return true;
@@ -77,9 +77,9 @@ public class DAO implements iDAO {
             while(resultSet.next())
             {
                 readUser = new User();
-                readUser.set_Username(resultSet.getString(1));
-                readUser.set_Password(resultSet.getString(2));
-                readUser.set_Token(resultSet.getString(3));
+                readUser.set_S_userName(resultSet.getString(1));
+                readUser.set_S_password(resultSet.getString(2));
+                readUser.set_S_token(resultSet.getString(3));
             }
         }
         catch(SQLException e)
@@ -110,9 +110,9 @@ public class DAO implements iDAO {
             while(rs.next())
             {
                 readUser = new User();
-                readUser.set_Username(rs.getString(1));
-                readUser.set_Password(rs.getString(2));
-                readUser.set_Token(rs.getString(3));
+                readUser.set_S_userName(rs.getString(1));
+                readUser.set_S_password(rs.getString(2));
+                readUser.set_S_token(rs.getString(3));
             }
         }
         catch(SQLException e)

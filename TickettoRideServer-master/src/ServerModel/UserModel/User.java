@@ -15,12 +15,12 @@ import java.util.Map;
 public class User implements iUser {
 
     //-----------------------------------------CLASS VARIABLES-------------------------------------------------//
-    private String _S_username = null;
-    private String _S_password = null;
-    private String _S_token = null;
-
+    private int _i_ID = -1;
     private Boolean _B_isInGame = false;
     private List<Game> _L_joinedGames = new ArrayList<>();
+    private String _S_userName;
+    private String _S_password;
+    private String _S_token;
 
     //_________________________________________________________________________________________________________//
 
@@ -30,28 +30,24 @@ public class User implements iUser {
     //-----------------------------------------STATIC VARIABLES------------------------------------------------//
     /**Maps a string () to a user*/
     /** Note: The function of finding a user with a determined id I think should be done here to keep us organized */
-    private static Map<String, User> _M_idToUser = new HashMap();
+    private static List<User> _L_listOfAllUsers = new ArrayList<>();
+    private static Map<Integer, User> _M_idToUser = new HashMap();
 
     //_________________________________________________________________________________________________________//
 
 
 
     //-----------------------------------------STATIC FUNCTIONS------------------------------------------------//
-    public static User getUserWithUsername(String username){ return _M_idToUser.get(username); }
+    public static User getUserWithID(int id){ return _M_idToUser.get(id); }
 
-    public static Boolean addLoggedInUser(String username){
-        try {
-            User loggedUser = DAO._SINGLETON.getUserByUserName(username);
-            mapIdToUser(username, loggedUser);
-            return true;
-        }
-        catch (Exception e){
-            return false;
-        }
+    public static Boolean addLoggedInUser(int userId){
+        User loggedUser = DAO._SINGLETON.getUserFromId(userId);
+        mapIdToUser(userId, loggedUser);
+        return true;
     }
 
-    public static Boolean mapIdToUser(String username, User user){
-        _M_idToUser.put(username, user);
+    public static Boolean mapIdToUser(int id, User user){
+        _M_idToUser.put(id, user);
         return true;
     }
 
@@ -62,22 +58,37 @@ public class User implements iUser {
 
     //-----------------------------------------SETTERS AND GETTERS---------------------------------------------//
 
-    public String get_Username() { return _S_username; }
-    public void set_Username(String username) { _S_username = username; }
-
-    public String get_Password(){ return _S_password; }
-    public void set_Password(String password ) { _S_password = password; }
-
-    public String get_Token(){ return _S_token; }
-    public void set_Token(String token) { _S_token = token; }
-
+    public int get_i_ID() { return _i_ID; }
+    public void set_i_ID(int _i_ID) { this._i_ID = _i_ID; }
 
     public Boolean isUserInGame() { return _B_isInGame; }
     public void set_UserGameStatus(Boolean _B_isInGame) { this._B_isInGame = _B_isInGame; }
 
     public List<Game> getJoinedGames() { return _L_joinedGames; }
     public void setJoinedGameList(List<Game> _L_joinedGames) { this._L_joinedGames = _L_joinedGames; }
+    public String get_S_userName() {
+        return _S_userName;
+    }
 
+    public void set_S_userName(String _S_userName) {
+        this._S_userName = _S_userName;
+    }
+
+    public String get_S_password() {
+        return _S_password;
+    }
+
+    public void set_S_password(String _S_password) {
+        this._S_password = _S_password;
+    }
+
+    public String get_S_token() {
+        return _S_token;
+    }
+
+    public void set_S_token(String _S_token) {
+        this._S_token = _S_token;
+    }
 
     //________________________________________________________________________________________________________//
 
@@ -92,6 +103,7 @@ public class User implements iUser {
         Game.addGame(createdGame, gameId);
         addGameToJoinedGames(createdGame);
         return true;
+
     }
 
     public Boolean addGameToJoinedGames( Game game ){
