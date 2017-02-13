@@ -47,25 +47,25 @@ public interface iModel {
      *
      */
 
-    public List<Game> getUserJoinedGames( int userId );
+    public List<Game> getUserJoinedGames( String username );
 
 
     /**
      *  Gets a game from the database, add it to the Game model, and adds it to the user joined games
      */
-    public Boolean initializeGameFromDB( int userId, int gameId );
+    public Boolean initializeGameFromDB( String username, int gameId );
 
     /**
      *  addPlayerToGame:
      *      Adds a user to a game if the game haven't started and if there's room.
      */
-    public Boolean addPlayerToGame(int userID, int gameID);
+    public Boolean addPlayerToGame(String username, int gameID);
 
     /**
      *  removePlayerFromGame:
      *      Removes a user from game if game haven't started.
      */
-    public Boolean removePlayerFromGame(int userID, int gameID);
+    public Boolean removePlayerFromGame(String username, int gameID);
 
     /**
      *  removeAllPlayersFromGame:
@@ -86,11 +86,11 @@ public interface iModel {
     /**
      *  It pulls information from the database and adds the logged in user to the model.
      */
-    public Boolean logIn(int userId);
+    public Boolean logIn(String username);
 
     /**
      *  It syncs the user info with the database and deletes its instance from the model.
      */
-    public Boolean logOut(int userId);
+    public Boolean logOut(String username);
 
 }

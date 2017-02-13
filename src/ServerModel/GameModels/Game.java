@@ -1,5 +1,6 @@
 package ServerModel.GameModels;
 
+import ServerModel.GameModels.PlayerModel.iPlayer;
 import ServerModel.UserModel.User;
 import com.sun.org.apache.xpath.internal.operations.Bool;
 
@@ -15,9 +16,6 @@ import static com.sun.org.apache.xerces.internal.impl.xpath.regex.CaseInsensitiv
 public class Game implements iGame {
 
 
-    Game(int gameDBId){
-
-    }
 
     //-----------------------------------------STATIC VARIABLES----------------------------------------//
     /** _M_idToGame maps a game id to a game. */
@@ -26,30 +24,33 @@ public class Game implements iGame {
     private static List<Game> _L_listOfAvailableGames = new ArrayList<>();
     /**  These are all the games that have already started */
     private static List<Game> _L_listOfStartedGames = new ArrayList<>();
-
+    /**  The max number of players */
+    public static int _MAX_PLAYERS = 4;
     /** Not sure if I should still use this var */
     public static int modelNextGameIndex = 0;
 
 
     //-----------------------------------------CLASS VARIABLES-----------------------------------------//
-    /** _M_idToUserInGame maps a user id to a User. It only maps the user's of the people in the game */
-    private Map<Integer, User> _M_idToUserInGame = new HashMap<>();
+    /** _M_idToUserInGame maps a username string to a User. It only maps the user's of the people in the game */
+    private Map<String, User> _M_idToUserInGame = new HashMap<>();
     /** _i_numberOfPlayers are the current number of users in the game */
     private int _i_numberOfPlayers = 0;
+    /** This is the user id of the person that created the game. */
+    private int _i_gameOwner = -1;
 
 
 
     //-----------------------------------------STATIC FUNCTIONS----------------------------------------//
 
-    /**  */
+    /** Gets the corresponding game mapped to the specified id.  */
     public static Game getGameWithId(int gameId){
         return _M_idToGame.get(gameId);
     }
 
     /** Tells if an specific user is in the game */
-    public static Boolean isUserInGame( int userId, int gameId ){
+    public static Boolean isUserInGame( String username, int gameId ){
         // Will get user if user in game. If not it will return false.
-        User result = _M_idToGame.get(gameId).getUserInGame(userId);
+        User result = _M_idToGame.get(gameId).getUserInGame(username);
         //Check for the result and return false if the result is null
         if(result == null){ return false; }
         //If the function made it this far means that the user is in the game.
@@ -106,14 +107,14 @@ public class Game implements iGame {
 
     //-----------------------------------------CLASS FUNCTIONS----------------------------------------//
     /** Uses a map to return the User object associated with a user id (returns null if user is not in the game) */
-    private User getUserInGame( int userId ){
-        return _M_idToUserInGame.get(userId);
+    private User getUserInGame( String username ){
+        return _M_idToUserInGame.get(username);
     }
 
-    public Boolean removePlayer(int userId ){
-        User player = _M_idToUserInGame.get(userId);
+    public Boolean removePlayer(String username ){
+        User player = _M_idToUserInGame.get(username);
         if( player != null ){
-            _M_idToUserInGame.remove(userId);
+            _M_idToUserInGame.remove(username);
             return true;
         }
         return false;
@@ -121,6 +122,11 @@ public class Game implements iGame {
 
     public void removeAllPlayer(){
         _M_idToUserInGame = new HashMap<>();
+    }
+
+    public Boolean addPlayerToGame( String username, User user){
+        _M_idToUserInGame.put(username, user);
+        return true;
     }
 
 

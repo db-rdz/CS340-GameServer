@@ -31,19 +31,25 @@ public class ServerModel implements iModel {
     }
 
     @Override
-    public List<Game> getUserJoinedGames( int userId ){
-        return User.getUserWithID(userId).getJoinedGames();
+    public List<Game> getUserJoinedGames( String username ){
+        return User.getUserWithUsername(username).getJoinedGames();
     }
 
     @Override
-    public Boolean initializeGameFromDB( int userId, int gameId ){
-        User.getUserWithID(userId).initializeGame(gameId);
+    public Boolean initializeGameFromDB( String username, int gameId ){
+        User.getUserWithUsername(username).initializeGame(gameId);
         return true;
     }
 
+//    @Override
+//    public Boolean terminateGame( int gameId ){
+//        User.getUserWithID(userId).initializeGame(gameId);
+//        return true;
+//    }
+
     @Override
-    public Boolean addPlayerToGame(int userID, int gameID) {
-        if(Game.isUserInGame(userID, gameID)){
+    public Boolean addPlayerToGame(String username, int gameID) {
+        if(Game.isUserInGame(username, gameID)){
             return false;
         }
         if(Game.isGameFull(gameID)){
@@ -51,13 +57,13 @@ public class ServerModel implements iModel {
         }
 
         Game game = Game.getGameWithId(gameID);
-        User.getUserWithID(userID).addGameToJoinedGames(game);
+        User.getUserWithUsername(username).addGameToJoinedGames(game);
         return true;
     }
 
     @Override
-    public Boolean removePlayerFromGame(int userID, int gameID) {
-        return Game.getGameWithId(gameID).removePlayer(userID);
+    public Boolean removePlayerFromGame(String username, int gameID) {
+        return Game.getGameWithId(gameID).removePlayer(username);
     }
 
     @Override
@@ -71,12 +77,12 @@ public class ServerModel implements iModel {
     }
 
     @Override
-    public Boolean logIn(int userId) {
-        return User.addLoggedInUser(userId);
+    public Boolean logIn(String username) {
+        return User.addLoggedInUser(username);
     }
 
     @Override
-    public Boolean logOut(int userId){
+    public Boolean logOut(String username){
         return false;
     }
 }
