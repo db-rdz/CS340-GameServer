@@ -4,7 +4,6 @@ import java.sql.SQLException;
 import java.util.List;
 
 import ServerModel.GameModels.Game;
-import ServerModel.Models.GameModel;
 import ServerModel.UserModel.User;
 
 /**
@@ -30,8 +29,10 @@ public interface iDAO {
 
     public void initializeDB();
 
-    public List<GameModel> getGamesByUserName(String userName) throws SQLException;
+    public List<Game> getGamesByUserName(String userName) throws SQLException;
 
-    public List<GameModel> getAllGames()  throws SQLException;
+    public List<Game> getAllGames()  throws SQLException;
+
+    public List<User> getAllUsers() throws SQLException;
 
 }
