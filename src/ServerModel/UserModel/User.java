@@ -17,6 +17,8 @@ public class User implements iUser {
     //-----------------------------------------CLASS VARIABLES-------------------------------------------------//
     private String _S_username = null;
     private String _S_password = null;
+    private String _S_token = null;
+
     private Boolean _B_isInGame = false;
     private List<Game> _L_joinedGames = new ArrayList<>();
 
@@ -28,7 +30,6 @@ public class User implements iUser {
     //-----------------------------------------STATIC VARIABLES------------------------------------------------//
     /**Maps a string () to a user*/
     /** Note: The function of finding a user with a determined id I think should be done here to keep us organized */
-    private static List<User> _L_listOfAllUsers = new ArrayList<>();
     private static Map<String, User> _M_idToUser = new HashMap();
 
     //_________________________________________________________________________________________________________//
@@ -39,9 +40,14 @@ public class User implements iUser {
     public static User getUserWithUsername(String username){ return _M_idToUser.get(username); }
 
     public static Boolean addLoggedInUser(String username){
-        User loggedUser = DAO._SINGLETON.getUserByUserName(username);
-        mapIdToUser(username, loggedUser);
-        return true;
+        try {
+            User loggedUser = DAO._SINGLETON.getUserByUserName(username);
+            mapIdToUser(username, loggedUser);
+            return true;
+        }
+        catch (Exception e){
+            return false;
+        }
     }
 
     public static Boolean mapIdToUser(String username, User user){
@@ -58,6 +64,13 @@ public class User implements iUser {
 
     public String get_Username() { return _S_username; }
     public void set_Username(String username) { _S_username = username; }
+
+    public String get_Password(){ return _S_password; }
+    public void set_Password(String password ) { _S_password = password; }
+
+    public String get_Token(){ return _S_token; }
+    public void set_Token(String token) { _S_token = token; }
+
 
     public Boolean isUserInGame() { return _B_isInGame; }
     public void set_UserGameStatus(Boolean _B_isInGame) { this._B_isInGame = _B_isInGame; }
@@ -79,17 +92,10 @@ public class User implements iUser {
         Game.addGame(createdGame, gameId);
         addGameToJoinedGames(createdGame);
         return true;
-
     }
 
     public Boolean addGameToJoinedGames( Game game ){
         _L_joinedGames.add( game );
         return true;
     }
-
-
-
-
-
-
 }

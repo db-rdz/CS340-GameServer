@@ -1,10 +1,10 @@
 package Database;
 
-import ServerModel.GameModels.Game;
-import ServerModel.UserModel.User;
-
 import java.sql.SQLException;
 import java.util.List;
+
+import ServerModel.GameModels.Game;
+import ServerModel.UserModel.User;
 
 /**
  * Created by benjamin on 10/02/17.
@@ -32,5 +32,7 @@ public interface iDAO {
     public List<Game> getGamesByUserName(String userName) throws SQLException;
 
     public List<Game> getAllGames()  throws SQLException;
+
+    public List<User> getAllUsers() throws SQLException;
 
 }

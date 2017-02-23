@@ -38,7 +38,9 @@ public class Game implements iGame {
     /** This is the user id of the person that created the game. */
     private int _i_gameOwner = -1;
 
+    private String _S_gameName;
 
+    private Boolean _S_active = true;
 
     //-----------------------------------------STATIC FUNCTIONS----------------------------------------//
 
@@ -104,6 +106,22 @@ public class Game implements iGame {
     public static List<Game> get_allStartedGames() { return _L_listOfStartedGames; }
     public static void set_StartedGameList(List<Game> StartedGames) { _L_listOfStartedGames = StartedGames; }
 
+    public String get_S_gameName() {
+        return _S_gameName;
+    }
+
+    public void set_S_gameName(String _S_gameName) {
+        this._S_gameName = _S_gameName;
+    }
+
+    public Boolean get_S_active() {
+        return _S_active;
+    }
+
+    public void set_S_active(Boolean _S_active) {
+        this._S_active = _S_active;
+    }
+
 
     //-----------------------------------------CLASS FUNCTIONS----------------------------------------//
     /** Uses a map to return the User object associated with a user id (returns null if user is not in the game) */
@@ -128,13 +146,4 @@ public class Game implements iGame {
         _M_idToUserInGame.put(username, user);
         return true;
     }
-
-
-
-
-
-
-
-
-
 }
