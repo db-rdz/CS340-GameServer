@@ -2,41 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="c1d83853-b6b4-4c84-926d-1747a0e5eb59" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/ServerModel/GameModels/CardsModel/DestCard.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/ServerModel/GameModels/CardsModel/DestCardDeck.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/ServerModel/GameModels/CardsModel/TrainCard.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/ServerModel/GameModels/CardsModel/TrainCardDeck.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/ServerModel/GameModels/PlayerModel/Player.java" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/TickettoRideServer-master (1).zip" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/TickettoRideServer-master/.idea/misc.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/TickettoRideServer-master/.idea/modules.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/TickettoRideServer-master/.idea/vcs.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/TickettoRideServer-master/.idea/workspace.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/TickettoRideServer-master/TickettoRideServer.iml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/TickettoRideServer-master/src/Database/DAO.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/TickettoRideServer-master/src/Database/DataBase.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/TickettoRideServer-master/src/Database/RandomGenerator.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/TickettoRideServer-master/src/Database/iDAO.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/TickettoRideServer-master/src/ServerModel/GameModels/CardsModel/iDestCard.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/TickettoRideServer-master/src/ServerModel/GameModels/CardsModel/iTrainCard.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/TickettoRideServer-master/src/ServerModel/GameModels/Game.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/TickettoRideServer-master/src/ServerModel/GameModels/PlayerModel/iPlayer.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/TickettoRideServer-master/src/ServerModel/GameModels/RouteModel/iRoute.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/TickettoRideServer-master/src/ServerModel/GameModels/iGame.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/TickettoRideServer-master/src/ServerModel/Models/GameModel.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/TickettoRideServer-master/src/ServerModel/ServerModel.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/TickettoRideServer-master/src/ServerModel/UserModel/User.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/TickettoRideServer-master/src/ServerModel/UserModel/iUser.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/TickettoRideServer-master/src/ServerModel/iModel.java" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/Database/DAO.java" afterPath="$PROJECT_DIR$/src/Database/DAO.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/Database/iDAO.java" afterPath="$PROJECT_DIR$/src/Database/iDAO.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/ServerModel/GameModels/CardsModel/iTrainCard.java" afterPath="$PROJECT_DIR$/src/ServerModel/GameModels/CardsModel/iTrainCard.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/ServerModel/GameModels/Game.java" afterPath="$PROJECT_DIR$/src/ServerModel/GameModels/Game.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/ServerModel/ServerModel.java" afterPath="$PROJECT_DIR$/src/ServerModel/ServerModel.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/ServerModel/UserModel/User.java" afterPath="$PROJECT_DIR$/src/ServerModel/UserModel/User.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/ServerModel/UserModel/iUser.java" afterPath="$PROJECT_DIR$/src/ServerModel/UserModel/iUser.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/ServerModel/iModel.java" afterPath="$PROJECT_DIR$/src/ServerModel/iModel.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.gitignore" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -55,7 +21,7 @@
       <file leaf-file-name="User.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/ServerModel/UserModel/User.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="90">
+            <state relative-caret-position="954">
               <caret line="53" column="36" lean-forward="false" selection-start-line="53" selection-start-column="26" selection-end-line="53" selection-end-column="36" />
               <folding>
                 <element signature="imports" expanded="true" />
@@ -67,7 +33,7 @@
       <file leaf-file-name="ServerModel.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/ServerModel/ServerModel.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="44">
+            <state relative-caret-position="810">
               <caret line="51" column="77" lean-forward="false" selection-start-line="51" selection-start-column="77" selection-end-line="51" selection-end-column="77" />
               <folding>
                 <element signature="imports" expanded="true" />
@@ -83,12 +49,10 @@
       <file leaf-file-name="Game.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/ServerModel/GameModels/Game.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="378">
+            <state relative-caret-position="792">
               <caret line="44" column="69" lean-forward="false" selection-start-line="44" selection-start-column="56" selection-end-line="44" selection-end-column="69" />
               <folding>
                 <element signature="imports" expanded="true" />
-                <element signature="e#5812#5813#0" expanded="true" />
-                <element signature="e#5875#5876#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -128,13 +92,13 @@
         <entry file="file://$PROJECT_DIR$/src/ServerModel/GameModels/PlayerModel/iPlayer.java">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="108">
-              <caret line="6" column="40" lean-forward="true" selection-start-line="6" selection-start-column="40" selection-end-line="6" selection-end-column="40" />
+              <caret line="6" column="40" lean-forward="false" selection-start-line="6" selection-start-column="40" selection-end-line="6" selection-end-column="40" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Player.java" pinned="false" current-in-tab="true">
+      <file leaf-file-name="Player.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/ServerModel/GameModels/PlayerModel/Player.java">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="216">
@@ -146,11 +110,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="iTrainCard.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/ServerModel/GameModels/CardsModel/iTrainCard.java">
+      <file leaf-file-name=".gitignore" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/.gitignore">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="126">
-              <caret line="7" column="26" lean-forward="false" selection-start-line="7" selection-start-column="26" selection-end-line="7" selection-end-column="26" />
+            <state relative-caret-position="0">
+              <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -160,7 +124,7 @@
         <entry file="file://$PROJECT_DIR$/src/ServerModel/GameModels/CardsModel/TrainCard.java">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="270">
-              <caret line="15" column="0" lean-forward="true" selection-start-line="15" selection-start-column="0" selection-end-line="15" selection-end-column="0" />
+              <caret line="15" column="0" lean-forward="false" selection-start-line="15" selection-start-column="0" selection-end-line="15" selection-end-column="0" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -209,6 +173,7 @@
         <option value="$PROJECT_DIR$/src/ServerModel/ServerModel.java" />
         <option value="$PROJECT_DIR$/src/ServerModel/GameModels/Game.java" />
         <option value="$PROJECT_DIR$/src/ServerModel/GameModels/PlayerModel/Player.java" />
+        <option value="$PROJECT_DIR$/.gitignore" />
       </list>
     </option>
   </component>
@@ -232,7 +197,8 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
+      <pane id="PackagesPane" />
+      <pane id="Scratches" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -261,8 +227,7 @@
           </PATH>
         </subPane>
       </pane>
-      <pane id="PackagesPane" />
-      <pane id="Scratches" />
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -508,7 +473,7 @@
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.22685888" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.23065251" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
@@ -564,19 +529,10 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/ServerModel/iModel.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1710">
-          <caret line="95" column="1" lean-forward="false" selection-start-line="95" selection-start-column="1" selection-end-line="95" selection-end-column="1" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/ServerModel/GameModels/iGame.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="72">
           <caret line="4" column="3" lean-forward="true" selection-start-line="4" selection-start-column="3" selection-end-line="4" selection-end-column="3" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -600,8 +556,6 @@
           <caret line="37" column="39" lean-forward="false" selection-start-line="37" selection-start-column="39" selection-end-line="37" selection-end-column="39" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#5812#5813#0" expanded="true" />
-            <element signature="e#5875#5876#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -610,7 +564,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -628,21 +581,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="396">
           <caret line="22" column="0" lean-forward="false" selection-start-line="22" selection-start-column="0" selection-end-line="22" selection-end-column="0" />
-          <folding>
-            <element signature="imports" expanded="false" />
-            <element signature="e#510#511#0" expanded="false" />
-            <element signature="e#540#541#0" expanded="false" />
-            <element signature="e#599#600#0" expanded="false" />
-            <element signature="e#626#627#0" expanded="false" />
-            <element signature="e#685#686#0" expanded="false" />
-            <element signature="e#709#710#0" expanded="false" />
-            <element signature="e#767#768#0" expanded="false" />
-            <element signature="e#794#795#0" expanded="false" />
-            <element signature="e#6945#6946#0" expanded="false" />
-            <element signature="e#6981#6982#0" expanded="false" />
-            <element signature="e#7621#7622#0" expanded="false" />
-            <element signature="e#7718#7719#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -650,9 +588,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="414">
           <caret line="23" column="33" lean-forward="false" selection-start-line="23" selection-start-column="16" selection-end-line="23" selection-end-column="33" />
-          <folding>
-            <element signature="imports" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -660,7 +595,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -668,7 +602,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="90">
           <caret line="5" column="22" lean-forward="false" selection-start-line="5" selection-start-column="22" selection-end-line="5" selection-end-column="22" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -683,7 +616,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="90">
           <caret line="5" column="22" lean-forward="false" selection-start-line="5" selection-start-column="22" selection-end-line="5" selection-end-column="22" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -713,7 +645,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1008">
           <caret line="59" column="47" lean-forward="false" selection-start-line="59" selection-start-column="44" selection-end-line="59" selection-end-column="47" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -721,7 +652,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="90">
           <caret line="5" column="22" lean-forward="false" selection-start-line="5" selection-start-column="22" selection-end-line="5" selection-end-column="22" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -736,7 +666,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="90">
           <caret line="5" column="22" lean-forward="false" selection-start-line="5" selection-start-column="22" selection-end-line="5" selection-end-column="22" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -766,7 +695,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -774,7 +702,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="90">
           <caret line="5" column="22" lean-forward="false" selection-start-line="5" selection-start-column="22" selection-end-line="5" selection-end-column="22" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -789,7 +716,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="90">
           <caret line="5" column="22" lean-forward="false" selection-start-line="5" selection-start-column="22" selection-end-line="5" selection-end-column="22" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -830,7 +756,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="72">
           <caret line="4" column="3" lean-forward="false" selection-start-line="4" selection-start-column="3" selection-end-line="4" selection-end-column="3" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -838,7 +763,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -846,9 +770,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="126">
           <caret line="11" column="23" lean-forward="false" selection-start-line="11" selection-start-column="23" selection-end-line="11" selection-end-column="23" />
-          <folding>
-            <element signature="imports" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -856,21 +777,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="270">
           <caret line="26" column="29" lean-forward="false" selection-start-line="26" selection-start-column="16" selection-end-line="26" selection-end-column="29" />
-          <folding>
-            <element signature="imports" expanded="false" />
-            <element signature="e#510#511#0" expanded="false" />
-            <element signature="e#540#541#0" expanded="false" />
-            <element signature="e#599#600#0" expanded="false" />
-            <element signature="e#626#627#0" expanded="false" />
-            <element signature="e#685#686#0" expanded="false" />
-            <element signature="e#709#710#0" expanded="false" />
-            <element signature="e#767#768#0" expanded="false" />
-            <element signature="e#794#795#0" expanded="false" />
-            <element signature="e#6945#6946#0" expanded="false" />
-            <element signature="e#6981#6982#0" expanded="false" />
-            <element signature="e#7621#7622#0" expanded="false" />
-            <element signature="e#7718#7719#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -878,7 +784,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="108">
           <caret line="6" column="0" lean-forward="false" selection-start-line="6" selection-start-column="0" selection-end-line="6" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -886,7 +791,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="209">
           <caret line="84" column="6" lean-forward="true" selection-start-line="84" selection-start-column="6" selection-end-line="84" selection-end-column="6" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -894,9 +798,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="414">
           <caret line="25" column="0" lean-forward="false" selection-start-line="25" selection-start-column="0" selection-end-line="25" selection-end-column="0" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -911,7 +812,7 @@
     <entry file="file://$PROJECT_DIR$/src/ServerModel/GameModels/CardsModel/TrainCard.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="270">
-          <caret line="15" column="0" lean-forward="true" selection-start-line="15" selection-start-column="0" selection-end-line="15" selection-end-column="0" />
+          <caret line="15" column="0" lean-forward="false" selection-start-line="15" selection-start-column="0" selection-end-line="15" selection-end-column="0" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
@@ -920,7 +821,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/ServerModel/ServerModel.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="44">
+        <state relative-caret-position="810">
           <caret line="51" column="77" lean-forward="false" selection-start-line="51" selection-start-column="77" selection-end-line="51" selection-end-column="77" />
           <folding>
             <element signature="imports" expanded="true" />
@@ -935,7 +836,7 @@
     <entry file="file://$PROJECT_DIR$/src/ServerModel/GameModels/PlayerModel/iPlayer.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="108">
-          <caret line="6" column="40" lean-forward="true" selection-start-line="6" selection-start-column="40" selection-end-line="6" selection-end-column="40" />
+          <caret line="6" column="40" lean-forward="false" selection-start-line="6" selection-start-column="40" selection-end-line="6" selection-end-column="40" />
           <folding />
         </state>
       </provider>
@@ -966,7 +867,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/ServerModel/UserModel/User.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="90">
+        <state relative-caret-position="954">
           <caret line="53" column="36" lean-forward="false" selection-start-line="53" selection-start-column="26" selection-end-line="53" selection-end-column="36" />
           <folding>
             <element signature="imports" expanded="true" />
@@ -976,12 +877,10 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/ServerModel/GameModels/Game.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="378">
+        <state relative-caret-position="792">
           <caret line="44" column="69" lean-forward="false" selection-start-line="44" selection-start-column="56" selection-end-line="44" selection-end-column="69" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#5812#5813#0" expanded="true" />
-            <element signature="e#5875#5876#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -993,6 +892,14 @@
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.gitignore">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
         </state>
       </provider>
     </entry>
