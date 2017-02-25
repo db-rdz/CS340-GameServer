@@ -49,8 +49,13 @@ public class ServerModel implements iModel {
         return true;
     }
 
+    @Override
     public Boolean startGame(int gameId){ return Game.getGameWithId(gameId).startGame(); }
+
+    @Override
     public Boolean cancelGame(int gameId){ return Game.getGameWithId(gameId).cancelGame(); }
+
+    @Override
     public Boolean endGame(int gameId){ return Game.getGameWithId(gameId).endGame(); }
 
 

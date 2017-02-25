@@ -64,6 +64,26 @@ public interface iModel {
     public Boolean initializeGameFromDB(String username, int gameId);
 
     /**
+     *  This function will send the game from the available game list to the started game list and will prepare
+     *  everything for the game to start.
+     * */
+    public Boolean startGame(int gameId);
+
+    /**
+     *  Precondition: Game haven't started.
+     *  This function will delete all instances of games and will kick all the players out of the game and
+     *  return their status to "not in a game"
+     * */
+    public Boolean cancelGame(int gameId);
+
+    /**
+     *  Precondition: Game has to have a winner.
+     *  Will delete all instances of the game and kick all players of the game and return their status to
+     *  "not in a game"
+     * */
+    public Boolean endGame(int gameId);
+
+    /**
      * addPlayerToGame:
      * Adds a user to a game if the game haven't started and if there's room.
      */
@@ -86,6 +106,8 @@ public interface iModel {
      *
      */
     public Boolean addGameToLobby(iGame game);
+
+
 
     //______________________________________________________________________________________________//
 
