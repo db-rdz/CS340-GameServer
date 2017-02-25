@@ -20,10 +20,9 @@ public class User implements iUser {
     private String _S_token = null;
 
     private Boolean _B_isInGame = false;
-    private List<Game> _L_joinedGames = new ArrayList<>();
+    private Game _G_joinedGame = null;
 
     //_________________________________________________________________________________________________________//
-
 
 
 
@@ -39,6 +38,8 @@ public class User implements iUser {
     //-----------------------------------------STATIC FUNCTIONS------------------------------------------------//
     public static User getUserWithUsername(String username){ return _M_idToUser.get(username); }
 
+    public static List<User> getAllLoggedInUsers(){ return (List<User>) _M_idToUser.values(); }
+
     public static Boolean addLoggedInUser(String username){
         try {
             User loggedUser = DAO._SINGLETON.getUserByUserName(username);
@@ -50,14 +51,17 @@ public class User implements iUser {
         }
     }
 
+    public static Boolean logOutUser(String username){
+        _M_idToUser.remove(username);
+        return true;
+    }
+
     public static Boolean mapIdToUser(String username, User user){
         _M_idToUser.put(username, user);
         return true;
     }
 
     //________________________________________________________________________________________________________//
-
-
 
 
     //-----------------------------------------SETTERS AND GETTERS---------------------------------------------//
@@ -71,13 +75,11 @@ public class User implements iUser {
     public String get_Token(){ return _S_token; }
     public void set_Token(String token) { _S_token = token; }
 
-
     public Boolean isUserInGame() { return _B_isInGame; }
     public void set_UserGameStatus(Boolean _B_isInGame) { this._B_isInGame = _B_isInGame; }
 
-    public List<Game> getJoinedGames() { return _L_joinedGames; }
-    public void setJoinedGameList(List<Game> _L_joinedGames) { this._L_joinedGames = _L_joinedGames; }
-
+    public Game get_joinedGame(){ return _G_joinedGame; }
+    public void set_joinedGame(Game game){ _G_joinedGame = game; }
 
     //________________________________________________________________________________________________________//
 
@@ -89,13 +91,34 @@ public class User implements iUser {
 
     public Boolean initializeGame(int gameId ){
         Game createdGame = DAO._SINGLETON.getGameFromId( gameId );
-        Game.addGame(createdGame, gameId);
-        addGameToJoinedGames(createdGame);
+        Game.addGameToModel(createdGame, gameId);
+        set_joinedGame(createdGame);
         return true;
     }
 
-    public Boolean addGameToJoinedGames( Game game ){
-        _L_joinedGames.add( game );
+    public Boolean clearFinishedGame(){
+        _G_joinedGame = null;
+        _B_isInGame = false;
         return true;
     }
+
+    public Boolean joinGame(Game game){
+        _G_joinedGame = game;
+        _B_isInGame = true;
+        return true;
+    }
+
+    public Boolean joinGame(int gameId){
+        Game game = Game.getGameWithId(gameId);
+        _G_joinedGame = game;
+        _B_isInGame = true;
+        return true;
+    }
+
+    public Boolean exitGame(){
+        _G_joinedGame = null;
+        _B_isInGame = false;
+        return true;
+    }
+
 }

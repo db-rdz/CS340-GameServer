@@ -4,16 +4,14 @@ import ServerModel.GameModels.PlayerModel.iPlayer;
 import ServerModel.UserModel.User;
 import com.sun.org.apache.xpath.internal.operations.Bool;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
 import static com.sun.org.apache.xerces.internal.impl.xpath.regex.CaseInsensitiveMap.get;
 
 /**
  * Created by benjamin on 10/02/17.
  */
-public class Game implements iGame {
+public class Game implements iGame, Cloneable {
 
 
 
@@ -21,9 +19,9 @@ public class Game implements iGame {
     /** _M_idToGame maps a game id to a game. */
     private static Map<Integer, Game> _M_idToGame = new HashMap();
     /**  These are all the games that haven't started */
-    private static List<Game> _L_listOfAvailableGames = new ArrayList<>();
+    private static Map<Integer, Game> _M_listOfAvailableGames = new HashMap<>();
     /**  These are all the games that have already started */
-    private static List<Game> _L_listOfStartedGames = new ArrayList<>();
+    private static Map<Integer, Game> _M_listOfStartedGames = new HashMap<>();
     /**  The max number of players */
     public static int _MAX_PLAYERS = 4;
     /** Not sure if I should still use this var */
@@ -31,12 +29,26 @@ public class Game implements iGame {
 
 
     //-----------------------------------------CLASS VARIABLES-----------------------------------------//
+
+    /** The name of the game. I don't think we are using this one. */
+    private String _S_gameName = null;
+    /** tells if a game has already begun. */
+    private Boolean _B_active = null;
+    /** The id of the game in the database */
+    private int _i_gameId = -1;
+    /** The next player to make a move */
+    private int _i_nextPlayerTurn = 0;
+
     /** _M_idToUserInGame maps a username string to a User. It only maps the user's of the people in the game */
-    private Map<String, User> _M_idToUserInGame = new HashMap<>();
+    private Map<String, User> _M_idToUserInGame = new LinkedHashMap<>();
+    /** _M_idToUserInGame maps a username string to a Player. Player extends User */
+    private Map<String, User> _M_idToPlayerInGame = new LinkedHashMap<>();
+    /** _L_turnList lists the order of the players in the game */
+    private List<String> _L_turnList = new ArrayList<>();
     /** _i_numberOfPlayers are the current number of users in the game */
     private int _i_numberOfPlayers = 0;
-    /** This is the user id of the person that created the game. */
-    private int _i_gameOwner = -1;
+    /** This is the username of the person that created the game. */
+    private String _S_ownerUsername = null;
 
 
 
@@ -72,7 +84,7 @@ public class Game implements iGame {
 
 
     /** Adds an already created game in the available games list and maps it to its Id */
-    public static Boolean addGame(Game game, int gameId){
+    public static Boolean addGameToModel(Game game, int gameId){
         mapGameToId(game, gameId);
         insertInAvailableGames(game);
         return true;
@@ -87,7 +99,7 @@ public class Game implements iGame {
 
     /** Adds the game to the available game list. */
     public static Boolean insertInAvailableGames(Game game){
-        _L_listOfAvailableGames.add(game);
+        _M_listOfAvailableGames.put(game.get_gameId(), game);
         return true;
     }
 
@@ -98,22 +110,47 @@ public class Game implements iGame {
     public int get_numberOfPlayers() { return _i_numberOfPlayers; }
     public void set_numberOfPlayers(int _i_numberOfPlayers) { this._i_numberOfPlayers = _i_numberOfPlayers; }
 
-    public static List<Game> get_allAvailableGames() { return _L_listOfAvailableGames; }
-    public static void set_availableGameList(List<Game> AvailableGames) {_L_listOfAvailableGames = AvailableGames;}
+    public static List<Game> get_allAvailableGames() { return (List<Game>)_M_listOfAvailableGames.values(); }
+    public static void set_availableGameList(Map<Integer, Game> AvailableGames) {_M_listOfAvailableGames = AvailableGames;}
 
-    public static List<Game> get_allStartedGames() { return _L_listOfStartedGames; }
-    public static void set_StartedGameList(List<Game> StartedGames) { _L_listOfStartedGames = StartedGames; }
+    public static List<Game> get_allStartedGames() { return (List<Game>) _M_listOfStartedGames.values(); }
+    public static void set_StartedGameList(Map<Integer, Game> StartedGames) { _M_listOfStartedGames = StartedGames; }
+
+    public String get_gameName() { return _S_gameName; }
+    public void set_gameName(String _S_gameName) { this._S_gameName = _S_gameName; }
+
+    public Boolean is_active() { return _B_active; }
+    public void set_active(Boolean _B_active) { this._B_active = _B_active; }
+
+    public int get_gameId() { return _i_gameId; }
+    public void set_gameId(int _i_gameId) { this._i_gameId = _i_gameId; }
+
+    public String get_gameOwner(){ return _S_ownerUsername; }
+    public void set_gameOwner(String username){ _S_ownerUsername = username; }
 
 
     //-----------------------------------------CLASS FUNCTIONS----------------------------------------//
+
+        //---------USER ACTIONS (IE. GET USER, GET ALL PLAYERS, ADD PLAYER, REMOVE PLAYER, ETC)-------//
+
     /** Uses a map to return the User object associated with a user id (returns null if user is not in the game) */
     private User getUserInGame( String username ){
         return _M_idToUserInGame.get(username);
     }
 
+    private List<String> getAllPlayers(){
+        return (List<String>)_M_idToUserInGame.keySet();
+    }
+
+    public Boolean addPlayerToGame(User user){
+        _M_idToUserInGame.put(user.get_Username(), user);
+        return true;
+    }
+
     public Boolean removePlayer(String username ){
         User player = _M_idToUserInGame.get(username);
         if( player != null ){
+            player.exitGame();
             _M_idToUserInGame.remove(username);
             return true;
         }
@@ -121,13 +158,70 @@ public class Game implements iGame {
     }
 
     public void removeAllPlayer(){
-        _M_idToUserInGame = new HashMap<>();
+        List<String> allPlayers = getAllPlayers();
+        for(int i = 0; i < allPlayers.size(); i++){
+            removePlayer(allPlayers.get(i));
+        }
     }
 
     public Boolean addPlayerToGame( String username, User user){
         _M_idToUserInGame.put(username, user);
         return true;
     }
+
+        //------------------GAME ACTIONS (IE. START, CANCEL, DESTROY, ETC...)-------------------------//
+
+    public Boolean startGame(){
+        if(_i_numberOfPlayers >= 2){
+            moveGameToStartedGames();
+            _L_turnList = (List<String>) _M_idToUserInGame.keySet();
+            return true;
+        }
+        return false;
+    }
+
+    public void destroyStartedGame(){
+        _M_idToGame.remove(_i_gameId);
+        _M_listOfStartedGames.remove(_i_gameId);
+    }
+
+    public void destroyAvailableGame(){
+        _M_idToGame.remove(_i_gameId);
+        _M_listOfAvailableGames.remove(_i_gameId);
+    }
+
+    public Boolean endGame(){
+        removeAllPlayer();
+        destroyStartedGame();
+        return true;
+    }
+
+    public Boolean cancelGame(){
+        if(_B_active == true){
+            return false;
+        }
+        removeAllPlayer();
+        destroyAvailableGame();
+        return true;
+    }
+
+
+    public Boolean moveGameToStartedGames(){
+        _M_listOfAvailableGames.remove(_i_gameId);
+        _M_listOfStartedGames.put(_i_gameId, this);
+        return true;
+    }
+
+    @Override
+    public Game clone(){
+        Game game = new Game();
+        List<User> new_userList = (List<User>) _M_idToUserInGame.values();
+  //      game.setPlayers(players); //TODO: edit this
+        game.set_gameId(_i_gameId);
+        return game;
+    }
+
+
 
 
 

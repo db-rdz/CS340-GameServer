@@ -5,4 +5,6 @@ package ServerModel.GameModels.CardsModel;
  */
 public interface iTrainCard {
 
+    public void shuffle();
+
 }

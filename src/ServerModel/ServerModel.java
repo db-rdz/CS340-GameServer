@@ -15,6 +15,8 @@ import java.util.Map;
  */
 public class ServerModel implements iModel {
 
+    public static ServerModel _SINGLETON = new ServerModel();
+
     @Override
     public List<Game> getAvailableGames() {
         return Game.get_allAvailableGames();
@@ -31,8 +33,14 @@ public class ServerModel implements iModel {
     }
 
     @Override
-    public List<Game> getUserJoinedGames( String username ){
-        return User.getUserWithUsername(username).getJoinedGames();
+    public User getUserWithUsername( String username ){ return User.getUserWithUsername(username); }
+
+    @Override
+    public List<User> getAllLoggedInUsers(){ return User.getAllLoggedInUsers(); }
+
+    @Override
+    public Game getUserJoinedGame( String username ){
+        return User.getUserWithUsername(username).get_joinedGame();
     }
 
     @Override
@@ -41,15 +49,15 @@ public class ServerModel implements iModel {
         return true;
     }
 
-//    @Override
-//    public Boolean terminateGame( int gameId ){
-//        User.getUserWithID(userId).initializeGame(gameId);
-//        return true;
-//    }
+    public Boolean startGame(int gameId){ return Game.getGameWithId(gameId).startGame(); }
+    public Boolean cancelGame(int gameId){ return Game.getGameWithId(gameId).cancelGame(); }
+    public Boolean endGame(int gameId){ return Game.getGameWithId(gameId).endGame(); }
+
 
     @Override
     public Boolean addPlayerToGame(String username, int gameID) {
-        if(Game.isUserInGame(username, gameID)){
+        User user = User.getUserWithUsername(username);
+        if(user.isUserInGame()){
             return false;
         }
         if(Game.isGameFull(gameID)){
@@ -57,7 +65,8 @@ public class ServerModel implements iModel {
         }
 
         Game game = Game.getGameWithId(gameID);
-        User.getUserWithUsername(username).addGameToJoinedGames(game);
+        game.addPlayerToGame(user);
+        user.joinGame(game);
         return true;
     }
 
@@ -82,7 +91,10 @@ public class ServerModel implements iModel {
     }
 
     @Override
-    public Boolean logOut(String username){
-        return false;
+    public Boolean logOut(String username){ return User.logOutUser(username); }
+
+    @Override
+    public Game getGame(int gameId) {
+        return Game.getGameWithId(gameId);
     }
 }

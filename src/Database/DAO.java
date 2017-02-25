@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ServerModel.GameModels.Game;
-import ServerModel.Models.GameModel;
 import ServerModel.UserModel.User;
 
 /**
@@ -166,10 +165,10 @@ public class DAO implements iDAO {
     }
 
     @Override
-    public List<GameModel> getGamesByUserName(String userName) throws SQLException {
+    public List<Game> getGamesByUserName(String userName) throws SQLException {
         PreparedStatement statement = null;
         ResultSet resultSet = null;
-        List<GameModel> gamesList = new ArrayList<GameModel>();
+        List<Game> gamesList = new ArrayList<Game>();
         try {
             String getGamesSQL = "select * from Games where Games.id in " +
                     "(select gameId from UserGames where UserGames.userName = ?)";
@@ -178,10 +177,10 @@ public class DAO implements iDAO {
             resultSet = statement.executeQuery();
 
             while (resultSet.next()) {
-                GameModel game = new GameModel();
-                game._gameName = resultSet.getString(1);
-                game._numberOfPlayers = resultSet.getInt(2);
-                game._active = resultSet.getBoolean(3);
+                Game game = new Game();
+                game.set_gameName( resultSet.getString(1) );
+                game.set_numberOfPlayers( resultSet.getInt(2) );
+                game.set_active( resultSet.getBoolean(3) );
                 gamesList.add(game);
             }
 
@@ -198,10 +197,10 @@ public class DAO implements iDAO {
     }
 
     @Override
-    public List<GameModel> getAllGames() throws SQLException {
+    public List<Game> getAllGames() throws SQLException {
         PreparedStatement statement = null;
         ResultSet resultSet = null;
-        List<GameModel> gamesList = new ArrayList<GameModel>();
+        List<Game> gamesList = new ArrayList<Game>();
 
         try {
             String getGamesSQL = "select * from Games";
@@ -209,10 +208,10 @@ public class DAO implements iDAO {
             resultSet = statement.executeQuery();
 
             while (resultSet.next()) {
-                GameModel game = new GameModel();
-                game._gameName = resultSet.getString(1);
-                game._numberOfPlayers = resultSet.getInt(2);
-                game._active = resultSet.getBoolean(3);
+                Game game = new Game();
+                game.set_gameName( resultSet.getString(1) );
+                game.set_numberOfPlayers( resultSet.getInt(2) );
+                game.set_active( resultSet.getBoolean(3) );
                 gamesList.add(game);
             }
 
