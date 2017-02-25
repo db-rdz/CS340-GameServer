@@ -178,9 +178,15 @@ public class DAO implements iDAO {
 
             while (resultSet.next()) {
                 Game game = new Game();
+<<<<<<< HEAD
                 game.set_gameName( resultSet.getString(1) );
                 game.set_numberOfPlayers( resultSet.getInt(2) );
                 game.set_active( resultSet.getBoolean(3) );
+=======
+                game.set_S_gameName(resultSet.getString(1));
+                game.set_numberOfPlayers(resultSet.getInt(2));
+                game.set_S_active(resultSet.getBoolean(3));
+>>>>>>> d1407a606be8cafa8691643a6e2a0e9215c38226
                 gamesList.add(game);
             }
 
@@ -209,9 +215,15 @@ public class DAO implements iDAO {
 
             while (resultSet.next()) {
                 Game game = new Game();
+<<<<<<< HEAD
                 game.set_gameName( resultSet.getString(1) );
                 game.set_numberOfPlayers( resultSet.getInt(2) );
                 game.set_active( resultSet.getBoolean(3) );
+=======
+                game.set_S_gameName(resultSet.getString(1));
+                game.set_numberOfPlayers(resultSet.getInt(2));
+                game.set_S_active(resultSet.getBoolean(3));
+>>>>>>> d1407a606be8cafa8691643a6e2a0e9215c38226
                 gamesList.add(game);
             }
 
@@ -225,6 +237,36 @@ public class DAO implements iDAO {
                 statement.close();
         }
         return gamesList;
+    }
+
+    @Override
+    public List<User> getAllUsers() throws SQLException {
+        PreparedStatement statement = null;
+        ResultSet resultSet = null;
+        List<User> userList = new ArrayList<User>();
+        try {
+            String getUsersSQL = "select * from Users";
+            statement = _db.connection.prepareStatement(getUsersSQL);
+            resultSet = statement.executeQuery();
+
+            while (resultSet.next()) {
+                User user = new User();
+                user.set_Username(resultSet.getString(1));
+                user.set_Password(resultSet.getString(2));
+                user.set_Token(resultSet.getString(3));
+                userList.add(user);
+            }
+
+        } catch (SQLException e ){
+            System.out.println(e.getMessage());
+        }
+        finally {
+            if (statement != null)
+                statement.close();
+            if (resultSet != null)
+                statement.close();
+        }
+        return userList;
     }
 
     @Override

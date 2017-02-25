@@ -32,5 +32,10 @@ public interface iDAO {
     public List<Game> getGamesByUserName(String userName) throws SQLException;
 
     public List<Game> getAllGames()  throws SQLException;
+<<<<<<< HEAD
+=======
+
+    public List<User> getAllUsers() throws SQLException;
+>>>>>>> d1407a606be8cafa8691643a6e2a0e9215c38226
 
 }

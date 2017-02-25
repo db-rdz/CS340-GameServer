@@ -50,7 +50,9 @@ public class Game implements iGame, Cloneable {
     /** This is the username of the person that created the game. */
     private String _S_ownerUsername = null;
 
+    private String _S_gameName;
 
+    private Boolean _S_active = true;
 
     //-----------------------------------------STATIC FUNCTIONS----------------------------------------//
 
@@ -128,6 +130,22 @@ public class Game implements iGame, Cloneable {
     public String get_gameOwner(){ return _S_ownerUsername; }
     public void set_gameOwner(String username){ _S_ownerUsername = username; }
 
+    public String get_S_gameName() {
+        return _S_gameName;
+    }
+
+    public void set_S_gameName(String _S_gameName) {
+        this._S_gameName = _S_gameName;
+    }
+
+    public Boolean get_S_active() {
+        return _S_active;
+    }
+
+    public void set_S_active(Boolean _S_active) {
+        this._S_active = _S_active;
+    }
+
 
     //-----------------------------------------CLASS FUNCTIONS----------------------------------------//
 
@@ -168,6 +186,7 @@ public class Game implements iGame, Cloneable {
         _M_idToUserInGame.put(username, user);
         return true;
     }
+<<<<<<< HEAD
 
         //------------------GAME ACTIONS (IE. START, CANCEL, DESTROY, ETC...)-------------------------//
 
@@ -231,4 +250,6 @@ public class Game implements iGame, Cloneable {
 
 
 
+=======
+>>>>>>> d1407a606be8cafa8691643a6e2a0e9215c38226
 }
