@@ -1,9 +1,9 @@
-package ServerModel;
+package com.example.ryanblaser.tickettoride.ServerModel;
 
-import ServerModel.GameModels.Game;
-import ServerModel.GameModels.iGame;
-import ServerModel.UserModel.User;
-import ServerModel.UserModel.iUser;
+import com.example.ryanblaser.tickettoride.ServerModel.GameModels.Game;
+import com.example.ryanblaser.tickettoride.ServerModel.GameModels.iGame;
+import com.example.ryanblaser.tickettoride.ServerModel.UserModel.User;
+import com.example.ryanblaser.tickettoride.ServerModel.UserModel.iUser;
 
 import java.util.List;
 

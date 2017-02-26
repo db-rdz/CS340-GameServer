@@ -1,6 +1,6 @@
-package ServerModel.GameModels.PlayerModel;
+package com.example.ryanblaser.tickettoride.ServerModel.GameModels.PlayerModel;
 
-import ServerModel.GameModels.CardsModel.DestCard;
+import com.example.ryanblaser.tickettoride.ServerModel.GameModels.CardsModel.DestCard;
 
 import java.util.ArrayList;
 import java.util.List;

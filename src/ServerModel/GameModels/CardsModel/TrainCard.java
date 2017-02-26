@@ -1,4 +1,4 @@
-package ServerModel.GameModels.CardsModel;
+package com.example.ryanblaser.tickettoride.ServerModel.GameModels.CardsModel;
 
 import java.util.ArrayList;
 import java.util.List;

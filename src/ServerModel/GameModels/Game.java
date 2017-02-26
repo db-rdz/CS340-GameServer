@@ -1,7 +1,7 @@
-package ServerModel.GameModels;
+package com.example.ryanblaser.tickettoride.ServerModel.GameModels;
 
-import ServerModel.GameModels.PlayerModel.iPlayer;
-import ServerModel.UserModel.User;
+import com.example.ryanblaser.tickettoride.ServerModel.GameModels.PlayerModel.iPlayer;
+import com.example.ryanblaser.tickettoride.ServerModel.UserModel.User;
 import com.sun.org.apache.xpath.internal.operations.Bool;
 
 import java.util.*;

@@ -1,4 +1,4 @@
-package Database;
+package com.example.ryanblaser.tickettoride.Database;
 
 import com.sun.org.apache.xpath.internal.operations.Bool;
 
@@ -8,8 +8,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import ServerModel.GameModels.Game;
-import ServerModel.UserModel.User;
+import com.example.ryanblaser.tickettoride.ServerModel.GameModels.Game;
+import com.example.ryanblaser.tickettoride.ServerModel.UserModel.User;
 
 /**
  * Created by benjamin on 11/02/17.

@@ -1,4 +1,4 @@
-package Database;
+package com.example.ryanblaser.tickettoride.Database;
 
 /**
  * Created by raulbr on 2/12/17.
