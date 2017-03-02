@@ -133,86 +133,80 @@ public class ServerCommunicator {
     private HttpHandler commandHandler = new HttpHandler() {
         @Override
         public void handle(HttpExchange exchange) throws IOException {
-        	
-        	InputStreamReader isr = new InputStreamReader(exchange.getRequestBody());
-        	CommandContainer input = null;
-        	try {
-        		
-        		input = objectMapper.readValue(exchange.getRequestBody(), CommandContainer.class);
-        		System.out.println("jackson CommandContainer: " + input.icommand.get(0));
-        		
-        	} catch (Exception e) {
-        		e.printStackTrace();
-        	}
-        	
-        	System.out.println("\nExecuting " + input.str_type.get(0));
-        	
-            ICommand command = null;
-            // switch all command types
-            switch (input.str_type.get(0)) {
-                case "AddJoinableCommand":
-//                	simpleModule.addAbstractTypeMapping(ICommand.class, AddJoinableToClientCommand.class);
-//                	objectMapper.registerModule(simpleModule);
-//                    command = (AddGameToServerCommand) input.icommand.get(0);
-                    command = new AddGameToServerCommand(new Game()); //Can cast to string since 
-                    break;
-                case "AddPlayerToServerCommand":
-//                	String authenticationCode = (String)input.icommand.get(0); 
-//                	int gameId = (int)input.icommand.get(1);
-//                    command = new AddPlayerToServerCommand(gameId, authenticationCode);
-                	//command = (AddPlayerToServerCommand) input.icommand.get(0);
-                    break;
-//                case "DeleteGameCommand":
-//                    command = (DeleteGameCommand) input.icommand.get(0);
-//                    break;
-//                case "GetCommandsCommand":
-//                    command = (GetCommandsCommand) input.icommand.get(0);
-//                    break;
-                case "LoginCommand":
-//                	simpleModule.addAbstractTypeMapping(ICommand.class, LoginCommand.class);
-//                	objectMapper.registerModule(simpleModule);
-            		command = new LoginCommand(input.icommand.get(0).getUser());
-                    break;
-                case "LogoutCommand":
-//                    command = new LogoutCommand((String)input.icommand.get(0));
-                    break;
-                case "RegisterCommand":
-                	User user2 = new User();
-//            		user2.setUsername((String) input.icommand.get(0));
-//            		user2.setPassword((String) input.icommand.get(1));
-                	command = new RegisterCommand(user2.getUsername(), user2.getPassword());
-                    break;
-                case "StartGameCommand":
-                    command = (StartGameCommand) input.icommand.get(0);
-                    break;
-                default:
-                    throw new UnknownHostException();
-
-            }
-            
-            CommandContainer response = null;
-            try{
-                response = command.execute();
-            } catch(GameIsFullException | UserAlreadyLoggedIn e){}
-            String theResponse = objectMapper.writeValueAsString(response);
-//            System.out.println("this -> client: " + theResponse);
-            exchange.sendResponseHeaders(200, theResponse.length());
-            StreamIO.write(exchange.getResponseBody(), theResponse);
-            System.out.println("Sending back to client!");
-        }
-    };
     
+            InputStreamReader isr = new InputStreamReader(exchange.getRequestBody());
+            CommandContainer input = null;
+            try {
+                input = objectMapper.readValue(exchange.getRequestBody(), CommandContainer.class);
+                System.out.println("jackson CommandContainer: " + input.icommand.get(0));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+    
+            System.out.println("\nExecuting " + input.str_type.get(0));
+    
+        ICommand command = null;
+        // switch all command types
+        switch (input.str_type.get(0)) {
+            case "AddJoinableCommand":
+                command = new AddGameToServerCommand(new Game(), input.icommand.get(0).getAuthenticationCode())
+                break;
+            case "AddPlayerToServerCommand":
+            //                	String authenticationCode = (String)input.icommand.get(0);
+            //                	int gameId = (int)input.icommand.get(1);
+            //                    command = new AddPlayerToServerCommand(gameId, authenticationCode);
+            //command = (AddPlayerToServerCommand) input.icommand.get(0);
+                break;
+            //                case "DeleteGameCommand":
+            //                    command = (DeleteGameCommand) input.icommand.get(0);
+            //                    break;
+            //                case "GetCommandsCommand":
+            //                    command = (GetCommandsCommand) input.icommand.get(0);
+            //                    break;
+            case "LoginCommand":
+                command = new LoginCommand(input.icommand.get(0).getUser());
+                break;
+            case "LogoutCommand":
+                command = input.icommand.get(0);
+                break;
+            case "RegisterCommand":
+                command = new RegisterCommand((User) input.icommand.get(0).getUser());
+                break;
+            case "StartGameCommand":
+                command = input.icommand.get(0);
+                break;
+            default:
+                throw new UnknownHostException();
+        }
+    
+    CommandContainer response = null;
+    try{
+        response = command.execute();
+    } catch(GameIsFullException | UserAlreadyLoggedIn e){}
+    String theResponse = objectMapper.writeValueAsString(response);
+    //            System.out.println("this -> client: " + theResponse);
+    exchange.sendResponseHeaders(200, theResponse.length());
+    StreamIO.write(exchange.getResponseBody(), theResponse);
+    System.out.println("Sending back to client!");
+}
+};
+
     private HttpHandler pollerHandler = new HttpHandler() {
         @Override
         public void handle(HttpExchange exchange) throws IOException {
-        	System.out.println("Hello from the pollerHandler");
-            CommandContainer response = null, input = gson.fromJson(StreamIO.read(exchange.getRequestBody()), CommandContainer.class);
-            try{
-                response = ((ICommand) input.icommand.get(0)).execute();
-            } catch(GameIsFullException | UserAlreadyLoggedIn e){}
-            String theResponse = gson.toJson(response);
-            exchange.sendResponseHeaders(200, theResponse.length());
-            StreamIO.write(exchange.getResponseBody(), theResponse);
+            System.out.println("Hello from the pollerHandler");
+            InputStreamReader isr = new InputStreamReader(exchange.getRequestBody());
+            CommandContainer input = null;
+            try {
+                input = objectMapper.readValue(exchange.getRequestBody(), CommandContainer.class);
+                System.out.println("jackson CommandContainer: " + input.icommand.get(0));
+                CommandContainer response = input.icommand.get(0).execute();
+                String theResponse = objectMapper.writeValueAsString(response);
+                exchange.sendResponseHeaders(200, theResponse.length());
+                StreamIO.write(exchange.getResponseBody(), theResponse);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     };
 
@@ -222,5 +216,5 @@ public class ServerCommunicator {
 
         }
     };
-    
+
 }
