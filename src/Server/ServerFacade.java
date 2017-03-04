@@ -35,6 +35,7 @@ public class ServerFacade implements IServer {
     @Override
     public CommandContainer login(String username, String password) throws IClient.InvalidUsername, IClient.InvalidPassword, UserAlreadyLoggedIn {
         try {
+            //        	System.out.println("hello from the ServerFacade login");
             // tries to retrieve the user from the database
             if (DAO._SINGLETON.login(username, password))
             {
@@ -44,12 +45,23 @@ public class ServerFacade implements IServer {
                 user.setPassword(theUser.get_Password());
                 user.setStr_authentication_code(theUser.get_Token());
                 
+                //                ICommand listJoinableCommand = new ListJoinableCommand(ServerModel.SINGLETON.getAvailableGames());
+                //                ICommand listResumableCommand = new ListResumableCommand(ServerModel.SINGLETON.getStartedGames());
+                //                ICommand listWaitingCommand = new ListWaitingCommand(theUser.getJoinedGames());
+                
                 List<String> types = new ArrayList<>();
                 types.add("LoginRegisterResponseCommand");
+                //
+                // types.add("ListResumableCommand");
+                //                types.add("ListWaitingCommand");
                 
                 List<ICommand> commands = new ArrayList<>();
                 LoginRegisterResponseCommand lrsc = new LoginRegisterResponseCommand(username, password, theUser.get_Token());
                 commands.add(lrsc);
+                //Break down the .add for User info just like on client side. This is for ease.
+                //                commands.add(theUser.get_Username());
+                //                commands.add(theUser.get_Password());
+                //                commands.add(theUser.get_Token());
                 
                 if (theUser.getJoinedGames().isEmpty())
                 {
@@ -153,11 +165,25 @@ public class ServerFacade implements IServer {
             
             UserModel.User theUser = DAO._SINGLETON.getUserByUserName(username);
             
+            
+            //            LoginRegisterResponseCommand success = new LoginRegisterResponseCommand(theUser.get_Username(), theUser.get_Password(), theUser.get_Token());
+            //
+            //            ICommand listJoinableCommand = new ListJoinableCommand(ServerModel.SINGLETON.getAvailableGames());
+            //            ICommand listResumableCommand = new ListResumableCommand(ServerModel.SINGLETON.getStartedGames());
+            //            ICommand listWaitingCommand = new ListWaitingCommand(theUser.getJoinedGames());
+            
             List<String> types = new ArrayList<>();
             types.add("LoginRegisterResponseCommand");
             types.add("ListJoinableCommand");
+            //            types.add("ListResumableCommand");
+            //            types.add("ListWaitingCommand");
             
             List<ICommand> commands = new ArrayList<>();
+            //            commands.add(success); //Break down the .add for User info just like on client side. This is for ease.
+            //            commands.add(theUser.get_Username());
+            //            commands.add(theUser.get_Password());
+            //            commands.add(theUser.get_Token());
+            
             
             LoginRegisterResponseCommand lrsc = new LoginRegisterResponseCommand(username, password, theUser.get_Token());
             commands.add(lrsc);
@@ -231,9 +257,8 @@ public class ServerFacade implements IServer {
         CommandContainer response = new CommandContainer(types, commands);
         String username = "";
         
-        List<User> allUsers = UserModel.User.get_L_listOfAllUsers();
-        for (int i = 0; i < allUsers.size(); i++) {
-            username = allUsers.get(i).get_Username();
+        for (int i = 0; i < UserModel.User.get_L_listOfAllUsers().size(); i++) {
+            username = UserModel.User.get_L_listOfAllUsers().get(i).get_Username();
             ClientProxy.SINGLETON.get_m_usersCommands().put(username, response);
         }
         
@@ -260,9 +285,8 @@ public class ServerFacade implements IServer {
         CommandContainer response = new CommandContainer(types, commands);
         String username = "";
         
-        List<User> allUsers = UserModel.User.get_L_listOfAllUsers();
-        for (int i = 0; i < allUsers.size(); i++) {
-            username = allUsers.get(i).get_Username();
+        for (int i = 0; i < UserModel.User.get_L_listOfAllUsers().size(); i++) {
+            username = UserModel.User.get_L_listOfAllUsers().get(i).get_Username();
             ClientProxy.SINGLETON.get_m_usersCommands().put(username, response);
         } //TODO: Include this in the ServerCommunicator.
         
@@ -287,9 +311,8 @@ public class ServerFacade implements IServer {
         CommandContainer commandContainer = new CommandContainer(types, commands);
         String username = "";
         
-        List<User> allUsers = UserModel.User.get_L_listOfAllUsers();
-        for (int i = 0; i < allUsers.size(); i++) {
-            username = allUsers.get(i).get_Username();
+        for (int i = 0; i < UserModel.User.get_L_listOfAllUsers().size(); i++) {
+            username = UserModel.User.get_L_listOfAllUsers().get(i).get_Username();
             ClientProxy.SINGLETON.get_m_usersCommands().put(username, commandContainer);
         }
         
@@ -329,9 +352,8 @@ public class ServerFacade implements IServer {
             //            commands.add(intGameId);
             
             CommandContainer commandContainer = new CommandContainer(types, commands);
-            List<User> allUsers = UserModel.User.get_L_listOfAllUsers();
-            for (int i = 0; i < allUsers.size(); i++) {
-                UserModel.User theUser = allUsers.get(i);
+            for (int i = 0; i < UserModel.User.get_L_listOfAllUsers().size(); i++) {
+                UserModel.User theUser = UserModel.User.get_L_listOfAllUsers().get(i);
                 username = theUser.get_Username();
                 
                 if (!Game.isUserInGame(username, intGameId))
@@ -359,9 +381,8 @@ public class ServerFacade implements IServer {
             CommandContainer commandContainer = new CommandContainer(types, commands);
             String username = "";
             
-            List<User> allUsers = UserModel.User.get_L_listOfAllUsers();
-            for (int i = 0; i < allUsers.size(); i++) {
-                UserModel.User theUser = allUsers.get(i);
+            for (int i = 0; i < UserModel.User.get_L_listOfAllUsers().size(); i++) {
+                UserModel.User theUser = UserModel.User.get_L_listOfAllUsers().get(i);
                 username = theUser.get_Username();
                 
                 if (theUser.get_Token() != strAuthenticationCode)

@@ -18,6 +18,7 @@ import Server.IServer.GameIsFullException;
 import Server.IServer.UserAlreadyLoggedIn;
 import jdk.nashorn.internal.ir.CatchNode;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.introspect.JacksonAnnotationIntrospector;
 import com.fasterxml.jackson.databind.module.SimpleAbstractTypeResolver;
@@ -52,7 +53,7 @@ import java.util.Enumeration;
 
 public class ServerCommunicator {
     public static ServerCommunicator SINGLETON = new ServerCommunicator();
-
+    
     private static final int MAX_WAITING_CONNECTION = 10;
     private HttpServer server;
     private static int SERVER_PORT_NUMBER;
@@ -62,60 +63,62 @@ public class ServerCommunicator {
     private SimpleModule module_login = new SimpleModule();
     private SimpleModule module_add_joinable = new SimpleModule();
     private SimpleAbstractTypeResolver resolver = new SimpleAbstractTypeResolver();
-
+    
     private static class InvalidAuthenticationCodeException extends Exception {
-
+        
     }
-
+    
     public static void main(String[] args)
     {
-    	SERVER_PORT_NUMBER = Integer.parseInt(args[0]);
+        //   	SERVER_PORT_NUMBER = Integer.parseInt(args[0]);
+        SERVER_PORT_NUMBER = 8080;
         SINGLETON.run();
     }
     
     private void setModules() {
-    	module_login.addAbstractTypeMapping(ICommand.class, LoginCommand.class);
-    	module_add_joinable.addAbstractTypeMapping(ICommand.class, AddJoinableToClientCommand.class);
-    	objectMapper.registerModule(module_login);
-    	objectMapper.registerModule(module_add_joinable);
-    	
-    	resolver.addMapping(ICommand.class, LoginCommand.class);
+        module_login.addAbstractTypeMapping(ICommand.class, LoginCommand.class);
+        module_add_joinable.addAbstractTypeMapping(ICommand.class, AddJoinableToClientCommand.class);
+        objectMapper.registerModule(module_login);
+        objectMapper.registerModule(module_add_joinable);
+        
+        resolver.addMapping(ICommand.class, LoginCommand.class);
     }
-
+    
     private void run()
     {
-//    	setModules();
+        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        //    	setModules();
         try {
             server = HttpServer.create(new InetSocketAddress(SERVER_PORT_NUMBER), MAX_WAITING_CONNECTION);
             
-			String probableAddress = "Could not find a likely IP choice";
+            String probableAddress = "Could not find a likely IP choice";
             Enumeration e = NetworkInterface.getNetworkInterfaces();
-			System.out.println("This machine is attached to the following IP addresses:");
-			while(e.hasMoreElements())
-			{
-			    NetworkInterface n = (NetworkInterface) e.nextElement();
-			    Enumeration ee = n.getInetAddresses();
-			    while (ee.hasMoreElements())
-			    {
-			        InetAddress i = (InetAddress) ee.nextElement();
-			        String prefix = i.getHostAddress().substring(0, 3);
-			        if(prefix.contains("128") || prefix.contains("192") || prefix.contains("10"))
-			        	probableAddress = i.getHostAddress();
-
-			        System.out.println("\t" + i.getHostAddress());
-			    }
-			}
-			if(probableAddress.equals("Could not find a likely IP choice"))
-			{
-				System.out.println(probableAddress);
-				//System.out.println("Server not started");
-				//return;
-			}
-			else
-			{
-				System.out.println("Host ip address: " + probableAddress);
-				System.out.println("Host server port: " + SERVER_PORT_NUMBER + "\n");
-			}
+            System.out.println("This machine is attached to the following IP addresses:");
+            while(e.hasMoreElements())
+            {
+                NetworkInterface n = (NetworkInterface) e.nextElement();
+                Enumeration ee = n.getInetAddresses();
+                while (ee.hasMoreElements())
+                {
+                    InetAddress i = (InetAddress) ee.nextElement();
+                    String prefix = i.getHostAddress().substring(0, 3);
+                    if(prefix.contains("128") || prefix.contains("192") || prefix.contains("10"))
+                        probableAddress = i.getHostAddress();
+                    
+                    System.out.println("\t" + i.getHostAddress());
+                }
+            }
+            if(probableAddress.equals("Could not find a likely IP choice"))
+            {
+                System.out.println(probableAddress);
+                //System.out.println("Server not started");
+                //return;
+            }
+            else
+            {
+                System.out.println("Host ip address: " + probableAddress);
+                System.out.println("Host server port: " + SERVER_PORT_NUMBER + "\n");
+            }
             
         } catch (IOException e) {
             e.printStackTrace();
@@ -127,57 +130,68 @@ public class ServerCommunicator {
         server.start();
         
     }
-
+    
     //2-16-17 1:40am
     //IT WORKS NOW!!
     private HttpHandler commandHandler = new HttpHandler() {
-        @Override
-        public void handle(HttpExchange exchange) throws IOException {
+    @Override
+    public void handle(HttpExchange exchange) throws IOException {
     
-            InputStreamReader isr = new InputStreamReader(exchange.getRequestBody());
-            CommandContainer input = null;
-            try {
-                input = objectMapper.readValue(exchange.getRequestBody(), CommandContainer.class);
-                System.out.println("jackson CommandContainer: " + input.icommand.get(0));
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+    InputStreamReader isr = new InputStreamReader(exchange.getRequestBody());
+    CommandContainer input = null;
+    try {
+        
+        input = objectMapper.readValue(exchange.getRequestBody(), CommandContainer.class);
+        System.out.println("jackson CommandContainer: " + input.icommand.get(0));
+        
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
     
-            System.out.println("\nExecuting " + input.str_type.get(0));
+    System.out.println("\nExecuting " + input.str_type.get(0));
     
-        ICommand command = null;
-        // switch all command types
-        switch (input.str_type.get(0)) {
-            case "AddJoinableCommand":
-                command = new AddGameToServerCommand(new Game(), input.icommand.get(0).getAuthenticationCode())
-                break;
-            case "AddPlayerToServerCommand":
+    ICommand command = null;
+    // switch all command types
+    switch (input.str_type.get(0)) {
+        case "AddJoinableCommand":
+            //                	simpleModule.addAbstractTypeMapping(ICommand.class, AddJoinableToClientCommand.class);
+            //                	objectMapper.registerModule(simpleModule);
+            //                    command = (AddGameToServerCommand) input.icommand.get(0);
+            command = new AddGameToServerCommand(new Game(), input.icommand.get(0).getAuthenticationCode()); //Can cast to string since
+            break;
+        case "AddPlayerToServerCommand":
             //                	String authenticationCode = (String)input.icommand.get(0);
             //                	int gameId = (int)input.icommand.get(1);
             //                    command = new AddPlayerToServerCommand(gameId, authenticationCode);
             //command = (AddPlayerToServerCommand) input.icommand.get(0);
-                break;
+            break;
             //                case "DeleteGameCommand":
             //                    command = (DeleteGameCommand) input.icommand.get(0);
             //                    break;
             //                case "GetCommandsCommand":
             //                    command = (GetCommandsCommand) input.icommand.get(0);
             //                    break;
-            case "LoginCommand":
-                command = new LoginCommand(input.icommand.get(0).getUser());
-                break;
-            case "LogoutCommand":
-                command = input.icommand.get(0);
-                break;
-            case "RegisterCommand":
-                command = new RegisterCommand((User) input.icommand.get(0).getUser());
-                break;
-            case "StartGameCommand":
-                command = input.icommand.get(0);
-                break;
-            default:
-                throw new UnknownHostException();
-        }
+        case "LoginCommand":
+            //                	simpleModule.addAbstractTypeMapping(ICommand.class, LoginCommand.class);
+            //                	objectMapper.registerModule(simpleModule);
+            command = new LoginCommand(input.icommand.get(0).getUser());
+            break;
+        case "LogoutCommand":
+            //                    command = new LogoutCommand((String)input.icommand.get(0));
+            break;
+        case "RegisterCommand":
+            //User user2 = new User();
+            //            		user2.setUsername((String) input.icommand.get(0));
+            //            		user2.setPassword();
+            command = new RegisterCommand((User) input.icommand.get(0).getUser());
+            break;
+        case "StartGameCommand":
+            command = (StartGameCommand) input.icommand.get(0);
+            break;
+        default:
+            throw new UnknownHostException();
+            
+    }
     
     CommandContainer response = null;
     try{
@@ -191,30 +205,32 @@ public class ServerCommunicator {
 }
 };
 
-    private HttpHandler pollerHandler = new HttpHandler() {
-        @Override
-        public void handle(HttpExchange exchange) throws IOException {
-            System.out.println("Hello from the pollerHandler");
-            InputStreamReader isr = new InputStreamReader(exchange.getRequestBody());
-            CommandContainer input = null;
-            try {
-                input = objectMapper.readValue(exchange.getRequestBody(), CommandContainer.class);
-                System.out.println("jackson CommandContainer: " + input.icommand.get(0));
-                CommandContainer response = input.icommand.get(0).execute();
-                String theResponse = objectMapper.writeValueAsString(response);
-                exchange.sendResponseHeaders(200, theResponse.length());
-                StreamIO.write(exchange.getResponseBody(), theResponse);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    };
+private HttpHandler pollerHandler = new HttpHandler() {
+@Override
+public void handle(HttpExchange exchange) throws IOException {
+System.out.println("Hello from the pollerHandler");
+InputStreamReader isr = new InputStreamReader(exchange.getRequestBody());
+CommandContainer input = null;
+try {
 
-    private HttpHandler defaultHandler = new HttpHandler() {
-        @Override
-        public void handle(HttpExchange exchange) throws IOException {
+input = objectMapper.readValue(exchange.getRequestBody(), CommandContainer.class);
+System.out.println("jackson CommandContainer: " + input.icommand.get(0));
+CommandContainer response = input.icommand.get(0).execute();
+String theResponse = objectMapper.writeValueAsString(response);
+exchange.sendResponseHeaders(200, theResponse.length());
+StreamIO.write(exchange.getResponseBody(), theResponse);
 
-        }
-    };
+} catch (Exception e) {
+e.printStackTrace();
+}
+}
+};
+
+private HttpHandler defaultHandler = new HttpHandler() {
+@Override
+public void handle(HttpExchange exchange) throws IOException {
+
+}
+};
 
 }
