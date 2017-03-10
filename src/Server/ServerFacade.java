@@ -7,17 +7,11 @@ import Command.Phase1.AddJoinableToClientCommand;
 import Command.Phase1.AddPlayerToClientCommand;
 import Command.Phase1.AddWaitingToClientCommand;
 import Command.Phase1.DeleteGameCommand;
-import Command.Phase1.GetCommandsCommand;
 import Command.Phase1.ListJoinableCommand;
-import Command.Phase1.ListWaitingCommand;
 import Command.Phase1.LoginRegisterResponseCommand;
-import Command.Phase1.LogoutResponseCommand;
 import Command.Phase2.*;
 import Database.DAO;
-import Database.DataBase;
 import GameModels.Game;
-import Server.IServer.GameIsFullException;
-import Server.IServer.UserAlreadyLoggedIn;
 import ServerModel.*;
 
 import java.sql.SQLException;
@@ -26,9 +20,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
-import com.sun.org.apache.xerces.internal.impl.dtd.models.CMAny;
 
 /**
  * Created by RyanBlaser on 2/5/17.
