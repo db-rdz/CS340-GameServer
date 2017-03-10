@@ -1,4 +1,4 @@
-package com.example.ryanblaser.tickettoride.ServerModel.GameModels.CardsModel;
+package ServerModel.GameModels.CardsModel;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -9,8 +9,12 @@ import java.util.List;
  */
 public class TrainCardDeck {
 
-    TrainCardDeck _SINGLETON = new TrainCardDeck();
-    List<TrainCard> _L_Deck = new ArrayList<>();
+    List<TrainCard> _L_Deck = new ArrayList<TrainCard>();
+    List<TrainCard> _fiveCards = new ArrayList<TrainCard>();
+
+    public TrainCardDeck() {
+        fillDeck();
+    }
 
     public void shuffle(){
         Collections.shuffle(_L_Deck);
@@ -22,10 +26,16 @@ public class TrainCardDeck {
         }
     }
 
-    public void getFourCards(){
-
+    public List<TrainCard> getFiveCards(){
+        //Make sure the list always have 5 cards and return it.
+        return _fiveCards;
     }
 
-
+    private void fillDeck() {
+        for (int i = 0; i < 100; i++) {
+            TrainCard trainCard = new TrainCard();
+            _L_Deck.add(trainCard);
+        }
+    }
 
 }

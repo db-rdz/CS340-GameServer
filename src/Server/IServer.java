@@ -1,7 +1,7 @@
 package Server;
 import Client.IClient;
 import Client.User;
-import Command.CommandContainer;
+import Command.ICommand;
 import GameModels.Game;
 import UserModel.*;
 
@@ -20,14 +20,12 @@ public interface IServer {
     	
     }
 
-    CommandContainer login(String username, String password) throws IClient.InvalidUsername, IClient.InvalidPassword, UserAlreadyLoggedIn;
-    CommandContainer register(String username, String password) throws IClient.UsernameAlreadyExists, UserAlreadyLoggedIn;
-    CommandContainer addGame(Game game);
-    public CommandContainer addResumableGame(Game game);
-    public CommandContainer addJoinableGame(Game game);
-    public CommandContainer addWaitingGame(Game game);
-    CommandContainer removeGame(Game game);
-    CommandContainer startGame(Game game, String str_authentication_code);
-    public CommandContainer addPlayer(String str_authentication_code, int iGameId) throws GameIsFullException;
-    public CommandContainer logout(String str_authentication_code);
+    public List<ICommand> login(String username, String password) throws IClient.InvalidUsername, IClient.InvalidPassword, UserAlreadyLoggedIn;
+    public List<ICommand> register(String username, String password) throws IClient.UsernameAlreadyExists, UserAlreadyLoggedIn;
+    public List<ICommand> addJoinableGameToServer(Game game, String authenticationCode);
+    public List<ICommand> addWaitingGame(Game game);
+    public List<ICommand> removeGame(Game game);
+    public List<ICommand> startGame(Game game, String str_authentication_code);
+    public List<ICommand> addPlayer(String str_authentication_code, int iGameId) throws GameIsFullException;
+    public List<ICommand> logout(String str_authentication_code);
 }

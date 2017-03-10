@@ -1,4 +1,4 @@
-package com.example.ryanblaser.tickettoride.Database;
+package Database;
 
 import java.util.Random;
 

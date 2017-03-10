@@ -1,10 +1,10 @@
-package com.example.ryanblaser.tickettoride.ServerModel;
+package ServerModel;
 
-import com.example.ryanblaser.tickettoride.Database.DAO;
-import com.example.ryanblaser.tickettoride.ServerModel.GameModels.Game;
-import com.example.ryanblaser.tickettoride.ServerModel.GameModels.iGame;
-import com.example.ryanblaser.tickettoride.ServerModel.UserModel.User;
-import com.example.ryanblaser.tickettoride.ServerModel.UserModel.iUser;
+import Database.DAO;
+import GameModels.Game;
+import GameModels.iGame;
+import UserModel.User;
+import UserModel.iUser;
 
 import java.util.HashMap;
 import java.util.List;
@@ -14,8 +14,8 @@ import java.util.Map;
  * Created by benjamin on 10/02/17.
  */
 public class ServerModel implements iModel {
-
-    public static ServerModel _SINGLETON = new ServerModel();
+	
+	public static ServerModel SINGLETON = new ServerModel();
 
     @Override
     public List<Game> getAvailableGames() {
@@ -33,14 +33,8 @@ public class ServerModel implements iModel {
     }
 
     @Override
-    public User getUserWithUsername( String username ){ return User.getUserWithUsername(username); }
-
-    @Override
-    public List<User> getAllLoggedInUsers(){ return User.getAllLoggedInUsers(); }
-
-    @Override
-    public Game getUserJoinedGame( String username ){
-        return User.getUserWithUsername(username).get_joinedGame();
+    public List<Integer> getUserJoinedGames( String username ){
+        return User.getUserWithUsername(username).get_L_joinedGames();
     }
 
     @Override
@@ -49,29 +43,23 @@ public class ServerModel implements iModel {
         return true;
     }
 
-    @Override
-    public Boolean startGame(int gameId){ return Game.getGameWithId(gameId).startGame(); }
-
-    @Override
-    public Boolean cancelGame(int gameId){ return Game.getGameWithId(gameId).cancelGame(); }
-
-    @Override
-    public Boolean endGame(int gameId){ return Game.getGameWithId(gameId).endGame(); }
-
+//    @Override
+//    public Boolean terminateGame( int gameId ){
+//        User.getUserWithID(userId).initializeGame(gameId);
+//        return true;
+//    }
 
     @Override
     public Boolean addPlayerToGame(String username, int gameID) {
-        User user = User.getUserWithUsername(username);
-        if(user.isUserInGame()){
-            return false;
-        }
-        if(Game.isGameFull(gameID)){
+    	if(Game.isGameFull(gameID)){
+    		return false;
+    	}
+        if(Game.isUserInGame(username, gameID)){
             return false;
         }
 
         Game game = Game.getGameWithId(gameID);
-        game.addPlayerToGame(user);
-        user.joinGame(game);
+        User.getUserWithUsername(username).addGameToJoinedGames(gameID);
         return true;
     }
 
@@ -96,10 +84,21 @@ public class ServerModel implements iModel {
     }
 
     @Override
-    public Boolean logOut(String username){ return User.logOutUser(username); }
-
-    @Override
-    public Game getGame(int gameId) {
-        return Game.getGameWithId(gameId);
+    public Boolean logOut(String username){
+    	
+//        User.get_L_listOfAllUsers().remove(username);
+    	return false;
     }
+
+	public Game getGame(int intGameId) {
+		
+		Game game = null;
+		try {
+			game = Game.getAllGames().get(--intGameId);
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return game;
+	}
 }
