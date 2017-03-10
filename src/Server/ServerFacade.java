@@ -205,7 +205,7 @@ public class ServerFacade implements IServer {
 	        
 	        UserModel.User theUser = null;
 	        try {
-	            theUser = DAO._SINGLETON.getUserByAccessToken(strAuthenticationCode);
+	            theUser = DAO._SINGLETON.getUserByAccessToken(strAuthenticationCode); //TODO: Change to use list of usernames
 	        } catch (SQLException e) {
 	            e.printStackTrace();
 	        }
