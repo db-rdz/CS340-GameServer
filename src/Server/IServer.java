@@ -25,7 +25,7 @@ public interface IServer {
     public List<ICommand> addJoinableGameToServer(Game game, String authenticationCode);
     public List<ICommand> addWaitingGame(Game game);
     public List<ICommand> removeGame(Game game);
-    public List<ICommand> startGame(Game game, String str_authentication_code);
+    public List<ICommand> startGame(int gameId, List<String> usernamesInGame);
     public List<ICommand> addPlayer(String str_authentication_code, int iGameId) throws GameIsFullException;
     public List<ICommand> logout(String str_authentication_code);
 }

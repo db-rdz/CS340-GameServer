@@ -12,9 +12,7 @@ import java.util.Map;
  * Created by benjamin on 10/02/17.
  */
 
-//@JsonTypeInfo(use = Id.NAME,
-//	  include = JsonTypeInfo.As.PROPERTY,
-//	  property = "user")
+
 public class User implements iUser {
 	
 	public User() {}
@@ -39,7 +37,7 @@ public class User implements iUser {
     //-----------------------------------------STATIC VARIABLES------------------------------------------------//
     /**Maps a string () to a user*/
     /** Note: The function of finding a user with a determined id I think should be done here to keep us organized */
-    private static Map<String, User> _M_idToUser = new HashMap();
+    private static Map<String, User> _M_usernameToLoggedInUser = new HashMap();
     private  List<User> _L_listOfAllUsers = new ArrayList<>();
 
     //_________________________________________________________________________________________________________//
@@ -47,7 +45,7 @@ public class User implements iUser {
 
 
     //-----------------------------------------STATIC FUNCTIONS------------------------------------------------//
-    public static User getUserWithUsername(String username){ return _M_idToUser.get(username); }
+    public static User getUserWithUsername(String username){ return _M_usernameToLoggedInUser.get(username); }
 
     public static Boolean addLoggedInUser(String username){
         try {
@@ -71,7 +69,7 @@ public class User implements iUser {
      * @return
      */
     public static Boolean mapUsernameToLoggedInUser(String username, User loggedUser){
-        _M_idToUser.put(username, loggedUser);
+        _M_usernameToLoggedInUser.put(username, loggedUser);
         return true;
     }
 
@@ -130,12 +128,12 @@ public class User implements iUser {
         return _B_isLoggedIn;
     }
 
-    public static void set_M_idToUser(Map<String, User> _M_idToUser) {
-        User._M_idToUser = _M_idToUser;
+    public static void set_M_usernameToLoggedInUser(Map<String, User> _M_usernameToLoggedInUser) {
+        User._M_usernameToLoggedInUser = _M_usernameToLoggedInUser;
     }
     
-    public static Map<String, User> get_M_idToUser() {
-		return _M_idToUser;
+    public static Map<String, User> get_M_usernameToLoggedInUser() {
+		return _M_usernameToLoggedInUser;
 	}
 
     public void set_L_listOfAllUsers(List<User> _L_listOfAllUsers) {

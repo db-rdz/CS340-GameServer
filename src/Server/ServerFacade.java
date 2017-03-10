@@ -16,6 +16,8 @@ import Command.Phase2.*;
 import Database.DAO;
 import Database.DataBase;
 import GameModels.Game;
+import Server.IServer.GameIsFullException;
+import Server.IServer.UserAlreadyLoggedIn;
 import ServerModel.*;
 
 import java.sql.SQLException;
@@ -59,8 +61,8 @@ public class ServerFacade implements IServer {
                     for (Game game : games) {
                     	gameIds.add(game.get_i_gameId());
                     }
-//                    ListJoinableCommand listJoinableCommand = new ListJoinableCommand(gameIds);
-//                    commands.add(listJoinableCommand); //Need to update what games there are first before login
+                    ListJoinableCommand listJoinableCommand = new ListJoinableCommand(gameIds);
+                    commands.add(listJoinableCommand); //Need to update what games there are first before login
                 }
                 else
                 {
@@ -89,6 +91,7 @@ public class ServerFacade implements IServer {
                 LoginRegisterResponseCommand lrsc = new LoginRegisterResponseCommand(user);
                 commands.add(lrsc);
                 
+                ClientProxy.SINGLETON.get_m_usersCommands().put(username, new ArrayList<ICommand>());
                 ServerModel.SINGLETON.logIn(theUser.get_S_username());
                 System.out.println("Logging in user: " + DAO._SINGLETON.getUserByAccessToken(theUser.get_S_token()).get_S_username());
                 System.out.println("Authorization code: " + theUser.get_S_token());
@@ -125,7 +128,7 @@ public class ServerFacade implements IServer {
             user.setStr_authentication_code(theUser.get_S_token());
             
             List<ICommand> commands = new ArrayList<>();
-            
+                        
             
             LoginRegisterResponseCommand lrsc = new LoginRegisterResponseCommand(user);
             commands.add(lrsc);
@@ -136,10 +139,12 @@ public class ServerFacade implements IServer {
             	gameIds.add(game.get_i_gameId());
             }
             ListJoinableCommand listJoinableCommand = new ListJoinableCommand(gameIds);
-            commands.add(listJoinableCommand);             
+            commands.add(listJoinableCommand);    
+            
             Map<String, List<ICommand>> copy = ClientProxy.SINGLETON.get_m_usersCommands();
             System.out.println(copy);
             
+            ClientProxy.SINGLETON.get_m_usersCommands().put(username, new ArrayList<ICommand>());
             System.out.println("Registering and logging in user: " + DAO._SINGLETON.getUserByAccessToken(theUser.get_S_token()).get_S_username());
             System.out.println("Authorization code: " + theUser.get_S_token());
             return commands;
@@ -165,46 +170,60 @@ public class ServerFacade implements IServer {
         
         for (int i = 0; i < UserModel.User.get_L_listOfAllUsers().size(); i++) {
             username = UserModel.User.get_L_listOfAllUsers().get(i).get_S_username();
-            ClientProxy.SINGLETON.get_m_usersCommands().put(username, commands);
+    		ClientProxy.SINGLETON.get_m_usersCommands().get(username).addAll(commands);
         } //TODO: Include this in the ServerCommunicator.
         
         return commands;
     }
     
     @Override
-    public List<ICommand> startGame(Game game, String strAuthenticationCode) { //TODO: use strAuthenticationCode
-        Game theGame = Game.getGameWithId(game.get_i_gameId());
-        
-        //send delete game command to all users not in game
-        ICommand deleteGameCommand = new DeleteGameCommand(game.get_i_gameId());
-        
-        List<ICommand> commands = new ArrayList<>();
-        commands.add(deleteGameCommand);
-        
-        String username = "";
-        
-        for (int i = 0; i < UserModel.User.get_L_listOfAllUsers().size(); i++) {
-            username = UserModel.User.get_L_listOfAllUsers().get(i).get_S_username();
-            ClientProxy.SINGLETON.get_m_usersCommands().put(username, commands);
-        }
-        
-        // send to all users in game
-        //        Iterator iter = theGame.get_M_idToGame().values().iterator(); //TODO: is this correct??
-        Iterator iter = theGame.get_M_idToUserInGame().values().iterator(); //TODO: is this correct??
-//        ICommand addResumableToClientCommand = new AddResumableToClientCommand(game);
+    public List<ICommand> startGame(int gameId, List<String> usernamesInGame) {
+		try {
+			Game theGame = DAO._SINGLETON.getGamebyGameId(gameId);
+			//send delete game command to all users not in game
+	        ICommand deleteGameCommand = new DeleteGameCommand(gameId);
+	        
+	        List<ICommand> commands = new ArrayList<>();
+	        commands.add(deleteGameCommand);
+	        
+	        String username = "";
+	        
+	        //Deletes the Joinable game from every user logged in except the creator since he never received that command
+	        Iterator iterator = UserModel.User.get_M_usernameToLoggedInUser().values().iterator();
+	        while (iterator.hasNext())
+	        {
+	        	UserModel.User newUser = (UserModel.User) iterator.next();
+	        	String gameCreator = usernamesInGame.get(0);
+	        	if (!newUser.get_S_username().equals(gameCreator)) { //Sends DeleteGameCommand to everyone but the creator of the game.
+	        		System.out.println(newUser.get_S_username() + " receiving commmands: " + commands);
+	        		ClientProxy.SINGLETON.get_m_usersCommands().get(newUser.get_S_username()).addAll(commands);
+	        		System.out.println(newUser.get_S_username() + " has these commands: " + ClientProxy.SINGLETON.get_m_usersCommands().get(newUser.get_S_username()));
 
-        
-        commands.clear();
-        commands.add(new InitializeGameCommand());
-        
-        while (iter.hasNext()) {
-            UserModel.User user = (UserModel.User) iter.next();
-            username = user.get_S_username();
-            ClientProxy.SINGLETON.get_m_usersCommands().put(username, commands);
-        }
-        
-        return commands;
-    }
+	        	}
+	        }
+	        
+	        // send to all users in game
+	        Iterator iter = theGame.get_M_idToUserInGame().values().iterator();
+
+	        List<ICommand> returnCommands = new ArrayList<>();
+	        returnCommands.add(new InitializeGameCommand());
+	        
+	        while (iter.hasNext()) {
+	            UserModel.User user = (UserModel.User) iter.next();
+	            username = user.get_S_username();
+	            System.out.println(user.get_S_username() + " receiving commmands: " + commands);
+	    		ClientProxy.SINGLETON.get_m_usersCommands().get(username).addAll(returnCommands);
+	    		System.out.println(user.get_S_username() + " has these commands: " + ClientProxy.SINGLETON.get_m_usersCommands().get(user.get_S_username()));
+
+	        }
+	        
+	        return returnCommands;
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	return null; //Meaning something went wrong here.
+}
+
     
     @Override
     public List<ICommand> addPlayer(String str_authentication_code, int intGameId) throws GameIsFullException {
@@ -238,14 +257,16 @@ public class ServerFacade implements IServer {
                 List<ICommand> commands = new ArrayList<>(); //prevents losing the commands in the map 
                 commands.add(addPlayerToClientCommand);
                 
-                List<ICommand> debug;
+                Map<String, List<ICommand>> debug;
                 for (int i = 0; i < users.size(); i++) {
                 	UserModel.User user = users.get(i);
+                	
                 	//Only gives the AddPlayerToClientCommand to users that are in a specific game.
                 	if (!user.get_S_token().equals(theUser.get_S_token())) {
-//                		System.out.println(theUser.get_S_username() + " receiving commmands: " + commands);
-                		debug = ClientProxy.SINGLETON.get_m_usersCommands().put(user.get_S_username(), commands);
-//                		System.out.println(theUser.get_S_username() + " has these commands: " + debug);
+                		System.out.println(user.get_S_username() + " receiving commmands: " + commands);
+                		ClientProxy.SINGLETON.get_m_usersCommands().get(user.get_S_username()).addAll(commands);
+                		debug = ClientProxy.SINGLETON.get_m_usersCommands();
+                		System.out.println(user.get_S_username() + " has these commands: " + debug.get(user.get_S_username()));
                 	}
                 	
             }
@@ -307,15 +328,17 @@ public class ServerFacade implements IServer {
             String username = "";
             Map<String, List<ICommand>> copy = new HashMap<>();
             
-            List<UserModel.User> users = DAO._SINGLETON.getAllUsers();
-            for (int i = 0; i < users.size(); i++) {
-                username = users.get(i).get_S_username();
-                
-                if (!users.get(i).get_S_token().equals(str_authentication_code)) { //The creator doesn't get sent an AddJoinableCommand 
-                	ClientProxy.SINGLETON.get_m_usersCommands().put(username, commands);
-                	
-                }
+            //Sends AddJoinableGameCommands to only logged in users.
+            Iterator iterator = UserModel.User.get_M_usernameToLoggedInUser().values().iterator();
+            while (iterator.hasNext())
+            {
+            	UserModel.User newUser = (UserModel.User) iterator.next();
+            	if (!newUser.get_S_token().equals(str_authentication_code)) {
+            		ClientProxy.SINGLETON.get_m_usersCommands().get(username).addAll(commands);
+            		
+            	}
             }
+            
             
             List<ICommand> returnCommands = new ArrayList<>();
 //            returnCommands.add(new AddPlayerToClientCommand(theUser.get_S_username(), theGame.get_i_gameId())); //The creator needs to be in the game he created

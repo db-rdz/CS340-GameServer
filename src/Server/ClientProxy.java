@@ -33,8 +33,7 @@ public class ClientProxy
 
     public List<ICommand> getUserCommands(String username, int lastCommandRecievedIndex)
     {
-    	List<ICommand> debugOnly = new ArrayList<>();
-    	debugOnly = _m_usersCommands.get(username);
+    	List<ICommand> debugOnly = _m_usersCommands.get(username);
     	List<ICommand> userCommands = new ArrayList<>();
     	for (int i = lastCommandRecievedIndex; i < debugOnly.size(); i++)
     	{
