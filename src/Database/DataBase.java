@@ -14,7 +14,6 @@ import java.sql.SQLException;
 
 public class DataBase {
     Connection connection;
-//    public DAO _dao = new DAO();
 
     public DataBase(){
         loadDriver();

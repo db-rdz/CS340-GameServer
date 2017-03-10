@@ -22,9 +22,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.introspect.JacksonAnnotationIntrospector;
 import com.fasterxml.jackson.databind.module.SimpleAbstractTypeResolver;
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.google.gson.Gson;
-import com.google.gson.JsonParseException;
-import com.google.gson.reflect.TypeToken;
 import com.sun.corba.se.pept.transport.EventHandler;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
@@ -61,9 +58,7 @@ public class ServerCommunicator {
     private static int SERVER_PORT_NUMBER;
     
     private ObjectMapper objectMapper = new ObjectMapper();
-    private SimpleModule module_login = new SimpleModule();
-    private SimpleModule module_add_joinable = new SimpleModule();
-    private SimpleAbstractTypeResolver resolver = new SimpleAbstractTypeResolver();
+    
     
     private static class InvalidAuthenticationCodeException extends Exception {
         
@@ -135,7 +130,7 @@ public class ServerCommunicator {
         
     			input = objectMapper.readValue(exchange.getRequestBody(), ICommand.class);
     			System.out.println("\njackson ICommand: " + input);
-    			System.out.println("\nExecuting " + input);
+    			System.out.println("Executing " + input);
         
     		} catch (Exception e) {
     			e.printStackTrace();
@@ -181,6 +176,7 @@ public class ServerCommunicator {
 			    OutputStreamWriter osw = new OutputStreamWriter(os);
 			    String theResponse = objectMapper.writerWithType(new TypeReference<List<ICommand>>() {
 			            }).writeValueAsString(response);	    
+
 			    exchange.sendResponseHeaders(200, theResponse.length());
 			    osw.write(theResponse);
 			    osw.close();
