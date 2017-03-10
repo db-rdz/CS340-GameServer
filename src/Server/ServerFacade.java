@@ -171,42 +171,60 @@ public class ServerFacade implements IServer {
     @Override
     public List<ICommand> startGame(int gameId, List<String> usernamesInGame) {
 		try {
-			Game theGame = DAO._SINGLETON.getGamebyGameId(gameId);
-			//send delete game command to all users not in game
+			Game theGame = Game.getGameWithId(gameId);
+	        
+	        //send delete game command to all users not in game
 	        ICommand deleteGameCommand = new DeleteGameCommand(gameId);
 	        
 	        List<ICommand> commands = new ArrayList<>();
 	        commands.add(deleteGameCommand);
 	        
 	        String username = "";
-	        
-	        //Deletes the Joinable game from every user logged in except the creator since he never received that command
-	        Iterator iterator = UserModel.User.get_M_usernameToLoggedInUser().values().iterator();
-	        while (iterator.hasNext())
-	        {
-	        	UserModel.User newUser = (UserModel.User) iterator.next();
-	        	String gameCreator = usernamesInGame.get(0);
-	        	if (!newUser.get_S_username().equals(gameCreator)) { //Sends DeleteGameCommand to everyone but the creator of the game.
-	        		System.out.println(newUser.get_S_username() + " receiving commmands: " + commands);
-	        		ClientProxy.SINGLETON.get_m_usersCommands().get(newUser.get_S_username()).addAll(commands);
-	        		System.out.println(newUser.get_S_username() + " has these commands: " + ClientProxy.SINGLETON.get_m_usersCommands().get(newUser.get_S_username()));
-
-	        	}
+	        List<UserModel.User> users = UserModel.User.get_L_listOfAllUsers();
+	         
+	        for (UserModel.User user : users) {
+	            username = user.get_S_username();
+	            ClientProxy.SINGLETON.get_m_usersCommands().put(username, commands);
 	        }
 	        
 	        // send to all users in game
-	        Iterator iter = theGame.get_M_idToUserInGame().values().iterator();
-
-	        List<ICommand> returnCommands = new ArrayList<>();
-	        returnCommands.add(new InitializeGameCommand());
 	        
-	        while (iter.hasNext()) {
-	            UserModel.User user = (UserModel.User) iter.next();
-	            username = user.get_S_username();
-	            System.out.println(user.get_S_username() + " receiving commmands: " + commands);
-	    		ClientProxy.SINGLETON.get_m_usersCommands().get(username).addAll(returnCommands);
-	    		System.out.println(user.get_S_username() + " has these commands: " + ClientProxy.SINGLETON.get_m_usersCommands().get(user.get_S_username()));
-
+	        //        Iterator iter = theGame.get_M_idToGame().values().iterator(); //TODO: is this correct??
+	        Iterator iter = theGame.get_M_idToUserInGame().keySet().iterator(); 
+	        //this should be an iterator through the set of usernames of all users in the game
+	        
+	        
+	        
+	        // TODO: get the deck of cards from the game and assign a hand to each player
+	        
+	        // Collection<TrainCard> deck = theGame.getDeck();
+	        // Collection<TrainCard> hand = null;
+	        
+	        List<ICommand> otherPlayerCommands = null;
+	        List<ICommand> returnCommands = new ArrayList<>();
+	        
+	        UserModel.User theUser = null;
+	        try {
+	            theUser = DAO._SINGLETON.getUserByAccessToken(strAuthenticationCode);
+	        } catch (SQLException e) {
+	            e.printStackTrace();
+	        }
+	        if (theUser != null)
+	        {
+	            while (iter.hasNext()) {
+	                // hand = deck.getHand();
+	                username = (String) iter.next();
+	                if (username != theUser.get_S_username())
+	                {
+	                    // otherPlayerCommands = new ArrayList<>();
+	                    // otherPlayerCommands.add(new InitializeGameCommand(hand));
+	                    ClientProxy.SINGLETON.get_m_usersCommands().get(username).addAll(otherPlayerCommands);
+	                }
+	                else
+	                {
+	                    // returnCommands.add(new InitializeGameCommand(hand));
+	                }
+	            }
 	        }
 	        
 	        return returnCommands;
