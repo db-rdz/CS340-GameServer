@@ -64,6 +64,7 @@ public class DataBase {
         }
         catch(SQLException e)
         {
+        	System.err.println("@Database OpenConnection");
             System.out.print("SQL error\n");
         }
         return;
@@ -169,7 +170,7 @@ public class DataBase {
                         "rainbow integer," +
                         "card1 integer," +
                         "card2 integer," +
-                        "card3 integer," +
+                        "card3 integer" +
                         ");";
         PreparedStatement PlayersStatement = this.connection.prepareStatement(createPlayersTable);
         PlayersStatement.executeUpdate();
@@ -254,7 +255,7 @@ public class DataBase {
                         "rainbow integer," +
                         "card1 integer," +
                         "card2 integer," +
-                        "card3 integer," +
+                        "card3 integer" +
                  ");";
 
         if(dropUserTable)
