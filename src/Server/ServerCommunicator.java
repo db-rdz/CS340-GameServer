@@ -1,31 +1,27 @@
 package Server;
 
-import Command.AddGameToServerCommand;
-import Command.AddJoinableToClientCommand;
-import Command.AddPlayerToServerCommand;
-import Command.CommandContainer;
-import Command.DeleteGameCommand;
-import Command.GetCommandsCommand;
 import Command.ICommand;
-import Command.LoginCommand;
-import Command.LogoutCommand;
-import Command.RegisterCommand;
-import Command.StartGameCommand;
-import Command.StreamIO;
+import Command.Phase1.AddGameToServerCommand;
+import Command.Phase1.AddJoinableToClientCommand;
+import Command.Phase1.AddPlayerToServerCommand;
+import Command.Phase1.DeleteGameCommand;
+import Command.Phase1.GetCommandsCommand;
+import Command.Phase1.LoginCommand;
+import Command.Phase1.LogoutCommand;
+import Command.Phase1.RegisterCommand;
+import Command.Phase1.StartGameCommand;
 import Database.DAO;
 import GameModels.Game;
 import Server.IServer.GameIsFullException;
 import Server.IServer.UserAlreadyLoggedIn;
 import jdk.nashorn.internal.ir.CatchNode;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.introspect.JacksonAnnotationIntrospector;
 import com.fasterxml.jackson.databind.module.SimpleAbstractTypeResolver;
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.google.gson.Gson;
-import com.google.gson.JsonParseException;
-import com.google.gson.reflect.TypeToken;
 import com.sun.corba.se.pept.transport.EventHandler;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
@@ -39,12 +35,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.NetworkInterface;
 import java.net.UnknownHostException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.List;
 
 
 /**
@@ -58,11 +57,8 @@ public class ServerCommunicator {
     private HttpServer server;
     private static int SERVER_PORT_NUMBER;
     
-    private Gson gson = new Gson();
     private ObjectMapper objectMapper = new ObjectMapper();
-    private SimpleModule module_login = new SimpleModule();
-    private SimpleModule module_add_joinable = new SimpleModule();
-    private SimpleAbstractTypeResolver resolver = new SimpleAbstractTypeResolver();
+    
     
     private static class InvalidAuthenticationCodeException extends Exception {
         
@@ -75,19 +71,9 @@ public class ServerCommunicator {
         SINGLETON.run();
     }
     
-    private void setModules() {
-        module_login.addAbstractTypeMapping(ICommand.class, LoginCommand.class);
-        module_add_joinable.addAbstractTypeMapping(ICommand.class, AddJoinableToClientCommand.class);
-        objectMapper.registerModule(module_login);
-        objectMapper.registerModule(module_add_joinable);
-        
-        resolver.addMapping(ICommand.class, LoginCommand.class);
-    }
-    
     private void run()
     {
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        //    	setModules();
         try {
             server = HttpServer.create(new InetSocketAddress(SERVER_PORT_NUMBER), MAX_WAITING_CONNECTION);
             
@@ -134,103 +120,78 @@ public class ServerCommunicator {
     //2-16-17 1:40am
     //IT WORKS NOW!!
     private HttpHandler commandHandler = new HttpHandler() {
-    @Override
-    public void handle(HttpExchange exchange) throws IOException {
+    	@SuppressWarnings("deprecation")
+		@Override
+    	public void handle(HttpExchange exchange) throws IOException {
     
-    InputStreamReader isr = new InputStreamReader(exchange.getRequestBody());
-    CommandContainer input = null;
-    try {
+//    		InputStreamReader isr = new InputStreamReader(exchange.getRequestBody());
+    		ICommand input = null;
+    		try {
         
-        input = objectMapper.readValue(exchange.getRequestBody(), CommandContainer.class);
-        System.out.println("jackson CommandContainer: " + input.icommand.get(0));
+    			input = objectMapper.readValue(exchange.getRequestBody(), ICommand.class);
+    			System.out.println("\njackson ICommand: " + input);
+    			System.out.println("Executing " + input);
         
-    } catch (Exception e) {
-        e.printStackTrace();
-    }
+    		} catch (Exception e) {
+    			e.printStackTrace();
+    		}
     
-    System.out.println("\nExecuting " + input.str_type.get(0));
-    
-    ICommand command = null;
-    // switch all command types
-    switch (input.str_type.get(0)) {
-        case "AddJoinableCommand":
-            //                	simpleModule.addAbstractTypeMapping(ICommand.class, AddJoinableToClientCommand.class);
-            //                	objectMapper.registerModule(simpleModule);
-            //                    command = (AddGameToServerCommand) input.icommand.get(0);
-            command = new AddGameToServerCommand(new Game(), input.icommand.get(0).getAuthenticationCode()); //Can cast to string since
-            break;
-        case "AddPlayerToServerCommand":
-            //                	String authenticationCode = (String)input.icommand.get(0);
-            //                	int gameId = (int)input.icommand.get(1);
-            //                    command = new AddPlayerToServerCommand(gameId, authenticationCode);
-            //command = (AddPlayerToServerCommand) input.icommand.get(0);
-            break;
-            //                case "DeleteGameCommand":
-            //                    command = (DeleteGameCommand) input.icommand.get(0);
-            //                    break;
-            //                case "GetCommandsCommand":
-            //                    command = (GetCommandsCommand) input.icommand.get(0);
-            //                    break;
-        case "LoginCommand":
-            //                	simpleModule.addAbstractTypeMapping(ICommand.class, LoginCommand.class);
-            //                	objectMapper.registerModule(simpleModule);
-            command = new LoginCommand(input.icommand.get(0).getUser());
-            break;
-        case "LogoutCommand":
-            //                    command = new LogoutCommand((String)input.icommand.get(0));
-            break;
-        case "RegisterCommand":
-            //User user2 = new User();
-            //            		user2.setUsername((String) input.icommand.get(0));
-            //            		user2.setPassword();
-            command = new RegisterCommand((User) input.icommand.get(0).getUser());
-            break;
-        case "StartGameCommand":
-            command = (StartGameCommand) input.icommand.get(0);
-            break;
-        default:
-            throw new UnknownHostException();
-            
-    }
-    
-    CommandContainer response = null;
-    try{
-        response = command.execute();
-    } catch(GameIsFullException | UserAlreadyLoggedIn e){}
-    String theResponse = objectMapper.writeValueAsString(response);
-    //            System.out.println("this -> client: " + theResponse);
-    exchange.sendResponseHeaders(200, theResponse.length());
-    StreamIO.write(exchange.getResponseBody(), theResponse);
-    System.out.println("Sending back to client!");
-}
-};
 
-private HttpHandler pollerHandler = new HttpHandler() {
-@Override
-public void handle(HttpExchange exchange) throws IOException {
-System.out.println("Hello from the pollerHandler");
-InputStreamReader isr = new InputStreamReader(exchange.getRequestBody());
-CommandContainer input = null;
-try {
+	    List<ICommand> response = null;
+	    try{
+	        response = input.execute();
+	    } catch(GameIsFullException | UserAlreadyLoggedIn e){}
+	    
+	    
+	    OutputStream os = exchange.getResponseBody();
+	    OutputStreamWriter osw = new OutputStreamWriter(os);
+	    try {
+	    	String theResponse = objectMapper.writerWithType(new TypeReference<List<ICommand>>() {
+	    	}).writeValueAsString(response);	    
+	    	exchange.sendResponseHeaders(200, theResponse.length());
+	    	osw.write(theResponse);
+	    	osw.close();
+	    	
+	    } catch (Exception e) {
+	    	e.printStackTrace();
+	    }
+	    
+	    System.out.println("Sending back to client!");
+    	}
+    };
 
-input = objectMapper.readValue(exchange.getRequestBody(), CommandContainer.class);
-System.out.println("jackson CommandContainer: " + input.icommand.get(0));
-CommandContainer response = input.icommand.get(0).execute();
-String theResponse = objectMapper.writeValueAsString(response);
-exchange.sendResponseHeaders(200, theResponse.length());
-StreamIO.write(exchange.getResponseBody(), theResponse);
+	private HttpHandler pollerHandler = new HttpHandler() {
+		@SuppressWarnings("deprecation")
+		@Override
+		public void handle(HttpExchange exchange) throws IOException {
+//			System.out.println("Hello from the pollerHandler");
+			InputStreamReader isr = new InputStreamReader(exchange.getRequestBody());
+			ICommand input = null;
+			try {
+				input = objectMapper.readValue(exchange.getRequestBody(), ICommand.class);
+				System.out.println("\njackson Icommand: " + input);
+				List<ICommand> response = input.execute();
+				
+			    OutputStream os = exchange.getResponseBody();
+			    OutputStreamWriter osw = new OutputStreamWriter(os);
+			    String theResponse = objectMapper.writerWithType(new TypeReference<List<ICommand>>() {
+			            }).writeValueAsString(response);	    
 
-} catch (Exception e) {
-e.printStackTrace();
-}
-}
-};
+			    exchange.sendResponseHeaders(200, theResponse.length());
+			    osw.write(theResponse);
+			    osw.close();
+			    
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+	};
 
-private HttpHandler defaultHandler = new HttpHandler() {
-@Override
-public void handle(HttpExchange exchange) throws IOException {
-
-}
-};
+	private HttpHandler defaultHandler = new HttpHandler() {
+	@Override
+	public void handle(HttpExchange exchange) throws IOException {
+	
+	}
+	};
 
 }
