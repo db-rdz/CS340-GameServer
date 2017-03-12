@@ -1,0 +1,37 @@
+package Command.Phase2;
+
+import Client.User;
+import Command.ICommand;
+import Server.IServer;
+import GameModels.Game;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import java.util.List;
+
+/**
+ * FROM CLIENT -> SERVER
+ * When a player wants more destination cards, this command will be called.
+ * The client will respond with a  SelectRequestedDestinationCard command (though it could be multiple cards)
+ *
+ * Created by natha on 2/28/2017.
+ */
+
+public class GetDestinationCardsCommand implements ICommand {
+    @Override
+    public List<ICommand> execute() throws IServer.GameIsFullException {
+        return null;
+    }
+
+    @JsonIgnore
+    @Override
+    public String getAuthenticationCode() {
+        return null;
+    }
+
+    @JsonIgnore
+    @Override
+    public User getUser() {
+        return null;
+    }
+
+}

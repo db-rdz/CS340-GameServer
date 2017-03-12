@@ -1,10 +1,12 @@
-package com.example.ryanblaser.tickettoride.Database;
+package Database;
 
 /**
  * Created by raulbr on 2/12/17.
  */
 
 import java.io.File;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -12,7 +14,6 @@ import java.sql.SQLException;
 
 public class DataBase {
     Connection connection;
-    public DAO _dao = new DAO();
 
     public DataBase(){
         loadDriver();
@@ -53,8 +54,8 @@ public class DataBase {
             }
         }
 
-        String dbName = "db" + File.separator + "database.sqlite";
-        String connectionURL = "jdbc:sqlite:" + dbName;
+		String dbName = "db" + File.separator + "database.sqlite";
+		String connectionURL = "jdbc:sqlite:" + dbName;
         connection = null;
         try
         {
@@ -63,6 +64,7 @@ public class DataBase {
         }
         catch(SQLException e)
         {
+        	System.err.println("@Database OpenConnection");
             System.out.print("SQL error\n");
         }
         return;
@@ -116,36 +118,62 @@ public class DataBase {
 
     public void createIfNotExist() throws SQLException
     {
+    	String createGamesTableSQL =
+    			"CREATE TABLE IF NOT EXISTS Games" +
+    					"(" +
+    					"id integer not null primary key autoincrement," +
+    					"gameId integer not null primary key," +
+    					"numberOfPlayers integer," +
+    					"player1 varchar(30)," +
+    					"player2 varchar(30)," +
+    					"player3 varchar(30)," +
+    					"player4 varchar(30)," +
+    					"player5 varchar(30)," +
+    					"active bit" +
+    					");";
+    	PreparedStatement GamesStatement = this.connection.prepareStatement(createGamesTableSQL); //WORKS
+    	GamesStatement.executeUpdate();
+    	
         String createUsersTableSQL =
-                "CREATE TABLE IF NOT EXISTS Users" +
-                 "(" +
-                    "userName primary key varchar(30)," +
-                    "password varchar(255)," +
-                    "token varchar(70)" +
-                 ");";
+    			"CREATE TABLE IF NOT EXISTS Users" +
+                		"(" +
+                		"userName varchar(30) not null primary key," +
+                		"password varchar(255)," +
+                		"token varchar(70)" +
+                		");";
         PreparedStatement UsersStatement = this.connection.prepareStatement(createUsersTableSQL);
         UsersStatement.executeUpdate();
-
-        String createGamesTableSQL =
-                "CREATE TABLE IF NOT EXISTS Games" +
-                "(" +
-                    "id integer not null primary key autoincrement," +
-                    "gameName varchar(64)," +
-                    "numberOfPlayers integer" +
-                    "active bit" +
-                ");";
-        PreparedStatement GamesStatement = this.connection.prepareStatement(createGamesTableSQL);
-        GamesStatement.executeUpdate();
 
         String createUserGamesTable =
                 "CREATE TABLE IF NOT EXISTS UserGames"+
                 "(" +
                     "id integer not null primary key autoincrement," +
                     "userName varchar(30) not null," +
-                    "gameId integer not null," +
+                    "gameId integer" +
                 ");";
         PreparedStatement UserGamesStatement = this.connection.prepareStatement(createUserGamesTable);
         UserGamesStatement.executeUpdate();
+
+        String createPlayersTable =
+                "CREATE TABLE IF NOT EXISTS Players" +
+                        "(" +
+                        "userName varchar(30) not null primary key," +
+                        "gameId integer not null," +
+                        "red integer," +
+                        "white integer," +
+                        "orange integer," +
+                        "green integer," +
+                        "blue integer," +
+                        "purple integer," +
+                        "yellow integer," +
+                        "pink integer," +
+                        "rainbow integer," +
+                        "card1 integer," +
+                        "card2 integer," +
+                        "card3 integer" +
+                        ");";
+        PreparedStatement PlayersStatement = this.connection.prepareStatement(createPlayersTable);
+        PlayersStatement.executeUpdate();
     }
 
     public void resetDB(boolean dropUserTable) throws SQLException
@@ -163,6 +191,7 @@ public class DataBase {
         String dropTableUsers = "DROP TABLE IF EXISTS Users; ";
         String dropTableGames = "DROP TABLE IF EXISTS Games; ";
         String dropTableUserGames = "DROP TABLE IF EXISTS UserGames; ";
+        String dropTablePlayers = "DROP TABLE IF EXISTS Players; ";
         if(dropUserTable)
         {
             PreparedStatement dropUsersStatement = this.connection.prepareStatement(dropTableUsers);
@@ -173,45 +202,76 @@ public class DataBase {
 
             PreparedStatement dropTableUserGamesStatement = this.connection.prepareStatement(dropTableUserGames);
             dropTableUserGamesStatement.executeUpdate();
+
+            PreparedStatement droptTableplayersStatement = this.connection.prepareStatement(dropTablePlayers);
+            droptTableplayersStatement.executeUpdate();
         }
     }
 
     private void createTAbleSQLStatements(boolean dropUserTable) throws SQLException {
         String createUsersTableSQL =
-                "CREATE TABLE IF NOT EXISTS Users" +
-                        "(" +
-                        "userName primary key varchar(30)," +
-                        "password varchar(255)," +
-                        "token varchar(70)" +
-                        ");";
+    			"CREATE TABLE IF NOT EXISTS Users" +
+                		"(" +
+                		"userName varchar(30) not null primary key," +
+                		"password varchar(255)," +
+                		"token varchar(70)" +
+                		");";
 
-        String createGamesTableSQL =
-                "CREATE TABLE IF NOT EXISTS Games" +
-                        "(" +
-                        "id integer not null primary key autoincrement," +
-                        "gameName varchar(64)," +
-                        "numberOfPlayers integer" +
-                        "active bit" +
-                        ");";
+    	String createGamesTableSQL =
+    			"CREATE TABLE IF NOT EXISTS Games" +
+    					"(" +
+    					"id integer not null primary key autoincrement," +
+    					"gameId integer not null primary key," +
+    					"numberOfPlayers integer," +
+    					"player1 varchar(30)," +
+    					"player2 varchar(30)," +
+    					"player3 varchar(30)," +
+    					"player4 varchar(30)," +
+    					"player5 varchar(30)," +
+    					"active bit" +
+    					");";
 
         String createUserGamesTable =
                 "CREATE TABLE IF NOT EXISTS UserGames"+
-                        "(" +
-                        "id integer not null primary key autoincrement," +
-                        "userName varchar(30) not null," +
+                "(" +
+                    "id integer not null primary key autoincrement," +
+                    "userName varchar(30) not null," +
+                    "gameId integer" +
+                ");";
+
+        String createPlayersTable =
+                "CREATE TABLE IF NOT EXISTS Players" +
+                 "(" +
+                        "userName varchar(30) not null primary key," +
                         "gameId integer not null," +
-                        ");";
+                        "red integer," +
+                        "white integer," +
+                        "orange integer," +
+                        "green integer," +
+                        "blue integer," +
+                        "purple integer," +
+                        "yellow integer," +
+                        "pink integer," +
+                        "rainbow integer," +
+                        "card1 integer," +
+                        "card2 integer," +
+                        "card3 integer" +
+                 ");";
 
         if(dropUserTable)
         {
             PreparedStatement createUsersTableStatement = this.connection.prepareStatement(createUsersTableSQL);
             createUsersTableStatement.executeUpdate();
-        }
-        PreparedStatement createGamesTableStatement = this.connection.prepareStatement(createGamesTableSQL);
-        createGamesTableStatement.executeUpdate();
+            
+            PreparedStatement createGamesTableStatement = this.connection.prepareStatement(createGamesTableSQL);
+            createGamesTableStatement.executeUpdate();
+            
+            PreparedStatement createUserGamesTableStatement = this.connection.prepareStatement(createUserGamesTable);
+            createUserGamesTableStatement.executeUpdate();
 
-        PreparedStatement createUserGamesTableStatement = this.connection.prepareStatement(createUserGamesTable);
-        createUserGamesTableStatement.executeUpdate();
+            PreparedStatement createPlayersTableStatement = this.connection.prepareStatement(createPlayersTable);
+            createPlayersTableStatement.executeUpdate();
+        }
     }
 
     public void fillReset(String username)

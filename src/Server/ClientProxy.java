@@ -1,6 +1,5 @@
 package Server;
 
-import Command.CommandContainer;
 import Command.ICommand;
 
 import java.util.ArrayList;
@@ -16,25 +15,31 @@ import java.util.logging.Handler;
 public class ClientProxy
 {
     public static ClientProxy SINGLETON = new ClientProxy();
-    
+
     public ClientProxy()
     {
         _m_usersCommands = new HashMap<>();
     }
-    
-    private Map<String, CommandContainer> _m_usersCommands;
-    
-    
-    public Map<String, CommandContainer> get_m_usersCommands() {
+
+    private Map<String, List<ICommand>> _m_usersCommands;
+
+    public Map<String, List<ICommand>> get_m_usersCommands() {
         return _m_usersCommands;
     }
-    
-    public void set_m_usersCommands(Map<String, CommandContainer> _m_usersCommands) {
+
+    public void set_m_usersCommands(Map<String, List<ICommand>> _m_usersCommands) {
         this._m_usersCommands = _m_usersCommands;
     }
-    
-    public CommandContainer getUserCommands(String username)
+
+    public List<ICommand> getUserCommands(String username, int lastCommandRecievedIndex)
     {
-        return _m_usersCommands.get(username);
+    	List<ICommand> debugOnly = _m_usersCommands.get(username);
+    	List<ICommand> userCommands = new ArrayList<>();
+    	for (int i = lastCommandRecievedIndex; i < debugOnly.size(); i++)
+    	{
+    		userCommands.add(debugOnly.get(i));
+    	}
+    		
+        return userCommands;
     }
 }
