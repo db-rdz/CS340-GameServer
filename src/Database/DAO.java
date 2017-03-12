@@ -1,14 +1,13 @@
 package Database;
 
-import Client.IClient.InvalidPassword;
-import Client.IClient.InvalidUsername;
-
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import Client.IClient.InvalidPassword;
+import Client.IClient.InvalidUsername;
 import GameModels.Game;
 import Server.IServer.UserAlreadyLoggedIn;
 import ServerModel.GameModels.PlayerModel.Player;
@@ -583,17 +582,18 @@ public class DAO implements iDAO {
     }
 
     @Override
-    public boolean updatePlayerTrainCards(String userName, String cardColor) throws SQLException {
+    public boolean updatePlayerTrainCards(String userName, String cardColor, String number) throws SQLException {
         _db.openConnection();
         PreparedStatement statement = null;
         boolean success = false;
         try
         {
-            String sql = "Update Players set ? = ? + 1 where Users.userName = ?";
+            String sql = "Update Players set ? = ? + ? where Users.userName = ?";
             statement = _db.connection.prepareStatement(sql);
-            statement.setString(1, userName);
-            statement.setString(2, userName);
-            statement.setString(3, userName);
+            statement.setString(1, cardColor);
+            statement.setString(2, cardColor);
+            statement.setString(3, number);
+            statement.setString(4, userName);
             if(statement.executeUpdate() == 1){
                 success = true;
             }

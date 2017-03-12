@@ -1,13 +1,26 @@
 package ServerModel.GameModels.CardsModel;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
+
+import org.apache.commons.lang3.tuple.Pair;
 
 /**
  * Created by benjamin on 25/02/17.
  */
 public class DestCard {
+    // should map the id of the map used on DestCardTypes
     private int _cardType;
+    private Pair<String, String> _destination;
+    private int points;
 
+    public DestCard(String city1, String city2){
+        _destination = Pair.of(city1, city2);
+    }
+
+    public int getPoints() {
+        return points;
+    }
+
+    public void setPoints(int points) {
+        this.points = points;
+    }
 }
