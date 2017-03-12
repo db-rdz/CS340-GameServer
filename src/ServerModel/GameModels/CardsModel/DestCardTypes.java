@@ -9,7 +9,7 @@ import java.util.HashMap;
  */
 
 public class DestCardTypes {
-    public static DestCard _SINGLETON = new DestCard();
+    public static DestCardTypes _SINGLETON = new DestCardTypes();
     private HashMap<Integer, ArrayList<String> > _destCards = new HashMap<Integer, ArrayList<String> >();
 
     // ArrayList index 0 = FROM city

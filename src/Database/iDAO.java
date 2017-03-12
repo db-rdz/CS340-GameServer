@@ -57,9 +57,10 @@ public interface iDAO {
     //By getting the player you will be getting their Train/Dest cards
     public Player getPlayerByUserName(String userName) throws SQLException;
 
-    //Update the train cards of a player, increments current value by 1
-    //cardColor is the color of the train card which are column names on the players table
-    public boolean updatePlayerTrainCards(String userName, String cardColor) throws SQLException;
+    //Update the train cards of a player, increments  or decrements current value by the number provided
+    // Example: update("Username", "blue", "1") or update("Username", "blue", "-1")
+    //cardColor is the color of the train card which are column names on the players table   "-"
+    public boolean updatePlayerTrainCards(String userName, String cardColor, String number) throws SQLException;
 
     // Updates a destination card of a player
     // card is the name of the card you want to update (column of table) options:
@@ -68,5 +69,5 @@ public interface iDAO {
     public boolean updatePlayerDestCards(String userName, String cardColumn, Integer newCardType) throws SQLException;
 
     //Moves a player to another game and resets his stats/cards
-    public boolean updatePlayerToNewGame(String userName, int newGameId);
+    public boolean updatePlayerToNewGame(String userName, int newGameId) throws SQLException;
 }
