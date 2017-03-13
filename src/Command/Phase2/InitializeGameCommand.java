@@ -7,6 +7,8 @@ import Command.ICommand;
 import GameModels.Game;
 import Server.IServer.GameIsFullException;
 import Server.IServer.UserAlreadyLoggedIn;
+import ServerModel.GameModels.CardsModel.DestCard;
+import ServerModel.GameModels.CardsModel.TrainCard;
 
 /**
  * FROM SERVER -> CLIENT
@@ -19,8 +21,18 @@ import Server.IServer.UserAlreadyLoggedIn;
  * Created by natha on 2/27/2017.
  */
 
-public class InitializeGameCommand implements ICommand {
+//Ryan: the command sends back the 4 train cards and 3 destCards
 
+public class InitializeGameCommand implements ICommand {
+	private List<TrainCard> hand;
+	private List<DestCard> destinationCards;
+	
+	public InitializeGameCommand(List<TrainCard> hand, List<DestCard> dc)
+	{
+		this.hand = hand;
+		destinationCards = dc;
+	}
+	
 	@Override
 	public List<ICommand> execute() throws GameIsFullException, UserAlreadyLoggedIn {
 		// TODO Auto-generated method stub
@@ -37,6 +49,16 @@ public class InitializeGameCommand implements ICommand {
 	public User getUser() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+	
+	public List<TrainCard> getHand()
+	{
+		return hand;
+	}
+	
+	public List<DestCard> getDestCards()
+	{
+		return destinationCards;
 	}
 
 }

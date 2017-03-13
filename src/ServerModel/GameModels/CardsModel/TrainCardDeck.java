@@ -12,7 +12,11 @@ public class TrainCardDeck {
     List<TrainCard> _fiveCards = new ArrayList<TrainCard>();
 
     public TrainCardDeck() {
-        fillDeck();
+    	fillDeck();
+    	for (int i = 0; i < 5; i++)
+    	{
+    		_fiveCards.add(drawTop());
+    	}
     }
 
     public void shuffle(){
@@ -32,12 +36,14 @@ public class TrainCardDeck {
         return _fiveCards;
     }
 
-    public Boolean getFromTheFiveCards( int chosenCardIndex ) {
-        if(_fiveCards.remove(chosenCardIndex) != null) {
+    // Ryan : changed return type so we can retrieve the card we get
+    public TrainCard getFromTheFiveCards( int chosenCardIndex ) {
+        TrainCard selectedCard = _fiveCards.get(chosenCardIndex);
+    	if(_fiveCards.remove(chosenCardIndex) != null) {
             _fiveCards.add(drawTop());
-            return true;
+            return selectedCard;
         }
-        return false;
+        return null;
     }
 
     private void fillDeck() {

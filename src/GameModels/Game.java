@@ -1,5 +1,7 @@
 package GameModels;
 
+import ServerModel.GameModels.CardsModel.DestCardDeck;
+import ServerModel.GameModels.CardsModel.TrainCardDeck;
 import ServerModel.GameModels.PlayerModel.Player;
 import UserModel.User;
 import com.sun.org.apache.xpath.internal.operations.Bool;
@@ -69,6 +71,17 @@ public class Game implements iGame {
     private User player4 = new User();
     
     private User player5 = new User();
+    
+    /**
+     * Ryan
+     * We need to store the deck of cards, the board, and the chat in each game
+     */
+    
+    private TrainCardDeck _deck = new TrainCardDeck();
+    
+    private DestCardDeck _destCards = new DestCardDeck();
+    
+    private List<String> _str_chatRoom = new ArrayList<>();    
 
     //-----------------------------------------STATIC FUNCTIONS----------------------------------------//
 
@@ -294,6 +307,21 @@ public class Game implements iGame {
             default:
                 return null;
         }
+    }
+    
+    public TrainCardDeck getDeck()
+    {
+    	return _deck;
+    }
+    
+    public DestCardDeck getDestCards()
+    {
+    	return _destCards;
+    }
+    
+    public List<String> getChatRoom()
+    {
+    	return _str_chatRoom;
     }
 
 }

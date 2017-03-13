@@ -19,11 +19,12 @@ import java.util.List;
 public class ShowMessageCommand implements ICommand {
 
     //Data members
-    private String str_message;
+	//Ryan: updated entire list instead of just adding one message
+    private List<String> chatRoom;
 
     //Constructor
-    public ShowMessageCommand(String str_message) {
-        this.str_message = str_message;
+    public ShowMessageCommand(List<String> chat) {
+        chatRoom = chat;
     }
 
     //Functions
@@ -46,7 +47,7 @@ public class ShowMessageCommand implements ICommand {
 
 
 
-    public String getStr_message() {
-        return str_message;
+    public List<String> getChatRoom() {
+        return chatRoom;
     }
 }
