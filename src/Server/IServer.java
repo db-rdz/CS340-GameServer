@@ -3,6 +3,8 @@ import Client.IClient;
 import Client.User;
 import Command.ICommand;
 import GameModels.Game;
+import ServerModel.GameModels.CardsModel.TrainCard;
+import ServerModel.GameModels.RouteModel.iRoute;
 import UserModel.*;
 
 import java.util.List;
@@ -25,7 +27,12 @@ public interface IServer {
     public List<ICommand> addJoinableGameToServer(Game game, String authenticationCode);
     public List<ICommand> addWaitingGame(Game game);
     public List<ICommand> removeGame(Game game);
-    public List<ICommand> startGame(int gameId, List<String> usernamesInGame);
+    public List<ICommand> startGame(int gameId, List<String> usernamesInGame, String strAuthenticationCode);
     public List<ICommand> addPlayer(String str_authentication_code, int iGameId) throws GameIsFullException;
     public List<ICommand> logout(String str_authentication_code);
+    public List<ICommand> broadcastToChatCommand(int gameId, String authenticationToken, String message);
+    public List<ICommand> claimRoute(int gameId, String authenticationCode, iRoute route);
+    public List<ICommand> getTopDeckTrainCard(int gameId);
+    public List<ICommand> getFaceUpTableTrainCard(int gameId, int cardIndex, boolean isWild);
+    
 }

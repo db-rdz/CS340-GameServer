@@ -3,6 +3,7 @@ package Command.Phase2;
 import Client.User;
 import Command.ICommand;
 import Server.IServer;
+import Server.ServerFacade;
 import GameModels.Game;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -18,15 +19,30 @@ import java.util.List;
  */
 
 public class BroadcastToChatCommand implements ICommand {
+    //Data members
+	// Ryan: added authenticationCode so that I can display what user sent the message in the chatroom
+    String message;
+    String str_authenticationCode;
+    int gameId;
+
+    //Constructors
+    public BroadcastToChatCommand(){}
+    public BroadcastToChatCommand(int g, String code, String messageToSend) {
+        str_authenticationCode = code;
+    	message = messageToSend;
+        gameId = g;
+    }
+
+    //Functions
     @Override
     public List<ICommand> execute() throws IServer.GameIsFullException {
-        return null;
+        return ServerFacade.SINGLETON.broadcastToChatCommand(gameId, str_authenticationCode, message);
     }
 
     @JsonIgnore
     @Override
     public String getAuthenticationCode() {
-        return null;
+        return str_authenticationCode;
     }
 
     @JsonIgnore
@@ -35,5 +51,17 @@ public class BroadcastToChatCommand implements ICommand {
         return null;
     }
 
-
+    public String getMessage() {
+        return message;
+    }
+    
+    public int getGameId()
+    {
+    	return gameId;
+    }
+    
+    public String get_strAuthenticationCode()
+    {
+    	return str_authenticationCode;
+    }
 }
