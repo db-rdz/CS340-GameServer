@@ -3,8 +3,10 @@ package Command.Phase2;
 import Client.User;
 import Command.ICommand;
 import Server.IServer;
+import Server.ServerFacade;
 import GameModels.Game;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import ServerModel.GameModels.RouteModel.iRoute;
 
 import java.util.List;
 
@@ -17,21 +19,49 @@ import java.util.List;
  */
 
 public class ClaimRouteCommand implements ICommand {
+    //Data members
+    private iRoute route;
+    private int gameId;
+    String authenticationCode;
+
+    //Constructors
+    public ClaimRouteCommand(){}
+    public ClaimRouteCommand(int g, String code, iRoute route1) {
+        route = route1;
+        gameId = g;
+        authenticationCode = code;
+    }
+
+    //Functions
     @Override
     public List<ICommand> execute() throws IServer.GameIsFullException {
-        return null;
+        return ServerFacade.SINGLETON.claimRoute(gameId, authenticationCode, route);
     }
 
     @JsonIgnore
     @Override
     public String getAuthenticationCode() {
-        return null;
+        return authenticationCode;
     }
 
     @JsonIgnore
     @Override
     public User getUser() {
         return null;
+    }
+
+    public iRoute getRoute() {
+        return route;
+    }
+    
+    public int getGameId()
+    {
+    	return gameId;
+    }
+    
+    public String getStrAuthenticationCode()
+    {
+    	return authenticationCode;
     }
 
 }

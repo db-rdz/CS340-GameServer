@@ -13,6 +13,11 @@ import Command.Phase2.*;
 import Database.DAO;
 import GameModels.Game;
 import ServerModel.*;
+import ServerModel.GameModels.CardsModel.DestCard;
+import ServerModel.GameModels.CardsModel.DestCardDeck;
+import ServerModel.GameModels.CardsModel.TrainCard;
+import ServerModel.GameModels.CardsModel.TrainCardDeck;
+import ServerModel.GameModels.RouteModel.iRoute;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -169,8 +174,9 @@ public class ServerFacade implements IServer {
     }
     
     @Override
-    public List<ICommand> startGame(int gameId, List<String> usernamesInGame) {
-		try {
+    public List<ICommand> startGame(int gameId, List<String> usernamesInGame, String strAuthenticationCode) {
+		//TODO put authentication code in startGameCommand on client side
+    	try {
 			Game theGame = Game.getGameWithId(gameId);
 	        
 	        //send delete game command to all users not in game
@@ -209,26 +215,38 @@ public class ServerFacade implements IServer {
 	        } catch (SQLException e) {
 	            e.printStackTrace();
 	        }
+	        List<TrainCard> trainCards = null;
+	        List<DestCard> destCards = null;
+	        
+	        TrainCardDeck theTrainCardDeck = theGame.getDeck();
+	        DestCardDeck theDestCardDeck = theGame.getDestCards();
 	        if (theUser != null)
 	        {
 	            while (iter.hasNext()) {
-	                // hand = deck.getHand();
+	                // initialize each player's hand
+	            	trainCards = new ArrayList<>();
+	                for (int i = 0; i < 4; i++)
+	                {
+	                	trainCards.add(theTrainCardDeck.drawTop());
+	                }
+	                destCards = theDestCardDeck.drawTop3();
+	                
 	                username = (String) iter.next();
 	                if (username != theUser.get_S_username())
 	                {
-	                    // otherPlayerCommands = new ArrayList<>();
-	                    // otherPlayerCommands.add(new InitializeGameCommand(hand));
+	                    otherPlayerCommands = new ArrayList<>();
+	                    otherPlayerCommands.add(new InitializeGameCommand(trainCards, destCards));
 	                    ClientProxy.SINGLETON.get_m_usersCommands().get(username).addAll(otherPlayerCommands);
 	                }
 	                else
 	                {
-	                    // returnCommands.add(new InitializeGameCommand(hand));
+	                    returnCommands.add(new InitializeGameCommand(trainCards, destCards));
 	                }
 	            }
 	        }
 	        
 	        return returnCommands;
-		} catch (SQLException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	return null; //Meaning something went wrong here.
@@ -402,5 +420,110 @@ public class ServerFacade implements IServer {
         
         return commands;
     }
+
+ // Ryan
+	@Override
+	public List<ICommand> broadcastToChatCommand(int gameId, String authenticationToken, String message) {
+		// TODO Sends back the entire list of messages, prepends message with the username shows who sent the message
+		
+		Game theGame = Game.getGameWithId(gameId);
+		List<String> chatRoom = theGame.getChatRoom();
+		UserModel.User theUser;
+		String username = "";
+		try {
+			theUser = DAO._SINGLETON.getUserByAccessToken(authenticationToken);
+			username = theUser.get_S_username();
+			message = username + ": " + message;
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		chatRoom.add(message);
+		List<ICommand> returnCommands = new ArrayList<>();
+		returnCommands.add(new ShowMessageCommand(chatRoom));
+		
+		// send to all users in game
+		Iterator iter = theGame.get_M_idToUserInGame().keySet().iterator();
+		while(iter.hasNext())
+		{
+			String newUsername = (String) iter.next();
+			if (newUsername != username)
+			{
+				ClientProxy.SINGLETON.get_m_usersCommands().get(newUsername).addAll(returnCommands);
+			}
+		}
+		
+		return returnCommands;
+	}
+
+	// Ryan
+	@Override
+	public List<ICommand> claimRoute(int gameId, String authenticationCode, iRoute route) {
+		// TODO Need the route model
+		Game theGame = Game.getGameWithId(gameId);
+		String username = "";
+		UserModel.User theUser = null;
+		try {
+			theUser = DAO._SINGLETON.getUserByAccessToken(authenticationCode);
+			username = theUser.get_S_username();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		// tells the other players that the route was claimed
+		String routeName = "";
+		List<ICommand> returnCommands = new ArrayList<>();
+		returnCommands.add(new NotifyRouteClaimedCommand("The route from " + routeName + " has been claimed by " + username + "."));
+		
+		// increments the player's points on every player's screen
+		int points = 0;
+		//points - route.getPoints();	
+		returnCommands.add(new UpdatePointsCommand(points, username));
+				
+		// send to all users in game
+		Iterator iter = theGame.get_M_idToUserInGame().keySet().iterator();
+		while(iter.hasNext())
+		{
+			String newUsername = (String) iter.next();
+			if (newUsername != username)
+			{
+				ClientProxy.SINGLETON.get_m_usersCommands().get(newUsername).addAll(returnCommands);
+			}
+		}
+		
+		// decrease car count by the weight of the route claimed
+		int weight = 0;
+		//weight = route.getWeight();
+		returnCommands.add(new UpdateCarCountCommand(weight));
+		
+		
+		return returnCommands;
+	}
+
+	// Ryan
+	@Override
+	public List<ICommand> getTopDeckTrainCard(int gameId) {
+		// TODO Do we need to increment the number of train cards each player has on the other player's screens?
+		
+		//gets the game, gets the deck from the game, and draws the top card 
+		TrainCard theCard = Game.getGameWithId(gameId).getDeck().drawTop();
+		List<ICommand> returnCommands = new ArrayList<>();
+		returnCommands.add(new UpdatePlayerTrainCardsCommand(theCard));
+		return returnCommands;
+	}
+
+	// Ryan
+	@Override
+	public List<ICommand> getFaceUpTableTrainCard(int gameId, int cardIndex, boolean isWild) {
+		// TODO Do we need to increment the number of train cards each player has on the other player's screens?
+		
+		TrainCard theCard = Game.getGameWithId(gameId).getDeck().getFromTheFiveCards(cardIndex);
+		List<ICommand> returnCommands = new ArrayList<>();
+		returnCommands.add(new UpdatePlayerTrainCardsCommand(theCard));
+		return returnCommands;
+	}
+    
+    
 
 }

@@ -15,14 +15,18 @@ import java.util.List;
  * Created by natha on 2/27/2017.
  */
 
+// Ryan: added a username field so it can be sent to all users and the points can be deducted from each client
+
 public class UpdatePointsCommand implements ICommand {
 
     //Data members
     private int int_points_to_add;
+    private String str_username;
 
     //Constructor
-    public UpdatePointsCommand(int int_points_to_add) {
+    public UpdatePointsCommand(int int_points_to_add, String u) {
         this.int_points_to_add = int_points_to_add;
+        str_username = u;
     }
 
     //Functions
@@ -46,5 +50,10 @@ public class UpdatePointsCommand implements ICommand {
 
     public int getInt_points_to_add() {
         return int_points_to_add;
+    }
+    
+    public String getUsername()
+    {
+    	return str_username;
     }
 }

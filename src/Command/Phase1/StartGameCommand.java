@@ -11,6 +11,7 @@ import Server.ServerFacade;
 public class StartGameCommand implements ICommand {
     private int gameId;
     private List<String> usernamesInGame;
+    private String _strAuthenticationCode;
     
     private StartGameCommand(){}
     public StartGameCommand(int g, List<String> k){
@@ -25,13 +26,13 @@ public class StartGameCommand implements ICommand {
 
     @Override
     public List<ICommand> execute(){
-    	ServerFacade.SINGLETON.startGame(gameId, usernamesInGame);
+    	ServerFacade.SINGLETON.startGame(gameId, usernamesInGame, _strAuthenticationCode);
         return null;
     }
 
     @Override
     public String getAuthenticationCode(){
-        return null;}
+        return _strAuthenticationCode;}
 
     public int getGameId() {
         return gameId;
@@ -39,6 +40,11 @@ public class StartGameCommand implements ICommand {
 
     public List<String> getUsernamesInGame() {
         return usernamesInGame;
+    }
+    
+    public String getStrAuthenticationCode()
+    {
+    	return _strAuthenticationCode;
     }
 }
 
