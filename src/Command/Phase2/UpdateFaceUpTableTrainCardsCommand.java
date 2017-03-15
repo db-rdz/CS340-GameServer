@@ -20,11 +20,11 @@ import java.util.List;
 public class UpdateFaceUpTableTrainCardsCommand implements ICommand {
 
     //Data members
-    private TrainCard trainCard; //TODO: make into a list?
+    private List<TrainCard> trainCards; //TODO: make into a list?
 
     //Constructor
-    public UpdateFaceUpTableTrainCardsCommand(TrainCard trainCard) {
-        this.trainCard = trainCard;
+    public UpdateFaceUpTableTrainCardsCommand(List<TrainCard> trainCards) {
+        this.trainCards = trainCards;
     }
 
     //Functions
@@ -47,7 +47,7 @@ public class UpdateFaceUpTableTrainCardsCommand implements ICommand {
 
 
 
-    public TrainCard getTrainCard() {
-        return trainCard;
+    public List<TrainCard> getTrainCard() {
+        return trainCards;
     }
 }
