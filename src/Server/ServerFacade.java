@@ -3,9 +3,9 @@ package Server;
 import Client.IClient;
 import Client.User;
 import Command.ICommand;
-import Command.Phase1.AddJoinableToClientCommand;
+import Command.Phase1.AddGameToJoinableListCommand;
+import Command.Phase1.AddJoinableGameCommand;
 import Command.Phase1.AddPlayerToClientCommand;
-import Command.Phase1.AddWaitingToClientCommand;
 import Command.Phase1.DeleteGameCommand;
 import Command.Phase1.ListJoinableCommand;
 import Command.Phase1.LoginRegisterResponseCommand;
@@ -25,6 +25,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import com.sun.corba.se.pept.transport.EventHandler;
 
 
 /**
@@ -157,20 +159,25 @@ public class ServerFacade implements IServer {
     
     @Override
     public List<ICommand> removeGame(Game game) {
-        
-        ICommand deleteGameCommand = new DeleteGameCommand(game.get_i_gameId());
-        
-        List<ICommand> commands = new ArrayList<>();
-        commands.add(deleteGameCommand);
-
-        String username = "";
-        
-        for (int i = 0; i < UserModel.User.get_L_listOfAllUsers().size(); i++) {
-            username = UserModel.User.get_L_listOfAllUsers().get(i).get_S_username();
-    		ClientProxy.SINGLETON.get_m_usersCommands().get(username).addAll(commands);
-        } //TODO: Include this in the ServerCommunicator.
-        
-        return commands;
+        try {
+        	ICommand deleteGameCommand = new DeleteGameCommand(game.get_i_gameId());
+        	
+        	List<ICommand> commands = new ArrayList<>();
+        	commands.add(deleteGameCommand);
+        	
+        	String username = "";
+        	List<UserModel.User> users = DAO._SINGLETON.getAllUsers();
+        	for (int i = 0; i < users.size(); i++) {
+        		username = users.get(i).get_S_username();
+        		ClientProxy.SINGLETON.get_m_usersCommands().get(username).addAll(commands);
+        	} //TODO: Include this in the ServerCommunicator.
+        	
+        	return commands;
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+        return null;
     }
     
     @Override
@@ -186,7 +193,7 @@ public class ServerFacade implements IServer {
 	        commands.add(deleteGameCommand);
 	        
 	        String username = "";
-	        List<UserModel.User> users = UserModel.User.get_L_listOfAllUsers();
+	        List<UserModel.User> users = DAO._SINGLETON.getAllUsers();
 	         
 	        for (UserModel.User user : users) {
 	            username = user.get_S_username();
@@ -307,7 +314,7 @@ public class ServerFacade implements IServer {
                 }
 
 	            List<ICommand> returnCommands = new ArrayList<>();
-	            returnCommands.add(new AddWaitingToClientCommand(theGame.get_i_gameId(), usernames, false));
+	            returnCommands.add(new AddJoinableGameCommand(theGame.get_i_gameId(), usernames, false));
 	            
 	            return returnCommands;
             } 
@@ -349,9 +356,10 @@ public class ServerFacade implements IServer {
             }
             Game.insertInAvailableGames(theGame);
             Game.mapGameToId(theGame, gameId);
+           
             
             List<ICommand> commands = new ArrayList<>();
-            commands.add(new AddJoinableToClientCommand(theGame));
+            commands.add(new AddGameToJoinableListCommand(theGame.get_i_gameId()));
             
             String username = "";
             Map<String, List<ICommand>> copy = new HashMap<>();
@@ -370,12 +378,11 @@ public class ServerFacade implements IServer {
             
             List<ICommand> returnCommands = new ArrayList<>();
 //            returnCommands.add(new AddPlayerToClientCommand(theUser.get_S_username(), theGame.get_i_gameId())); //The creator needs to be in the game he created
-//            returnCommands.add(new AddWaitingToClientCommand(theGame));
             List<String> usernames = new ArrayList<>();
             for (int i = 1; i <= theGame.get_numberOfPlayers(); i++) {
             	usernames.add(theGame.getPlayer(i).get_S_username());
             }
-            returnCommands.add(new AddWaitingToClientCommand(theGame.get_i_gameId(), usernames, true));
+            returnCommands.add(new AddJoinableGameCommand(theGame.get_i_gameId(), usernames, true));
                         
             return returnCommands;
             
@@ -391,11 +398,9 @@ public class ServerFacade implements IServer {
     public List<ICommand> addWaitingGame(Game game) {
         // send to user who called this function only
         ICommand deleteGameCommand = new DeleteGameCommand(game.get_i_gameId());
-//        ICommand addWaitingToClientCommand = new AddWaitingToClientCommand(game);
         
         List<ICommand> commands = new ArrayList<>();
         commands.add(deleteGameCommand);
-//        commands.add(addWaitingToClientCommand);
         
         return commands;
     }

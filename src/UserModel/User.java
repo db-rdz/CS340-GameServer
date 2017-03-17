@@ -38,7 +38,7 @@ public class User implements iUser {
     /**Maps a string () to a user*/
     /** Note: The function of finding a user with a determined id I think should be done here to keep us organized */
     private static Map<String, User> _M_usernameToLoggedInUser = new HashMap();
-    private  List<User> _L_listOfAllUsers = new ArrayList<>();
+    private List<User> _L_listOfAllUsers = new ArrayList<>();
 
     //_________________________________________________________________________________________________________//
 
@@ -140,40 +140,11 @@ public class User implements iUser {
         this._L_listOfAllUsers = _L_listOfAllUsers;
     }
     
-    public static List<User> get_L_listOfAllUsers() {
-		return null;
+    
+    public List<User> get_L_listOfAllUsers() {
+		return _L_listOfAllUsers;
 	}
 
-//    public String get_Username() { return _S_username; }
-//    public void set_Username(String username) { _S_username = username; }
-//
-//    public String get_Password(){ return _S_password; }
-//    public void set_Password(String password ) { _S_password = password; }
-//
-//    public String get_Token(){ return _S_token; }
-//    public void set_Token(String token) { _S_token = token; }
-//
-//
-//    public Boolean isUserInGame() { return _B_isInGame; }
-//    public void set_UserGameStatus(Boolean _B_isInGame) { this._B_isInGame = _B_isInGame; }
-//
-//    public List<Game> getJoinedGames() { return _L_joinedGames; }
-//    public void setJoinedGameList(List<Game> _L_joinedGames) { this._L_joinedGames = _L_joinedGames; }
-//
-//    public static List<User> get_L_listOfAllUsers() { //TODO: Implement!
-//        return null;
-//    }
-//
-//    public Boolean isLoggedIn() {
-//        return _B_isLoggedIn;
-//    }
-//    public void set_B_isLoggedIn(Boolean _B_isLoggedIn) {
-//        this._B_isLoggedIn = _B_isLoggedIn;
-//    }
-//
-//    public static Map<String, User> get_M_idToUser() {
-//        return _M_idToUser;
-//    }
 
 
 
