@@ -523,9 +523,15 @@ public class ServerFacade implements IServer {
 	public List<ICommand> getFaceUpTableTrainCard(int gameId, int cardIndex, boolean isWild) {
 		// TODO Do we need to increment the number of train cards each player has on the other player's screens?
 		
-		TrainCard theCard = Game.getGameWithId(gameId).getDeck().getFromTheFiveCards(cardIndex);
+		Game theGame = Game.getGameWithId(gameId);
+		TrainCardDeck theDeck = theGame.getDeck();
+		TrainCard theCard = theDeck.getFromTheFiveCards(cardIndex);
+		// update the card count of that type for that player
+		
+		List<TrainCard> fiveCards = theDeck.getFiveCards();
+		
 		List<ICommand> returnCommands = new ArrayList<>();
-		returnCommands.add(new UpdatePlayerTrainCardsCommand(theCard));
+		returnCommands.add(new UpdateFaceUpTableTrainCardsCommand(fiveCards));
 		return returnCommands;
 	}
     
