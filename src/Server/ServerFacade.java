@@ -94,9 +94,7 @@ public class ServerFacade implements IServer {
                 ServerModel.SINGLETON.logIn(theUser.get_S_username());
                 System.out.println("Logging in user: " + DAO._SINGLETON.getUserByAccessToken(theUser.get_S_token()).get_S_username());
                 System.out.println("Authorization code: " + theUser.get_S_token());
-                
-//                new GetCommandsCommand(theUser.get_S_username()).execute();
-                
+                                
                 return commands;
             }
         } catch (SQLException e) {
@@ -186,76 +184,58 @@ public class ServerFacade implements IServer {
     	try {
 			Game theGame = Game.getGameWithId(gameId);
 	        
-	        //send delete game command to all users not in game
-	        ICommand deleteGameCommand = new DeleteGameCommand(gameId);
-	        
-	        List<ICommand> commands = new ArrayList<>();
-	        commands.add(deleteGameCommand);
-	        
-	        String username = "";
-	        List<UserModel.User> users = DAO._SINGLETON.getAllUsers();
-	         
-	        for (UserModel.User user : users) {
-	            username = user.get_S_username();
-	            ClientProxy.SINGLETON.get_m_usersCommands().put(username, commands);
-	        }
-	        
-	        // send to all users in game
-	        
-	        //        Iterator iter = theGame.get_M_idToGame().values().iterator(); //TODO: is this correct??
-	        Iterator iter = theGame.get_M_idToUserInGame().keySet().iterator(); 
-	        //this should be an iterator through the set of usernames of all users in the game
-	        
-	        
-	        
-	        // TODO: get the deck of cards from the game and assign a hand to each player
-	        
-	        // Collection<TrainCard> deck = theGame.getDeck();
-	        // Collection<TrainCard> hand = null;
-	        
+	        // send to all users in game	        
 	        List<ICommand> otherPlayerCommands = null;
 	        List<ICommand> returnCommands = new ArrayList<>();
-	        
-	        UserModel.User theUser = null;
-	        try {
-	            theUser = DAO._SINGLETON.getUserByAccessToken(strAuthenticationCode); //TODO: Change to use list of usernames
-	        } catch (SQLException e) {
-	            e.printStackTrace();
-	        }
+
 	        List<TrainCard> trainCards = null;
 	        List<DestCard> destCards = null;
 	        
 	        TrainCardDeck theTrainCardDeck = theGame.getDeck();
 	        DestCardDeck theDestCardDeck = theGame.getDestCards();
-	        if (theUser != null)
-	        {
-	            while (iter.hasNext()) {
-	                // initialize each player's hand
-	            	trainCards = new ArrayList<>();
-	                for (int i = 0; i < 4; i++)
-	                {
-	                	trainCards.add(theTrainCardDeck.drawTop());
-	                }
-	                destCards = theDestCardDeck.drawTop3();
-	                
-	                username = (String) iter.next();
-	                if (username != theUser.get_S_username())
-	                {
-	                    otherPlayerCommands = new ArrayList<>();
-	                    otherPlayerCommands.add(new InitializeGameCommand(trainCards, destCards));
-	                    ClientProxy.SINGLETON.get_m_usersCommands().get(username).addAll(otherPlayerCommands);
-	                }
-	                else
-	                {
-	                    returnCommands.add(new InitializeGameCommand(trainCards, destCards));
-	                }
-	            }
-	        }
 	        
+        	trainCards = new ArrayList<>();
+            for (int j = 0; j < 4; j++)
+            {
+            	trainCards.add(theTrainCardDeck.drawTop());
+            }
+            destCards = theDestCardDeck.drawTop3();
+
+            returnCommands.add(new InitializeGameCommand(trainCards, destCards)); //The creator's cards
+
+            for (int i = 1; i < usernamesInGame.size(); i++) { //Ignore the game creator, start at Player 2
+                // initialize each player's hand
+            	trainCards = new ArrayList<>();
+                for (int j = 0; j < 4; j++) //Create everyone else's cards
+                {
+                	trainCards.add(theTrainCardDeck.drawTop());
+                }
+                destCards = theDestCardDeck.drawTop3();
+                                
+                otherPlayerCommands = new ArrayList<>();
+                otherPlayerCommands.add(new InitializeGameCommand(trainCards, destCards));
+        		System.out.println(usernamesInGame.get(i) + " receiving commmands: " + otherPlayerCommands);
+                ClientProxy.SINGLETON.get_m_usersCommands().get(usernamesInGame.get(i)).addAll(otherPlayerCommands);  
+            }
+            
+	        //TODO: send delete game command to all users not in game
+//	        ICommand deleteGameCommand = new DeleteGameCommand(gameId);
+//	        
+//	        List<ICommand> commands = new ArrayList<>();
+//	        commands.add(deleteGameCommand);
+//	        
+//	        String username = "";
+//	        List<UserModel.User> users = DAO._SINGLETON.getAllUsers();
+//	         
+//	        for (UserModel.User user : users) {
+//	        		username = user.get_S_username();
+//	            	ClientProxy.SINGLETON.get_m_usersCommands().get(username, commands);
+//	        }
 	        return returnCommands;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+    System.err.println("Error @StartGame");
 	return null; //Meaning something went wrong here.
 }
 
@@ -298,10 +278,10 @@ public class ServerFacade implements IServer {
                 	
                 	//Only gives the AddPlayerToClientCommand to users that are in a specific game.
                 	if (!user.get_S_token().equals(theUser.get_S_token())) {
-                		System.out.println(user.get_S_username() + " receiving commmands: " + commands);
+//                		System.out.println(user.get_S_username() + " receiving commmands: " + commands);
                 		ClientProxy.SINGLETON.get_m_usersCommands().get(user.get_S_username()).addAll(commands);
-                		debug = ClientProxy.SINGLETON.get_m_usersCommands();
-                		System.out.println(user.get_S_username() + " has these commands: " + debug.get(user.get_S_username()));
+//                		debug = ClientProxy.SINGLETON.get_m_usersCommands();
+//                		System.out.println(user.get_S_username() + " has these commands: " + debug.get(user.get_S_username()));
                 	}
                 	
             }
@@ -334,7 +314,7 @@ public class ServerFacade implements IServer {
             DAO._SINGLETON.deleteAllGames();
             @SuppressWarnings("unused")
 			Boolean value = DAO._SINGLETON.addGame(game);
-            Game theGame = new Game();
+            Game theGame = new Game(); //initialize
             
             Integer gameId = DAO._SINGLETON.getAllGames().size(); //The size == gameid
             UserModel.User theUser = DAO._SINGLETON.getUserByAccessToken(str_authentication_code);
@@ -357,27 +337,28 @@ public class ServerFacade implements IServer {
             Game.insertInAvailableGames(theGame);
             Game.mapGameToId(theGame, gameId);
            
-            
             List<ICommand> commands = new ArrayList<>();
             commands.add(new AddGameToJoinableListCommand(theGame.get_i_gameId()));
             
             String username = "";
             Map<String, List<ICommand>> copy = new HashMap<>();
             
-            //Sends AddJoinableGameCommands to only logged in users.
+            //Sends AddGameToJoinableListCommand to only logged in users.
             Iterator iterator = UserModel.User.get_M_usernameToLoggedInUser().values().iterator();
+//            Map<String, List<ICommand>> putIntoClientProxy = ClientProxy.SINGLETON.get_m_usersCommands();
+            
             while (iterator.hasNext())
             {
             	UserModel.User newUser = (UserModel.User) iterator.next();
-            	if (!newUser.get_S_token().equals(str_authentication_code)) {
-            		ClientProxy.SINGLETON.get_m_usersCommands().get(username).addAll(commands);
-            		
+            	if (!newUser.get_S_token().equals(str_authentication_code)) { //Doesn't send the game command to the creator
+            		username = newUser.get_S_username();
+            		ClientProxy.SINGLETON.get_m_usersCommands().get(username).addAll(commands);            		
             	}
             }
+//            ClientProxy.SINGLETON.set_m_usersCommands(putIntoClientProxy);
             
             
             List<ICommand> returnCommands = new ArrayList<>();
-//            returnCommands.add(new AddPlayerToClientCommand(theUser.get_S_username(), theGame.get_i_gameId())); //The creator needs to be in the game he created
             List<String> usernames = new ArrayList<>();
             for (int i = 1; i <= theGame.get_numberOfPlayers(); i++) {
             	usernames.add(theGame.getPlayer(i).get_S_username());

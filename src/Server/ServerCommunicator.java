@@ -11,7 +11,9 @@ import Command.Phase1.LogoutCommand;
 import Command.Phase1.RegisterCommand;
 import Command.Phase1.StartGameCommand;
 import Database.DAO;
+import Deserializers.PairDeserializer;
 import GameModels.Game;
+import Serializers.PairSerializer;
 import Server.IServer.GameIsFullException;
 import Server.IServer.UserAlreadyLoggedIn;
 import jdk.nashorn.internal.ir.CatchNode;
@@ -45,6 +47,8 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 
+import org.apache.commons.lang3.tuple.Pair;
+
 
 /**
  * Created by RyanBlaser on 2/6/17.
@@ -71,8 +75,20 @@ public class ServerCommunicator {
         SINGLETON.run();
     }
     
+    /**
+     * Nathan
+     * This allows Jackson to deserialize the apache.lang3.tuple.Pair class properly.
+     */
+    public void addPairModule() {
+        final SimpleModule module = new SimpleModule();
+        module.addSerializer(Pair.class, new PairSerializer());
+        module.addDeserializer(Pair.class, new PairDeserializer());
+        objectMapper.registerModule(module);
+    }
+    
     private void run()
     {
+    	addPairModule();
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         try {
             server = HttpServer.create(new InetSocketAddress(SERVER_PORT_NUMBER), MAX_WAITING_CONNECTION);
@@ -103,7 +119,7 @@ public class ServerCommunicator {
             else
             {
                 System.out.println("Host ip address: " + probableAddress);
-                System.out.println("Host server port: " + SERVER_PORT_NUMBER + "\n");
+                System.out.println("Host server port: " + SERVER_PORT_NUMBER);
             }
             
         } catch (IOException e) {
@@ -129,8 +145,8 @@ public class ServerCommunicator {
     		try {
         
     			input = objectMapper.readValue(exchange.getRequestBody(), ICommand.class);
-    			System.out.println("\njackson ICommand: " + input);
-    			System.out.println("Executing " + input);
+//    			System.out.println("\njackson ICommand: " + input);
+    			System.out.println("\nExecuting " + input);
         
     		} catch (Exception e) {
     			e.printStackTrace();
@@ -147,7 +163,8 @@ public class ServerCommunicator {
 	    OutputStreamWriter osw = new OutputStreamWriter(os);
 	    try {
 	    	String theResponse = objectMapper.writerWithType(new TypeReference<List<ICommand>>() {
-	    	}).writeValueAsString(response);	    
+	    	}).writeValueAsString(response);	
+	    	System.out.println(theResponse);
 	    	exchange.sendResponseHeaders(200, theResponse.length());
 	    	osw.write(theResponse);
 	    	osw.close();
@@ -169,7 +186,7 @@ public class ServerCommunicator {
 			ICommand input = null;
 			try {
 				input = objectMapper.readValue(exchange.getRequestBody(), ICommand.class);
-				System.out.println("\njackson Icommand: " + input);
+    			System.out.println("\nExecuting " + input);
 				List<ICommand> response = input.execute();
 				
 			    OutputStream os = exchange.getResponseBody();
