@@ -656,7 +656,7 @@ public class DAO implements iDAO {
 		}
     }
 
-    private void updateUserToken(String userName, String token)
+    public void updateUserToken(String userName, String token)
     {
     	_db.openConnection();
 

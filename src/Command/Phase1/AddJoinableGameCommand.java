@@ -7,16 +7,14 @@ import Client.User;
 import Command.ICommand;
 import GameModels.Game;
 
-public class AddWaitingToClientCommand implements ICommand{ // sent after changes from what List... commands sent
+public class AddJoinableGameCommand implements ICommand{ // sent after changes from what List... commands sent
 	
 	private int gameId;
 	private List<String> usernames;
 	private Boolean isCreator;
-//  private Game game;
-	public AddWaitingToClientCommand(){}
-//  public AddWaitingToClientCommand(Game g){
-//    game = g;}
-	public AddWaitingToClientCommand(int id, List<String> names, Boolean creator) {
+	
+	public AddJoinableGameCommand(){}
+	public AddJoinableGameCommand(int id, List<String> names, Boolean creator) {
 		gameId = id;
 		usernames = names;
 		isCreator = creator;
@@ -38,7 +36,6 @@ public class AddWaitingToClientCommand implements ICommand{ // sent after change
 	public List<ICommand> execute(){
 	  return null;
 	}
-//  public Game getGame() { return game; }
 	
 	public int getGameId() {
 		return gameId;
