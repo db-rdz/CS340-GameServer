@@ -85,9 +85,24 @@ public class ServerCommunicator {
         objectMapper.registerModule(module);
     }
     
+    public void eraseAllAuthenticationTokens() {
+    	try {
+    		List<UserModel.User> allUsers = DAO._SINGLETON.getAllUsers();
+			int amountOfUsers = DAO._SINGLETON.getAllUsers().size();
+			for (int i = 0; i < amountOfUsers; i++) {
+				DAO._SINGLETON.updateUserToken(allUsers.get(i).get_S_username(), "");
+			}
+		} catch (SQLException e) {
+		
+			e.printStackTrace();
+		}
+    }
+    
     private void run()
     {
     	addPairModule();
+    	eraseAllAuthenticationTokens();
+    	
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         try {
             server = HttpServer.create(new InetSocketAddress(SERVER_PORT_NUMBER), MAX_WAITING_CONNECTION);
