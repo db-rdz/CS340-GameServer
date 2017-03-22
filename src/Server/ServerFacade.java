@@ -308,12 +308,12 @@ public class ServerFacade implements IServer {
     
     
     @Override
-    public List<ICommand> addJoinableGameToServer(Game game, String str_authentication_code) {
+    public List<ICommand> addJoinableGameToServer(String str_authentication_code) {
         
         try {
             DAO._SINGLETON.deleteAllGames();
             @SuppressWarnings("unused")
-			Boolean value = DAO._SINGLETON.addGame(game);
+			Boolean value = DAO._SINGLETON.addGame(new Game());
             Game theGame = new Game(); //initialize
             
             Integer gameId = DAO._SINGLETON.getAllGames().size(); //The size == gameid

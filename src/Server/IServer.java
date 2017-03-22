@@ -24,7 +24,7 @@ public interface IServer {
 
     public List<ICommand> login(String username, String password) throws IClient.InvalidUsername, IClient.InvalidPassword, UserAlreadyLoggedIn;
     public List<ICommand> register(String username, String password) throws IClient.UsernameAlreadyExists, UserAlreadyLoggedIn;
-    public List<ICommand> addJoinableGameToServer(Game game, String authenticationCode);
+    public List<ICommand> addJoinableGameToServer(String authenticationCode);
     public List<ICommand> addWaitingGame(Game game);
     public List<ICommand> removeGame(Game game);
     public List<ICommand> startGame(int gameId, List<String> usernamesInGame, String strAuthenticationCode);
