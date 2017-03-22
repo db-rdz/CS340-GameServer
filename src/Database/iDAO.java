@@ -12,19 +12,18 @@ import UserModel.User;
 
 /**
  * Created by benjamin on 10/02/17.
- * Created by benjamin on 10/02/17.
  */
 public interface iDAO {
 
     public User getUserFromId(int userId);
-
-//    public int getUserId(String userName);
     
     public void UpdateGamePlayer(int gameId, String username, int numberOfPlayersInGame) throws SQLException;
 
     public Game getGameFromId(int gameId);
 
     public Boolean login(String userName, String password) throws SQLException, InvalidUsername, InvalidPassword, UserAlreadyLoggedIn;
+    
+    public void updateUserToken(String username, String authenticationCode);
 
     public Boolean authenticateUserWithToken(String token) throws SQLException;
 

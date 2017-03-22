@@ -70,7 +70,6 @@ public class ServerCommunicator {
     
     public static void main(String[] args)
     {
-        //   	SERVER_PORT_NUMBER = Integer.parseInt(args[0]);
         SERVER_PORT_NUMBER = 8080;
         SINGLETON.run();
     }
@@ -164,7 +163,7 @@ public class ServerCommunicator {
 	    try {
 	    	String theResponse = objectMapper.writerWithType(new TypeReference<List<ICommand>>() {
 	    	}).writeValueAsString(response);	
-	    	System.out.println(theResponse);
+//	    	System.out.println(theResponse);
 	    	exchange.sendResponseHeaders(200, theResponse.length());
 	    	osw.write(theResponse);
 	    	osw.close();

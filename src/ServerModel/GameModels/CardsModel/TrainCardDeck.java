@@ -47,7 +47,7 @@ public class TrainCardDeck {
     }
 
     private void fillDeck() {
-        String[] cardType = {"RED", "WHITE", "ORANGE", "GREEN", "BLUE", "PURPLE", "YELLOW", "PINK", "RAINBOW"};
+        String[] cardType = {"redcard", "orangecard", "yellowcard", "greencard", "bluecard", "pinkcard", "whitecard",  "blackcard", "rainbowcard"};
         for (String color : cardType) {
             for (int i = 0; i < 12; i++){
                 TrainCard trainCard = new TrainCard(color);

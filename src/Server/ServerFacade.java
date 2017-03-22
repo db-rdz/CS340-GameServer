@@ -9,6 +9,7 @@ import Command.Phase1.AddPlayerToClientCommand;
 import Command.Phase1.DeleteGameCommand;
 import Command.Phase1.ListJoinableCommand;
 import Command.Phase1.LoginRegisterResponseCommand;
+import Command.Phase1.LogoutResponseCommand;
 import Command.Phase2.*;
 import Database.DAO;
 import GameModels.Game;
@@ -52,7 +53,6 @@ public class ServerFacade implements IServer {
                
                 List<ICommand> commands = new ArrayList<>();
 
-//                
                 if (theUser.get_L_joinedGames().isEmpty())
                 {
                     List<Game> games = ServerModel.SINGLETON.getAvailableGames();
@@ -92,7 +92,7 @@ public class ServerFacade implements IServer {
                 
                 ClientProxy.SINGLETON.get_m_usersCommands().put(username, new ArrayList<ICommand>());
                 ServerModel.SINGLETON.logIn(theUser.get_S_username());
-                System.out.println("Logging in user: " + DAO._SINGLETON.getUserByAccessToken(theUser.get_S_token()).get_S_username());
+                System.out.println("Logging in user: " + theUser.get_S_username());
                 System.out.println("Authorization code: " + theUser.get_S_token());
                                 
                 return commands;
@@ -388,23 +388,26 @@ public class ServerFacade implements IServer {
     
     
     @Override
-    public List<ICommand> logout(String str_authentication_code) {
-        ServerModel.SINGLETON.logOut(str_authentication_code);
-        //ICommand logoutCommand = new LogoutResponseCommand();
-
-        List<ICommand> commands = new ArrayList<>();
-        UserModel.User user = new UserModel.User();
-        
-        try {
-            user = DAO._SINGLETON.getUserByAccessToken(str_authentication_code);
-        } catch (SQLException e) {
+    public List<ICommand> logout(User user) {
+    	try {
+    		System.out.println("Logging out user: " + user.getUsername());
+    		System.out.println("Authorization code: " + user.getStr_authentication_code());
+    		
+	        ServerModel.SINGLETON.logOut(user.getStr_authentication_code());
+	        DAO._SINGLETON.updateUserToken(user.getUsername(), ""); //empty token means user is logged out
+	
+	        List<ICommand> commands = new ArrayList<>();
+	        commands.add(new LogoutResponseCommand());
+	        
+            
+            
+            return commands;
+            
+        } catch (Exception e) {
         	System.err.println("@logout");
             e.printStackTrace();
         }
-        System.out.println("Logging out user: " + user.get_S_username());
-        System.out.println("Authorization code: " + user.get_S_token());
-        
-        return commands;
+        return null;
     }
 
  // Ryan
