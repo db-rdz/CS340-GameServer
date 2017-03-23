@@ -5,6 +5,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+
+import com.sun.xml.internal.ws.api.pipe.ThrowableContainerPropertySet;
 
 import Client.IClient.InvalidPassword;
 import Client.IClient.InvalidUsername;
@@ -44,20 +47,23 @@ public class DAO implements iDAO {
     @Override
     public Boolean login(String userName, String password) throws SQLException, InvalidUsername, InvalidPassword, UserAlreadyLoggedIn {
         User dbUser = getUserByUserName(userName);
-        if(dbUser == null) {
-            return false;
-        }
-        if (!dbUser.get_S_username().equals(userName)) {
-        	throw new InvalidUsername();
-        }
+        Boolean isValid;
+        if(dbUser == null) { isValid = false; }
+        
+        try {
+        	if (dbUser.get_S_username().equals(userName)) { isValid = true; }
+        } catch (Exception e) { throw new InvalidUsername(); }
+        
+        if (!dbUser.get_S_token().equals("")) { throw new UserAlreadyLoggedIn(); }
+        
         if(password.equals(dbUser.get_S_password())) {
-            updateUserToken(userName, makeToken());
-            return true;
+        	updateUserToken(userName, makeToken());
+        	isValid = true;
         }
         else { //if the password doesn't match
         	throw new InvalidPassword();
         }
-//        return false;
+        return isValid;
     }
 
     @Override
@@ -656,7 +662,7 @@ public class DAO implements iDAO {
 		}
     }
 
-    private void updateUserToken(String userName, String token)
+    public void updateUserToken(String userName, String token)
     {
     	_db.openConnection();
 

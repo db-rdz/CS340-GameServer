@@ -16,6 +16,14 @@ public class DestCard {
         _destination = Pair.of(city1, city2);
     }
 
+    public int get_cardType() {
+		return _cardType;
+	}
+    
+    public Pair<String, String> get_destination() {
+		return _destination;
+	}
+    
     public int getPoints() {
         return points;
     }

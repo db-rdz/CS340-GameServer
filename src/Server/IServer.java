@@ -24,12 +24,12 @@ public interface IServer {
 
     public List<ICommand> login(String username, String password) throws IClient.InvalidUsername, IClient.InvalidPassword, UserAlreadyLoggedIn;
     public List<ICommand> register(String username, String password) throws IClient.UsernameAlreadyExists, UserAlreadyLoggedIn;
-    public List<ICommand> addJoinableGameToServer(Game game, String authenticationCode);
+    public List<ICommand> addJoinableGameToServer(String authenticationCode);
     public List<ICommand> addWaitingGame(Game game);
     public List<ICommand> removeGame(Game game);
     public List<ICommand> startGame(int gameId, List<String> usernamesInGame, String strAuthenticationCode);
     public List<ICommand> addPlayer(String str_authentication_code, int iGameId) throws GameIsFullException;
-    public List<ICommand> logout(String str_authentication_code);
+    public List<ICommand> logout(User user);
     public List<ICommand> broadcastToChatCommand(int gameId, String authenticationToken, String message);
     public List<ICommand> claimRoute(int gameId, String authenticationCode, iRoute route);
     public List<ICommand> getTopDeckTrainCard(int gameId);

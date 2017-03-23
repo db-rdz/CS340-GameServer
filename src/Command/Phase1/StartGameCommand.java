@@ -14,9 +14,11 @@ public class StartGameCommand implements ICommand {
     private String _strAuthenticationCode;
     
     private StartGameCommand(){}
-    public StartGameCommand(int g, List<String> k){
+    public StartGameCommand(int g, List<String> k, String code){
         gameId = g;
-        usernamesInGame = k;}
+        usernamesInGame = k;
+        _strAuthenticationCode = code;
+    }
 
     @JsonIgnore
     @Override
@@ -26,8 +28,7 @@ public class StartGameCommand implements ICommand {
 
     @Override
     public List<ICommand> execute(){
-    	ServerFacade.SINGLETON.startGame(gameId, usernamesInGame, _strAuthenticationCode);
-        return null;
+    	return ServerFacade.SINGLETON.startGame(gameId, usernamesInGame, _strAuthenticationCode);
     }
 
     @Override
