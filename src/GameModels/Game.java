@@ -62,7 +62,7 @@ public class Game implements iGame {
      * Nathan
      * These relate to the Games table database
      */
-    private User player1 = new User(); //TODO: Gotta do something with the User
+    private User player1 = new User();
     
     private User player2 = new User();
     

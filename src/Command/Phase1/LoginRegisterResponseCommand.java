@@ -13,12 +13,14 @@ public class LoginRegisterResponseCommand implements ICommand{
     private User user;
     private Boolean validCredentials; //True if credentials are good
     private Boolean userLoggedInAlready; //False if the user isn't logged in already
+    private Boolean userRegisteredAlready;
   
     public LoginRegisterResponseCommand(){}
-    public LoginRegisterResponseCommand(User user, Boolean valid, Boolean loggedIn){
+    public LoginRegisterResponseCommand(User user, Boolean valid, Boolean loggedIn, Boolean registedAlready){
     	this.user = user;
     	validCredentials = valid;
     	userLoggedInAlready = loggedIn;
+    	userRegisteredAlready = registedAlready;
     }
 
 
@@ -45,5 +47,9 @@ public class LoginRegisterResponseCommand implements ICommand{
     
     public Boolean getUserLoggedInAlready() {
 		return userLoggedInAlready;
+	}
+    
+    public Boolean getUserRegisteredAlready() {
+		return userRegisteredAlready;
 	}
 }
