@@ -4,7 +4,7 @@ import Client.IClient;
 import Client.User;
 import Command.ICommand;
 import Command.Phase1.AddGameToJoinableListCommand;
-import Command.Phase1.AddJoinableGameCommand;
+import Command.Phase1.SwitchToWaitingActivityCommand;
 import Command.Phase1.AddPlayerToClientCommand;
 import Command.Phase1.DeleteGameCommand;
 import Command.Phase1.ListJoinableCommand;
@@ -300,7 +300,7 @@ public class ServerFacade implements IServer {
                 }
 
 	            List<ICommand> returnCommands = new ArrayList<>();
-	            returnCommands.add(new AddJoinableGameCommand(theGame.get_i_gameId(), usernames, false));
+	            returnCommands.add(new SwitchToWaitingActivityCommand(theGame.get_i_gameId(), usernames, false));
 	            
 	            return returnCommands;
             } 
@@ -369,7 +369,7 @@ public class ServerFacade implements IServer {
             for (int i = 1; i <= theGame.get_numberOfPlayers(); i++) {
             	usernames.add(theGame.getPlayer(i).get_S_username());
             }
-            returnCommands.add(new AddJoinableGameCommand(theGame.get_i_gameId(), usernames, true));
+            returnCommands.add(new SwitchToWaitingActivityCommand(theGame.get_i_gameId(), usernames, true));
                         
             return returnCommands;
             
