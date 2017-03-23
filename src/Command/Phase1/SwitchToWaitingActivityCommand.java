@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import Client.User;
 import Command.ICommand;
 import GameModels.Game;
+import ServerModel.GameModels.PlayerModel.Player;
 
 public class SwitchToWaitingActivityCommand implements ICommand{ // sent after changes from what List... commands sent
 	
@@ -19,6 +20,7 @@ public class SwitchToWaitingActivityCommand implements ICommand{ // sent after c
 		usernames = names;
 		isCreator = creator;
 	}
+	
 
 	@JsonIgnore
 	@Override

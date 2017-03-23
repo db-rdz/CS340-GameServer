@@ -87,7 +87,7 @@ public class ServerFacade implements IServer {
                 }
                 
                 //Update games first then have the user login
-                LoginRegisterResponseCommand lrsc = new LoginRegisterResponseCommand(user, true, false);
+                LoginRegisterResponseCommand lrsc = new LoginRegisterResponseCommand(user, true, false, true);
                 commands.add(lrsc);
                 
                 ClientProxy.SINGLETON.get_m_usersCommands().put(username, new ArrayList<ICommand>());
@@ -103,15 +103,15 @@ public class ServerFacade implements IServer {
         }
         catch (IClient.InvalidPassword e) {
         	commands.clear();
-        	commands.add(new LoginRegisterResponseCommand(null, false, true));
+        	commands.add(new LoginRegisterResponseCommand(null, false, true, false));
             return commands;
         } catch (IClient.InvalidUsername e) {
         	commands.clear();
-        	commands.add(new LoginRegisterResponseCommand(null, false, true));
+        	commands.add(new LoginRegisterResponseCommand(null, false, true, false));
             return commands;
         } catch (UserAlreadyLoggedIn e) {
         	commands.clear();
-        	commands.add(new LoginRegisterResponseCommand(null, true, true));
+        	commands.add(new LoginRegisterResponseCommand(null, true, true, true));
             return commands;
         }
         return null; //Returns null if the try doesn't catch any defined error.
@@ -119,9 +119,12 @@ public class ServerFacade implements IServer {
     
     @Override
     public List<ICommand> register(String username, String password) throws IClient.UsernameAlreadyExists, UserAlreadyLoggedIn {
+    	List<ICommand> commands = new ArrayList<>(); //Will be used for sending back bad registering
         try {
             if (!DAO._SINGLETON.registerUser(username, password)) {
-                throw new IClient.UsernameAlreadyExists();
+            	commands.clear();
+            	commands.add(new LoginRegisterResponseCommand(null, false, false, true));
+                return commands;
             }
             
             UserModel.User theUser = DAO._SINGLETON.getUserByUserName(username);
@@ -130,10 +133,9 @@ public class ServerFacade implements IServer {
             user.setPassword(theUser.get_S_password());
             user.setStr_authentication_code(theUser.get_S_token());
             
-            List<ICommand> commands = new ArrayList<>();
                         
             
-            LoginRegisterResponseCommand lrsc = new LoginRegisterResponseCommand(user, true, false);
+            LoginRegisterResponseCommand lrsc = new LoginRegisterResponseCommand(user, true, false, false);
             commands.add(lrsc);
             
             List<Game> games = ServerModel.SINGLETON.getAvailableGames();
@@ -174,7 +176,7 @@ public class ServerFacade implements IServer {
         	for (int i = 0; i < users.size(); i++) {
         		username = users.get(i).get_S_username();
         		ClientProxy.SINGLETON.get_m_usersCommands().get(username).addAll(commands);
-        	} //TODO: Include this in the ServerCommunicator.
+        	}
         	
         	return commands;
 			
@@ -268,7 +270,7 @@ public class ServerFacade implements IServer {
         	
                 theUser.set_B_isInGame(true); //The user is now in the game
                 
-//                theGame = DAO._SINGLETON.getGamebyGameId(intGameId); //Get the game from id
+                //Update the game then update the database
                 theGame.addPlayerToGame(theUser.get_S_username(), theUser); //Adds creator to the game
               	DAO._SINGLETON.updateGameNumberOfPlayers(intGameId, theGame.get_numberOfPlayers());
                 DAO._SINGLETON.UpdateGamePlayer(theGame.get_i_gameId(), theUser.get_S_username(), theGame.get_numberOfPlayers());
@@ -293,11 +295,8 @@ public class ServerFacade implements IServer {
                 	if (!user.get_S_token().equals(theUser.get_S_token())) {
 //                		System.out.println(user.get_S_username() + " receiving commmands: " + commands);
                 		ClientProxy.SINGLETON.get_m_usersCommands().get(user.get_S_username()).addAll(commands);
-//                		debug = ClientProxy.SINGLETON.get_m_usersCommands();
-//                		System.out.println(user.get_S_username() + " has these commands: " + debug.get(user.get_S_username()));
                 	}
-                	
-            }
+                }
 
             // send to user who joined
 //            DeleteGameCommand deleteGameCommand = new DeleteGameCommand(intGameId);
