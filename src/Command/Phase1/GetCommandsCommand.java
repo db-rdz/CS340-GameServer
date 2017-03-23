@@ -53,7 +53,7 @@ public class GetCommandsCommand implements ICommand{
                 	listOfSpecificUserCommands.add(command);
                 }
             	System.out.println("getting commands for " + username + ": " + listOfSpecificUserCommands);
-            	System.out.println("lastCommandReceivedIndex: " + lastCommandRecievedIndex + "\n");
+            	System.out.println("lastCommandReceivedIndex: " + lastCommandRecievedIndex);
 
             }
 		} catch (Exception e) {

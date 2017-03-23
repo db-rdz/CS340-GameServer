@@ -2,7 +2,7 @@ package Server;
 
 import Command.ICommand;
 import Command.Phase1.AddGameToServerCommand;
-import Command.Phase1.AddJoinableGameCommand;
+import Command.Phase1.SwitchToWaitingActivityCommand;
 import Command.Phase1.AddPlayerToServerCommand;
 import Command.Phase1.DeleteGameCommand;
 import Command.Phase1.GetCommandsCommand;

@@ -7,14 +7,14 @@ import Client.User;
 import Command.ICommand;
 import GameModels.Game;
 
-public class AddJoinableGameCommand implements ICommand{ // sent after changes from what List... commands sent
+public class SwitchToWaitingActivityCommand implements ICommand{ // sent after changes from what List... commands sent
 	
 	private int gameId;
 	private List<String> usernames;
 	private Boolean isCreator;
 	
-	public AddJoinableGameCommand(){}
-	public AddJoinableGameCommand(int id, List<String> names, Boolean creator) {
+	public SwitchToWaitingActivityCommand(){}
+	public SwitchToWaitingActivityCommand(int id, List<String> names, Boolean creator) {
 		gameId = id;
 		usernames = names;
 		isCreator = creator;
