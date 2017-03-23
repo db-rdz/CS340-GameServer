@@ -206,15 +206,8 @@ public class ServerFacade implements IServer {
             	trainCards.add(theTrainCardDeck.drawTop());
             }
             destCards = theDestCardDeck.drawTop3();
-            
-            //Nathan: The faceup train table cards at the beginning of the game.
-        	List<TrainCard> faceupTrainCards = new ArrayList<>();
-            for (int j = 0; j < 5; j++)
-            {
-            	faceupTrainCards.add(theTrainCardDeck.drawTop());
-            }
 
-            returnCommands.add(new InitializeGameCommand(trainCards, destCards, faceupTrainCards)); //The creator's cards
+            returnCommands.add(new InitializeGameCommand(trainCards, destCards)); //The creator's cards
 
             for (int i = 1; i < usernamesInGame.size(); i++) { //Ignore the game creator, start at Player 2
                 // initialize each player's hand
@@ -226,7 +219,7 @@ public class ServerFacade implements IServer {
                 destCards = theDestCardDeck.drawTop3();
                                 
                 otherPlayerCommands = new ArrayList<>();
-                otherPlayerCommands.add(new InitializeGameCommand(trainCards, destCards, faceupTrainCards));
+                otherPlayerCommands.add(new InitializeGameCommand(trainCards, destCards));
         		System.out.println(usernamesInGame.get(i) + " receiving commmands: " + otherPlayerCommands);
                 ClientProxy.SINGLETON.get_m_usersCommands().get(usernamesInGame.get(i)).addAll(otherPlayerCommands);  
             }
