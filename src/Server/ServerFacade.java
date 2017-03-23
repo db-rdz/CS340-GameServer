@@ -40,6 +40,7 @@ public class ServerFacade implements IServer {
     
     @Override
     public List<ICommand> login(String username, String password) throws IClient.InvalidUsername, IClient.InvalidPassword, UserAlreadyLoggedIn {
+    	List<ICommand> commands = new ArrayList<>(); //Will be used for sending back bad logins
         try {
             // tries to retrieve the user from the database
             if (DAO._SINGLETON.login(username, password))
@@ -51,7 +52,6 @@ public class ServerFacade implements IServer {
                 user.setStr_authentication_code(theUser.get_S_token());
                              
                
-                List<ICommand> commands = new ArrayList<>();
 
                 if (theUser.get_L_joinedGames().isEmpty())
                 {
@@ -87,7 +87,7 @@ public class ServerFacade implements IServer {
                 }
                 
                 //Update games first then have the user login
-                LoginRegisterResponseCommand lrsc = new LoginRegisterResponseCommand(user);
+                LoginRegisterResponseCommand lrsc = new LoginRegisterResponseCommand(user, true, false);
                 commands.add(lrsc);
                 
                 ClientProxy.SINGLETON.get_m_usersCommands().put(username, new ArrayList<ICommand>());
@@ -102,13 +102,19 @@ public class ServerFacade implements IServer {
             e.printStackTrace();
         }
         catch (IClient.InvalidPassword e) {
-            throw e;
+        	commands.clear();
+        	commands.add(new LoginRegisterResponseCommand(null, false, true));
+            return commands;
         } catch (IClient.InvalidUsername e) {
-            throw e;
+        	commands.clear();
+        	commands.add(new LoginRegisterResponseCommand(null, false, true));
+            return commands;
         } catch (UserAlreadyLoggedIn e) {
-            throw e;
+        	commands.clear();
+        	commands.add(new LoginRegisterResponseCommand(null, true, true));
+            return commands;
         }
-        return null; //Returns null if the try catches the error.
+        return null; //Returns null if the try doesn't catch any defined error.
     }
     
     @Override
@@ -127,7 +133,7 @@ public class ServerFacade implements IServer {
             List<ICommand> commands = new ArrayList<>();
                         
             
-            LoginRegisterResponseCommand lrsc = new LoginRegisterResponseCommand(user);
+            LoginRegisterResponseCommand lrsc = new LoginRegisterResponseCommand(user, true, false);
             commands.add(lrsc);
             
             List<Game> games = ServerModel.SINGLETON.getAvailableGames();
