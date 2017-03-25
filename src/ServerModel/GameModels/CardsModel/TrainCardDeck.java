@@ -10,12 +10,15 @@ import java.util.List;
 public class TrainCardDeck {
     List<TrainCard> _L_Deck = new ArrayList<TrainCard>();
     List<TrainCard> _fiveCards = new ArrayList<TrainCard>();
+    // Ryan : added discard pile to deck
+    List<TrainCard> _discardPile = new ArrayList<TrainCard>();
 
     public TrainCardDeck() {
     	fillDeck();
-    	for (int i = 0; i < 5; i++)
+    	setFiveCards();
+    	while (checkFiveCardsForWilds())
     	{
-    		_fiveCards.add(drawTop());
+    		replaceFiveCards();
     	}
     }
 
@@ -35,19 +38,28 @@ public class TrainCardDeck {
     public List<TrainCard> getFiveCards(){
         return _fiveCards;
     }
+    
+    public List<TrainCard> getDiscardPile()
+    {
+    	return _discardPile;
+    }
 
     // Ryan : changed return type so we can retrieve the card we get
     public TrainCard getFromTheFiveCards( int chosenCardIndex ) {
         TrainCard selectedCard = _fiveCards.get(chosenCardIndex);
     	if(_fiveCards.remove(chosenCardIndex) != null) {
             _fiveCards.add(drawTop());
+            while (checkFiveCardsForWilds())
+            {
+            	replaceFiveCards();
+            }
             return selectedCard;
         }
         return null;
     }
 
     private void fillDeck() {
-        String[] cardType = {"redcard", "orangecard", "yellowcard", "greencard", "bluecard", "pinkcard", "whitecard",  "blackcard", "rainbowcard"};
+        String[] cardType = {"RED", "WHITE", "ORANGE", "GREEN", "BLUE", "PURPLE", "YELLOW", "PINK", "RAINBOW"};
         for (String color : cardType) {
             for (int i = 0; i < 12; i++){
                 TrainCard trainCard = new TrainCard(color);
@@ -55,5 +67,49 @@ public class TrainCardDeck {
             }
         }
         shuffle();
+    }
+    
+    /*
+     * Ryan
+     * initializes/sets 5 new Train Cards
+     */
+    private void setFiveCards()
+    {
+    	for (int i = 0; i < 5; i++)
+    	{
+    		_fiveCards.add(drawTop());
+    	}
+    }
+    
+    /*
+     * Ryan
+     * checks to see if there are more than 3 wilds in the 5 cards
+     */
+    private Boolean checkFiveCardsForWilds()
+    {
+    	int numOfWilds = 0;
+    	for (TrainCard card : _fiveCards)
+    	{
+    		if (card.getType() == "RAINBOW")
+    		{
+    			numOfWilds++;
+    		}
+    	}
+    	if (numOfWilds >= 3)
+    	{
+    		return true; // needs to be replaced
+    	}
+    	return false; // doesn't need to be replaced
+    }
+    
+    /*
+     * Ryan
+     * replaces the five cards if there are more than 3 wilds
+     */
+    private void replaceFiveCards()
+    {
+    	_discardPile.addAll(_fiveCards);
+    	_fiveCards.clear();
+    	setFiveCards();
     }
 }

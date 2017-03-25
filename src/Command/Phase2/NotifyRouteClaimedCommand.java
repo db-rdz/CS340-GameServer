@@ -3,6 +3,7 @@ package Command.Phase2;
 import Client.User;
 import Command.ICommand;
 import Server.IServer;
+import ServerModel.GameModels.RouteModel.Route;
 import GameModels.Game;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -19,10 +20,12 @@ public class NotifyRouteClaimedCommand implements ICommand {
 
     //Data members
     private String str_message;
+    private Route route;
 
     //Constructor
-    public NotifyRouteClaimedCommand(String str_message) {
+    public NotifyRouteClaimedCommand(String str_message, Route r) {
         this.str_message = str_message;
+        route = r;
     }
 
     //Functions
@@ -46,5 +49,10 @@ public class NotifyRouteClaimedCommand implements ICommand {
 
     public String getStr_message() {
         return str_message;
+    }
+    
+    public Route getRoute()
+    {
+    	return route;
     }
 }

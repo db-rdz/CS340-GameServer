@@ -11,12 +11,14 @@ import GameModels.Game;
 import Server.ServerFacade;
 
 public class AddGameToServerCommand implements ICommand {
+    private Game game;
     private String str_authentication_code;
 
     public AddGameToServerCommand() {
     }
 
-    public AddGameToServerCommand(String k) {
+    public AddGameToServerCommand(Game g, String k) {
+        game = g;
         str_authentication_code = k;
     }
 
@@ -34,9 +36,11 @@ public class AddGameToServerCommand implements ICommand {
     //
     @Override
     public List<ICommand> execute() {
-    	return ServerFacade.SINGLETON.addJoinableGameToServer(str_authentication_code);
+    	return ServerFacade.SINGLETON.addJoinableGameToServer(game, str_authentication_code);
          
     }
+
+    public Game getGame() { return game; }
     
     public String getStr_authentication_code() {
 		return str_authentication_code;

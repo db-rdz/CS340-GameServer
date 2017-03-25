@@ -3,6 +3,7 @@ package Command.Phase2;
 import Client.User;
 import Command.ICommand;
 import Server.IServer;
+import ServerModel.GameModels.BoardModel.Scoreboard;
 import GameModels.Game;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -17,16 +18,14 @@ import java.util.List;
 
 // Ryan: added a username field so it can be sent to all users and the points can be deducted from each client
 
-public class UpdatePointsCommand implements ICommand {
+public class UpdateScoreboardCommand implements ICommand {
 
     //Data members
-    private int int_points_to_add;
-    private String str_username;
+    private List<Scoreboard> scoreboards;
 
     //Constructor
-    public UpdatePointsCommand(int int_points_to_add, String u) {
-        this.int_points_to_add = int_points_to_add;
-        str_username = u;
+    public UpdateScoreboardCommand(List<Scoreboard> s) {
+        scoreboards = s;
     }
 
     //Functions
@@ -48,12 +47,8 @@ public class UpdatePointsCommand implements ICommand {
     }
 
 
-    public int getInt_points_to_add() {
-        return int_points_to_add;
+    public List<Scoreboard> getScoreboards() {
+        return scoreboards;
     }
-    
-    public String getUsername()
-    {
-    	return str_username;
-    }
+
 }

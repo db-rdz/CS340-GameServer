@@ -10,28 +10,28 @@ import GameModels.Game;
 import Server.ServerFacade;
 
 public class LogoutCommand implements ICommand{
-	
-    private User user;
-    
-    private LogoutCommand(){}
-    public LogoutCommand(User user){
-        this.user = user;
-    }
+  private String str_authentication_code;
+  public LogoutCommand(){}
+  public LogoutCommand(String k){
+    str_authentication_code = k;}
 
-    @Override
-    public List<ICommand> execute(){
-    	return ServerFacade.SINGLETON.logout(user);
-    }
+  @Override
+  public String getAuthenticationCode() {
+    return null;
+  }
 
-    @JsonIgnore
-    @Override
-    public String getAuthenticationCode() {
-        return null;
+  @Override
+  public User getUser() {
+    return null;
+  }
+  
+  @Override
+  public List<ICommand> execute(){
+    return ServerFacade.SINGLETON.logout(str_authentication_code);
     }
-
-    @Override
-    public User getUser() {
-        return user;
-    }
+  
+//  @JsonIgnore
+//  @Override
+//  public Game getGame() { return null; }
   
 }
