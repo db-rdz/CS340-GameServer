@@ -6,21 +6,21 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import Client.User;
 import Command.ICommand;
 import GameModels.Game;
-import ServerModel.GameModels.PlayerModel.Player;
 
-public class SwitchToWaitingActivityCommand implements ICommand{ // sent after changes from what List... commands sent
+public class AddWaitingToClientCommand implements ICommand{ // sent after changes from what List... commands sent
 	
 	private int gameId;
 	private List<String> usernames;
 	private Boolean isCreator;
-	
-	public SwitchToWaitingActivityCommand(){}
-	public SwitchToWaitingActivityCommand(int id, List<String> names, Boolean creator) {
+//  private Game game;
+	public AddWaitingToClientCommand(){}
+//  public AddWaitingToClientCommand(Game g){
+//    game = g;}
+	public AddWaitingToClientCommand(int id, List<String> names, Boolean creator) {
 		gameId = id;
 		usernames = names;
 		isCreator = creator;
 	}
-	
 
 	@JsonIgnore
 	@Override
@@ -38,6 +38,7 @@ public class SwitchToWaitingActivityCommand implements ICommand{ // sent after c
 	public List<ICommand> execute(){
 	  return null;
 	}
+//  public Game getGame() { return game; }
 	
 	public int getGameId() {
 		return gameId;

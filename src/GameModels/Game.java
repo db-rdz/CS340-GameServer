@@ -1,8 +1,10 @@
 package GameModels;
 
+import ServerModel.GameModels.BoardModel.Scoreboard;
 import ServerModel.GameModels.CardsModel.DestCardDeck;
 import ServerModel.GameModels.CardsModel.TrainCardDeck;
 import ServerModel.GameModels.PlayerModel.Player;
+import ServerModel.GameModels.RouteModel.AllRoutes;
 import UserModel.User;
 import com.sun.org.apache.xpath.internal.operations.Bool;
 import com.sun.security.ntlm.Server;
@@ -12,6 +14,7 @@ import Database.DAO;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import static com.sun.org.apache.xerces.internal.impl.xpath.regex.CaseInsensitiveMap.get;
@@ -62,7 +65,7 @@ public class Game implements iGame {
      * Nathan
      * These relate to the Games table database
      */
-    private User player1 = new User();
+    private User player1 = new User(); //TODO: Gotta do something with the User
     
     private User player2 = new User();
     
@@ -74,14 +77,18 @@ public class Game implements iGame {
     
     /**
      * Ryan
-     * We need to store the deck of cards, the board, and the chat in each game
+     * Added TrainCardDeck, DestCardDeck, chatRoom, listOfAllRoutes, and Scoreboard map
      */
     
     private TrainCardDeck _deck = new TrainCardDeck();
     
     private DestCardDeck _destCards = new DestCardDeck();
     
-    private List<String> _str_chatRoom = new ArrayList<>();    
+    private List<String> _str_chatRoom = new ArrayList<>();   
+    
+    private AllRoutes allRoutes = new AllRoutes();
+    
+    private Map<String, Scoreboard> _M_playerScoreboards = new LinkedHashMap<String, Scoreboard>();
 
     //-----------------------------------------STATIC FUNCTIONS----------------------------------------//
 
@@ -243,6 +250,14 @@ public class Game implements iGame {
     public static List<String> getUsernames() {
 		return usernames;
 	}
+    
+    //Ryan
+    public AllRoutes getAllRoutes()
+    {
+    	return allRoutes;
+    }
+    
+    public Map<String, Scoreboard> get_M_PlayerScoreboards() { return _M_playerScoreboards; }
 
 
     //-----------------------------------------CLASS FUNCTIONS----------------------------------------//

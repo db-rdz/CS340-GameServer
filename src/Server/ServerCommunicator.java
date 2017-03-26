@@ -2,7 +2,7 @@ package Server;
 
 import Command.ICommand;
 import Command.Phase1.AddGameToServerCommand;
-import Command.Phase1.SwitchToWaitingActivityCommand;
+import Command.Phase1.AddJoinableToClientCommand;
 import Command.Phase1.AddPlayerToServerCommand;
 import Command.Phase1.DeleteGameCommand;
 import Command.Phase1.GetCommandsCommand;
@@ -11,9 +11,7 @@ import Command.Phase1.LogoutCommand;
 import Command.Phase1.RegisterCommand;
 import Command.Phase1.StartGameCommand;
 import Database.DAO;
-import Deserializers.PairDeserializer;
 import GameModels.Game;
-import Serializers.PairSerializer;
 import Server.IServer.GameIsFullException;
 import Server.IServer.UserAlreadyLoggedIn;
 import jdk.nashorn.internal.ir.CatchNode;
@@ -47,8 +45,6 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 
-import org.apache.commons.lang3.tuple.Pair;
-
 
 /**
  * Created by RyanBlaser on 2/6/17.
@@ -70,39 +66,13 @@ public class ServerCommunicator {
     
     public static void main(String[] args)
     {
+        //   	SERVER_PORT_NUMBER = Integer.parseInt(args[0]);
         SERVER_PORT_NUMBER = 8080;
         SINGLETON.run();
     }
     
-    /**
-     * Nathan
-     * This allows Jackson to deserialize the apache.lang3.tuple.Pair class properly.
-     */
-    public void addPairModule() {
-        final SimpleModule module = new SimpleModule();
-        module.addSerializer(Pair.class, new PairSerializer());
-        module.addDeserializer(Pair.class, new PairDeserializer());
-        objectMapper.registerModule(module);
-    }
-    
-    public void eraseAllAuthenticationTokens() {
-    	try {
-    		List<UserModel.User> allUsers = DAO._SINGLETON.getAllUsers();
-			int amountOfUsers = DAO._SINGLETON.getAllUsers().size();
-			for (int i = 0; i < amountOfUsers; i++) {
-				DAO._SINGLETON.updateUserToken(allUsers.get(i).get_S_username(), "");
-			}
-		} catch (SQLException e) {
-		
-			e.printStackTrace();
-		}
-    }
-    
     private void run()
     {
-    	addPairModule();
-    	eraseAllAuthenticationTokens();
-    	
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         try {
             server = HttpServer.create(new InetSocketAddress(SERVER_PORT_NUMBER), MAX_WAITING_CONNECTION);
@@ -133,7 +103,7 @@ public class ServerCommunicator {
             else
             {
                 System.out.println("Host ip address: " + probableAddress);
-                System.out.println("Host server port: " + SERVER_PORT_NUMBER);
+                System.out.println("Host server port: " + SERVER_PORT_NUMBER + "\n");
             }
             
         } catch (IOException e) {
@@ -159,8 +129,8 @@ public class ServerCommunicator {
     		try {
         
     			input = objectMapper.readValue(exchange.getRequestBody(), ICommand.class);
-//    			System.out.println("\njackson ICommand: " + input);
-    			System.out.println("\nExecuting " + input);
+    			System.out.println("\njackson ICommand: " + input);
+    			System.out.println("Executing " + input);
         
     		} catch (Exception e) {
     			e.printStackTrace();
@@ -177,8 +147,7 @@ public class ServerCommunicator {
 	    OutputStreamWriter osw = new OutputStreamWriter(os);
 	    try {
 	    	String theResponse = objectMapper.writerWithType(new TypeReference<List<ICommand>>() {
-	    	}).writeValueAsString(response);	
-//	    	System.out.println(theResponse);
+	    	}).writeValueAsString(response);	    
 	    	exchange.sendResponseHeaders(200, theResponse.length());
 	    	osw.write(theResponse);
 	    	osw.close();
@@ -200,7 +169,7 @@ public class ServerCommunicator {
 			ICommand input = null;
 			try {
 				input = objectMapper.readValue(exchange.getRequestBody(), ICommand.class);
-    			System.out.println("\nExecuting " + input);
+				System.out.println("\njackson Icommand: " + input);
 				List<ICommand> response = input.execute();
 				
 			    OutputStream os = exchange.getResponseBody();
