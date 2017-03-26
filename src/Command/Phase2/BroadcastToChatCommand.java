@@ -22,13 +22,13 @@ public class BroadcastToChatCommand implements ICommand {
     //Data members
 	// Ryan: added authenticationCode so that I can display what user sent the message in the chatroom
     String message;
-    String str_authenticationCode;
+    String authenticationCode;
     int gameId;
 
     //Constructors
     public BroadcastToChatCommand(){}
     public BroadcastToChatCommand(int g, String code, String messageToSend) {
-        str_authenticationCode = code;
+    	authenticationCode = code;
     	message = messageToSend;
         gameId = g;
     }
@@ -36,13 +36,12 @@ public class BroadcastToChatCommand implements ICommand {
     //Functions
     @Override
     public List<ICommand> execute() throws IServer.GameIsFullException {
-        return ServerFacade.SINGLETON.broadcastToChatCommand(gameId, str_authenticationCode, message);
+        return ServerFacade.SINGLETON.broadcastToChatCommand(gameId, authenticationCode, message);
     }
 
-    @JsonIgnore
     @Override
     public String getAuthenticationCode() {
-        return str_authenticationCode;
+        return authenticationCode;
     }
 
     @JsonIgnore
@@ -59,9 +58,5 @@ public class BroadcastToChatCommand implements ICommand {
     {
     	return gameId;
     }
-    
-    public String get_strAuthenticationCode()
-    {
-    	return str_authenticationCode;
-    }
+   
 }
