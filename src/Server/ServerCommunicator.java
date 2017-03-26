@@ -147,7 +147,7 @@ public class ServerCommunicator {
             else
             {
                 System.out.println("Host ip address: " + probableAddress);
-                System.out.println("Host server port: " + SERVER_PORT_NUMBER + "\n");
+                System.out.println("Host server port: " + SERVER_PORT_NUMBER);
             }
             
         } catch (IOException e) {

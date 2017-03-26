@@ -20,6 +20,10 @@ import Command.Phase1.LoginRegisterResponseCommand;
 import Command.Phase1.LogoutCommand;
 import Command.Phase1.RegisterCommand;
 import Command.Phase1.StartGameCommand;
+import Command.Phase2.BroadcastToChatCommand;
+import Command.Phase2.ClaimRouteCommand;
+import Command.Phase2.GetFaceUpTableTrainCardCommand;
+import Command.Phase2.GetTopDeckTrainCardCommand;
 import GameModels.Game;
 import Server.IServer.GameIsFullException;
 import Server.IServer.UserAlreadyLoggedIn;
@@ -36,7 +40,11 @@ import Server.IServer.UserAlreadyLoggedIn;
 	@Type(value = LogoutCommand.class),
 	@Type(value = RegisterCommand.class),
 	@Type(value = StartGameCommand.class),
-	@Type(value = GetCommandsCommand.class)
+	@Type(value = GetCommandsCommand.class),
+	@Type(value = BroadcastToChatCommand.class),
+	@Type(value = ClaimRouteCommand.class),
+	@Type(value = GetFaceUpTableTrainCardCommand.class),
+	@Type(value = GetTopDeckTrainCardCommand.class)
 })
 public interface ICommand {
     public List<ICommand> execute() throws GameIsFullException, UserAlreadyLoggedIn, InvalidUsername, InvalidPassword;

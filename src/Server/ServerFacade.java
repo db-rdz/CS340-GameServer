@@ -114,7 +114,7 @@ public class ServerFacade implements IServer {
                 ClientProxy.SINGLETON.get_m_usersCommands().put(username, new ArrayList<ICommand>());
                 ServerModel.SINGLETON.logIn(theUser.get_S_username());
                 
-                System.out.println("Logging in user: " + theUser.get_S_username());
+                System.out.println("\nLogging in user: " + theUser.get_S_username());
                 System.out.println("Authorization code: " + theUser.get_S_token());
                 
 //                new GetCommandsCommand(theUser.get_S_username()).execute();
