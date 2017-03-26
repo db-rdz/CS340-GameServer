@@ -30,6 +30,8 @@ import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 import com.sun.org.apache.xpath.internal.compiler.OpCodes;
 
+import Client.IClient.InvalidPassword;
+import Client.IClient.InvalidUsername;
 import Client.User;
 
 import java.io.BufferedReader;
@@ -70,6 +72,7 @@ public class ServerCommunicator {
     
     public static void main(String[] args)
     {
+    	
         SERVER_PORT_NUMBER = 8080;
         SINGLETON.run();
     }
@@ -98,10 +101,20 @@ public class ServerCommunicator {
 		}
     }
     
+    public void deleteAllServerGames() { 
+    	try {
+            DAO._SINGLETON.deleteAllGames();
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+    }
+    
     private void run()
     {
     	addPairModule();
     	eraseAllAuthenticationTokens();
+    	deleteAllServerGames();
     	
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         try {
@@ -152,42 +165,48 @@ public class ServerCommunicator {
     private HttpHandler commandHandler = new HttpHandler() {
     	@SuppressWarnings("deprecation")
 		@Override
-    	public void handle(HttpExchange exchange) throws IOException {
+    	public void handle(HttpExchange exchange) throws IOException{
     
 //    		InputStreamReader isr = new InputStreamReader(exchange.getRequestBody());
     		ICommand input = null;
     		try {
         
     			input = objectMapper.readValue(exchange.getRequestBody(), ICommand.class);
-//    			System.out.println("\njackson ICommand: " + input);
-    			System.out.println("\nExecuting " + input);
+//    			System.out.println("\nExecuting " + input);
         
     		} catch (Exception e) {
     			e.printStackTrace();
     		}
     
 
-	    List<ICommand> response = null;
-	    try{
-	        response = input.execute();
-	    } catch(GameIsFullException | UserAlreadyLoggedIn e){}
+		    List<ICommand> response = null;
+		    try{
+		        response = input.execute();
+		    } catch(GameIsFullException | UserAlreadyLoggedIn | InvalidUsername | InvalidPassword e) {
+		    	String exception = objectMapper.writeValueAsString(e);
+		    	exchange.sendResponseHeaders(13, exception.length());
+			    OutputStream os = exchange.getResponseBody();
+			    OutputStreamWriter osw = new OutputStreamWriter(os);
+		    	osw.write(exception);
+		    	osw.close();
+		    }
+		    
+		    
+		    OutputStream os = exchange.getResponseBody();
+		    OutputStreamWriter osw = new OutputStreamWriter(os);
+		    try {
+		    	String theResponse = objectMapper.writerWithType(new TypeReference<List<ICommand>>() {
+		    	}).writeValueAsString(response);	
+//		    	System.out.println(theResponse);
+		    	exchange.sendResponseHeaders(200, theResponse.length());
+		    	osw.write(theResponse);
+		    	osw.close();
+		    	
+		    } catch (Exception e) {
+		    	e.printStackTrace();
+		    }
 	    
-	    
-	    OutputStream os = exchange.getResponseBody();
-	    OutputStreamWriter osw = new OutputStreamWriter(os);
-	    try {
-	    	String theResponse = objectMapper.writerWithType(new TypeReference<List<ICommand>>() {
-	    	}).writeValueAsString(response);	
-//	    	System.out.println(theResponse);
-	    	exchange.sendResponseHeaders(200, theResponse.length());
-	    	osw.write(theResponse);
-	    	osw.close();
-	    	
-	    } catch (Exception e) {
-	    	e.printStackTrace();
-	    }
-	    
-	    System.out.println("Sending back to client!");
+//	    System.out.println("Sending back to client!");
     	}
     };
 
@@ -195,12 +214,11 @@ public class ServerCommunicator {
 		@SuppressWarnings("deprecation")
 		@Override
 		public void handle(HttpExchange exchange) throws IOException {
-//			System.out.println("Hello from the pollerHandler");
 			InputStreamReader isr = new InputStreamReader(exchange.getRequestBody());
 			ICommand input = null;
 			try {
 				input = objectMapper.readValue(exchange.getRequestBody(), ICommand.class);
-    			System.out.println("\nExecuting " + input);
+//    			System.out.println("\nExecuting " + input);
 				List<ICommand> response = input.execute();
 				
 			    OutputStream os = exchange.getResponseBody();

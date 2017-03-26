@@ -52,8 +52,8 @@ public class GetCommandsCommand implements ICommand{
                 for (ICommand command : ClientProxy.SINGLETON.getUserCommands(username, lastCommandRecievedIndex)) { //Does a deep copy of the list of commands
                 	listOfSpecificUserCommands.add(command);
                 }
-            	System.out.println("getting commands for " + username + ": " + listOfSpecificUserCommands);
-            	System.out.println("lastCommandReceivedIndex: " + lastCommandRecievedIndex);
+//            	System.out.println("getting commands for " + username + ": " + listOfSpecificUserCommands);
+//            	System.out.println("lastCommandReceivedIndex: " + lastCommandRecievedIndex);
 
             }
 		} catch (Exception e) {

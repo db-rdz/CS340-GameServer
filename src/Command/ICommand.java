@@ -8,6 +8,8 @@ import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 
 import Client.User;
+import Client.IClient.InvalidPassword;
+import Client.IClient.InvalidUsername;
 import Command.Phase1.AddGameToServerCommand;
 import Command.Phase1.SwitchToWaitingActivityCommand;
 import Command.Phase1.AddPlayerToServerCommand;
@@ -38,7 +40,7 @@ import Server.IServer.UserAlreadyLoggedIn;
 	@Type(value = GetCommandsCommand.class)
 })
 public interface ICommand {
-    public List<ICommand> execute() throws GameIsFullException, UserAlreadyLoggedIn;
+    public List<ICommand> execute() throws GameIsFullException, UserAlreadyLoggedIn, InvalidUsername, InvalidPassword;
     public String getAuthenticationCode();
     public User getUser();
 //    public Game getGame();

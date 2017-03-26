@@ -92,7 +92,7 @@ public class ServerFacade implements IServer {
                 
                 ClientProxy.SINGLETON.get_m_usersCommands().put(username, new ArrayList<ICommand>());
                 ServerModel.SINGLETON.logIn(theUser.get_S_username());
-                System.out.println("Logging in user: " + theUser.get_S_username());
+                System.out.println("\nLogging in user: " + theUser.get_S_username());
                 System.out.println("Authorization code: " + theUser.get_S_token());
                                 
                 return commands;
@@ -111,7 +111,7 @@ public class ServerFacade implements IServer {
             return commands;
         } catch (UserAlreadyLoggedIn e) {
         	commands.clear();
-        	commands.add(new LoginRegisterResponseCommand(null, true, true, true));
+        	commands.add(new LoginRegisterResponseCommand(null, true, true, false));
             return commands;
         }
         return null; //Returns null if the try doesn't catch any defined error.
@@ -150,7 +150,7 @@ public class ServerFacade implements IServer {
             System.out.println(copy);
             
             ClientProxy.SINGLETON.get_m_usersCommands().put(username, new ArrayList<ICommand>());
-            System.out.println("Registering and logging in user: " + DAO._SINGLETON.getUserByAccessToken(theUser.get_S_token()).get_S_username());
+            System.out.println("\nRegistering and logging in user: " + DAO._SINGLETON.getUserByAccessToken(theUser.get_S_token()).get_S_username());
             System.out.println("Authorization code: " + theUser.get_S_token());
             return commands;
             
@@ -229,7 +229,7 @@ public class ServerFacade implements IServer {
                                 
                 otherPlayerCommands = new ArrayList<>();
                 otherPlayerCommands.add(new InitializeGameCommand(trainCards, destCards, faceupTrainCards));
-        		System.out.println(usernamesInGame.get(i) + " receiving commmands: " + otherPlayerCommands);
+//        		System.out.println(usernamesInGame.get(i) + " receiving commmands: " + otherPlayerCommands);
                 ClientProxy.SINGLETON.get_m_usersCommands().get(usernamesInGame.get(i)).addAll(otherPlayerCommands);  
             }
             
@@ -246,6 +246,7 @@ public class ServerFacade implements IServer {
 //	        		username = user.get_S_username();
 //	            	ClientProxy.SINGLETON.get_m_usersCommands().get(username, commands);
 //	        }
+            
 	        return returnCommands;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -323,7 +324,6 @@ public class ServerFacade implements IServer {
     public List<ICommand> addJoinableGameToServer(String str_authentication_code) {
         
         try {
-            DAO._SINGLETON.deleteAllGames();
             @SuppressWarnings("unused")
 			Boolean value = DAO._SINGLETON.addGame(new Game());
             Game theGame = new Game(); //initialize

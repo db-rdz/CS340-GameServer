@@ -23,7 +23,7 @@ public class DAO implements iDAO {
     public static iDAO _SINGLETON = new DAO();
     private static DataBase _db;
     private int AUTH_TOKEN_LENGTH = 15;
-    private static int int_gameId;
+    private static int int_gameId = 1; //must initialize to 1 so the server properly counts games
 
     public DAO(){
         initializeDB();
@@ -34,10 +34,6 @@ public class DAO implements iDAO {
         return null;
     }
 
-//    @Override
-//    public int getUserId(String userName) {
-//        return 0;
-//    }
 
     @Override
     public Game getGameFromId(int gameId){
