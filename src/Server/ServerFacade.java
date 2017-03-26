@@ -569,6 +569,7 @@ public class ServerFacade implements IServer {
 		returnCommands.add(new NotifyRouteClaimedCommand("The route from " + route.get_ConnectingCities().getLeft() + " to " 
 							+ route.get_ConnectingCities().getRight() + " has been claimed by " + username + ".", route));
 		theGame.get_M_PlayerScoreboards().get(username).addPoints(route.get_i_pointValue());
+		theGame.get_M_PlayerScoreboards().get(username).addTrainCards(-(route.get_Weight()));
 		
 		// increments the player's points on every player's screen
 		returnCommands.add(new UpdateScoreboardCommand(new ArrayList<>(theGame.get_M_PlayerScoreboards().values())));
