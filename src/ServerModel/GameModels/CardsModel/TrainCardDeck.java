@@ -28,7 +28,16 @@ public class TrainCardDeck {
 
     public TrainCard drawTop(){
         if(_L_Deck.isEmpty()){
-            fillDeck();
+            if (!_discardPile.isEmpty())
+            {
+            	Collections.shuffle(_discardPile);
+            	_L_Deck.addAll(_discardPile);
+            	_discardPile.clear();
+            }
+            else
+            {
+            	fillDeck();
+            }
         }
         TrainCard topCard = _L_Deck.get(0);
         _L_Deck.remove(topCard);

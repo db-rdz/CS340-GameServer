@@ -244,17 +244,8 @@ public class ServerFacade implements IServer {
 	        }
 	        
 	        // send to all users in game
-	        
-	        //        Iterator iter = theGame.get_M_idToGame().values().iterator(); //TODO: is this correct??
 	        Iterator iter = theGame.get_M_idToUserInGame().keySet().iterator(); 
 	        //this should be an iterator through the set of usernames of all users in the game
-	        
-	        
-	        
-	        // TODO: get the deck of cards from the game and assign a hand to each player
-	        
-	        // Collection<TrainCard> deck = theGame.getDeck();
-	        // Collection<TrainCard> hand = null;
 	        
 	        List<ICommand> otherPlayerCommands = null;
 	        List<ICommand> returnCommands = new ArrayList<>();
@@ -282,6 +273,8 @@ public class ServerFacade implements IServer {
 	                destCards = theDestCardDeck.drawTop3();
 	                
 	                username = (String) iter.next();
+		            theGame.get_M_PlayerScoreboards().put(username, new Scoreboard());
+		            
 	                if (username != theUser.get_S_username())
 	                {
 	                    otherPlayerCommands = new ArrayList<>();
@@ -549,7 +542,7 @@ public class ServerFacade implements IServer {
 	 */
 	
 	@Override
-	public List<ICommand> claimRoute(int gameId, String authenticationCode, String routeMappingName) {
+	public List<ICommand> claimRoute(int gameId, String authenticationCode, Route theRoute, List<TrainCard> cardsUsedToClaimRoute) {
 		List<ICommand> returnCommands = new ArrayList<>();
 		Game theGame = Game.getGameWithId(gameId);
 		String username = "";
@@ -562,18 +555,22 @@ public class ServerFacade implements IServer {
 		}
 		
 		// gets the route from the list in the game and sets the owner
-		Route route = theGame.getAllRoutes().get_RoutesMap().get(routeMappingName);
+		Route route = theGame.getAllRoutes().get_RoutesMap().get(theRoute.get_S_MappingName());
 		route.set_Owner(username);
 		
 		// tells the other players that the route was claimed (maybe make a toast with the message)
 		returnCommands.add(new NotifyRouteClaimedCommand("The route from " + route.get_ConnectingCities().getLeft() + " to " 
 							+ route.get_ConnectingCities().getRight() + " has been claimed by " + username + ".", route));
 		theGame.get_M_PlayerScoreboards().get(username).addPoints(route.get_i_pointValue());
-		theGame.get_M_PlayerScoreboards().get(username).addTrainCards(-(route.get_Weight()));
+		// subtracts the number of cards used from the players total on the scoreboard
+		theGame.get_M_PlayerScoreboards().get(username).addTrainCards(-cardsUsedToClaimRoute.size());
 		
-		// increments the player's points on every player's screen
+		// updates the scoreboard
 		returnCommands.add(new UpdateScoreboardCommand(new ArrayList<>(theGame.get_M_PlayerScoreboards().values())));
-				
+		
+		// puts the cards used to claim the route in the discard pile
+		theGame.getDeck().getDiscardPile().addAll(cardsUsedToClaimRoute);
+		
 		// send to all users in game (NotifyRouteClaimed and UpdateScoreboard)
 		int currentPlayerNumber = 0;
 		for (int i = 1; i <= theGame.get_numberOfPlayers(); i++)
@@ -601,8 +598,8 @@ public class ServerFacade implements IServer {
 		}
 		ClientProxy.SINGLETON.get_m_usersCommands().get(theGame.getPlayer(currentPlayerNumber).get_S_username()).add(new NotifyTurnCommand());
 		
-		// decrease car count of player who claimed route by the weight of the route claimed
-		returnCommands.add(new UpdateCarCountCommand(route.get_Weight()));
+		// decrease car count of player who claimed route by the weight of the route claimed, updates player hand
+		returnCommands.add(new UpdateCarCountAndHandCommand(route.get_Weight(), cardsUsedToClaimRoute));
 		returnCommands.add(new EndTurnCommand());
 		
 		return returnCommands;
@@ -623,8 +620,6 @@ public class ServerFacade implements IServer {
 			e.printStackTrace();
 		}
 		
-		// TODO: update player count for that card on the server
-		
 		// updates the scoreboard
 		theGame.get_M_PlayerScoreboards().get(username).addTrainCards(1);
 		returnCommands.add(new UpdateScoreboardCommand(new ArrayList<>(theGame.get_M_PlayerScoreboards().values())));
@@ -644,6 +639,7 @@ public class ServerFacade implements IServer {
 			}
 		}
 		
+		// TODO: update player count for that card on the server
 		// adds top train card to current user's hand
 		returnCommands.add(new UpdatePlayerTrainCardsCommand(theGame.getDeck().drawTop()));
 		if (turnNumber == 2)
@@ -705,11 +701,10 @@ public class ServerFacade implements IServer {
 			}
 		}
 		
-		// adds the card sele
 		// TODO: update the card count of that type for that player on the server
 		returnCommands.add(new UpdatePlayerTrainCardsCommand(theCard));
 		
-		if (turnNumber == 2)
+		if (turnNumber == 2 || (turnNumber == 1 && theCard.getType() == "RAINBOW"))
 		{
 			if (currentPlayerNumber == theGame.get_numberOfPlayers())
 			{

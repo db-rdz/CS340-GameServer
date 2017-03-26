@@ -6,6 +6,9 @@ import Server.IServer;
 import Server.ServerFacade;
 import GameModels.Game;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import ServerModel.GameModels.CardsModel.TrainCard;
+import ServerModel.GameModels.RouteModel.Route;
 import ServerModel.GameModels.RouteModel.iRoute;
 
 import java.util.List;
@@ -20,22 +23,24 @@ import java.util.List;
 
 public class ClaimRouteCommand implements ICommand {
     //Data members
-    private iRoute route;
+    private Route route;
     private int gameId;
     String authenticationCode;
+    List<TrainCard> cardsUsedToClaimRoute;
 
     //Constructors
     public ClaimRouteCommand(){}
-    public ClaimRouteCommand(int g, String code, iRoute route1) {
+    public ClaimRouteCommand(int g, String code, Route route1, List<TrainCard> list) {
         route = route1;
         gameId = g;
         authenticationCode = code;
+        cardsUsedToClaimRoute = list;
     }
 
     //Functions
     @Override
     public List<ICommand> execute() throws IServer.GameIsFullException {
-        return ServerFacade.SINGLETON.claimRoute(gameId, authenticationCode, route);
+        return ServerFacade.SINGLETON.claimRoute(gameId, authenticationCode, route, cardsUsedToClaimRoute);
     }
 
     @JsonIgnore

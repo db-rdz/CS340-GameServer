@@ -32,7 +32,7 @@ public interface IServer {
     public List<ICommand> addPlayer(String str_authentication_code, int iGameId) throws GameIsFullException;
     public List<ICommand> logout(String str_authentication_code);
     public List<ICommand> broadcastToChatCommand(int gameId, String authenticationToken, String message);
-    public List<ICommand> claimRoute(int gameId, String authenticationCode, String routeMappingName);
+    public List<ICommand> claimRoute(int gameId, String authenticationCode, Route theRoute, List<TrainCard> cardsUsedToClaimRoute);
     public List<ICommand> getTopDeckTrainCard(int gameId, String authenticationToken, int turnNumber);
     public List<ICommand> getFaceUpTableTrainCard(int gameId, int cardIndex, boolean isWild, String authenticationCode, int turnNumber);
     

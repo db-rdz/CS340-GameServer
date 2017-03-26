@@ -3,6 +3,7 @@ package Command.Phase2;
 import Client.User;
 import Command.ICommand;
 import Server.IServer;
+import ServerModel.GameModels.CardsModel.TrainCard;
 import GameModels.Game;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -18,14 +19,18 @@ import java.util.List;
  * Created by natha on 2/27/2017.
  */
 
-public class UpdateCarCountCommand implements ICommand {
+public class UpdateCarCountAndHandCommand implements ICommand {
 
+	// Ryan : added list of train cards used so that we can use the server to update the model, rather than having
+	// the model update itself directly. These are the cards that need to be removed from the player's hand
     //Data members
     private int int_cars_used;
+    private List<TrainCard> l_train_cards_used;
 
     //Constructor
-    public UpdateCarCountCommand(int int_used_cars) {
+    public UpdateCarCountAndHandCommand(int int_used_cars, List<TrainCard> list) {
         this.int_cars_used = int_used_cars;
+        l_train_cards_used = list;
     }
     //Functions
     @Override
@@ -49,5 +54,10 @@ public class UpdateCarCountCommand implements ICommand {
 
     public int getInt_cars_used() {
         return int_cars_used;
+    }
+    
+    public List<TrainCard> get_l_train_cards_used()
+    {
+    	return l_train_cards_used;
     }
 }
