@@ -26,11 +26,13 @@ import ServerModel.GameModels.CardsModel.TrainCard;
 public class InitializeGameCommand implements ICommand {
 	private List<TrainCard> hand;
 	private List<DestCard> destinationCards;
+	private List<TrainCard> faceupTrainCards;
 	
-	public InitializeGameCommand(List<TrainCard> hand, List<DestCard> dc)
+	public InitializeGameCommand(List<TrainCard> hand, List<DestCard> dc, List<TrainCard> faceup)
 	{
 		this.hand = hand;
 		destinationCards = dc;
+		faceupTrainCards = faceup;
 	}
 	
 	@Override
@@ -56,9 +58,12 @@ public class InitializeGameCommand implements ICommand {
 		return hand;
 	}
 	
-	public List<DestCard> getDestCards()
-	{
+	public List<DestCard> getDestinationCards() {
 		return destinationCards;
+	}
+	
+	public List<TrainCard> getFaceupTrainCards() {
+		return faceupTrainCards;
 	}
 
 }

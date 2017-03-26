@@ -26,8 +26,7 @@ public class StartGameCommand implements ICommand {
 
     @Override
     public List<ICommand> execute(){
-    	ServerFacade.SINGLETON.startGame(gameId, usernamesInGame, _strAuthenticationCode);
-        return null;
+    	return ServerFacade.SINGLETON.startGame(gameId, usernamesInGame, _strAuthenticationCode);
     }
 
     @Override

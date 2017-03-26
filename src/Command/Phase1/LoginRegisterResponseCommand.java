@@ -8,30 +8,46 @@ import Client.User;
 import Command.ICommand;
 import GameModels.Game;
 
-public class LoginRegisterResponseCommand implements ICommand{
-	  private User user;
-	  public LoginRegisterResponseCommand(){}
-	  public LoginRegisterResponseCommand(User user){
-		  this.user = user;
-	    }
-	
-	
-	  @Override
-	  public User getUser() {
-	    return user;
-	  }
-	  
-	  @Override
-	  public List<ICommand> execute(){
-	    return null;
-	    }
-	  
-	  @JsonIgnore
-	  @Override
-	  public String getAuthenticationCode(){
-	    return user.getStr_authentication_code();}
-	  
-//	  @JsonIgnore
-//	  @Override
-//	  public Game getGame() { return null; }
-  }
+public class LoginRegisterResponseCommand implements ICommand {
+    private User user;
+    private Boolean validCredentials;
+    private Boolean userLoggedInAlready;
+    private Boolean userRegisteredAlready;
+
+    public LoginRegisterResponseCommand(){}
+    public LoginRegisterResponseCommand(User user, boolean credentials, boolean loggedin, boolean registeredalready){
+        this.user = user;
+        validCredentials = credentials;
+        userLoggedInAlready = loggedin;
+        userRegisteredAlready = registeredalready;
+    }
+
+
+    @Override
+    public User getUser() {
+    return user;
+    }
+
+    @Override
+    public List<ICommand> execute(){
+        return null;
+    }
+
+    @JsonIgnore
+    @Override
+    public String getAuthenticationCode(){
+        return null;
+    }
+
+    public Boolean getValidCredentials() {
+        return validCredentials;
+    }
+
+    public Boolean getUserLoggedInAlready() {
+        return userLoggedInAlready;
+    }
+
+    public Boolean getUserRegisteredAlready() {
+        return userRegisteredAlready;
+    }
+}

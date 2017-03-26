@@ -46,15 +46,15 @@ public class GetCommandsCommand implements ICommand{
     public List<ICommand> execute(){
         List<ICommand> listOfSpecificUserCommands = new ArrayList<>();
         int mapSize = ClientProxy.SINGLETON.get_m_usersCommands().size();
-        System.out.println("mapSize is: " + mapSize);
+//        System.out.println("mapSize is: " + mapSize);
         
         try {
             if (mapSize > 0 && UserModel.User.get_M_usernameToLoggedInUser().containsKey(username)) { //If there's commands for that logged in user, get them
                 for (ICommand command : ClientProxy.SINGLETON.getUserCommands(username, lastCommandRecievedIndex)) { //Does a deep copy of the list of commands
                 	listOfSpecificUserCommands.add(command);
                 }
-            	System.out.println("getting commands for " + username + ": " + listOfSpecificUserCommands);
-            	System.out.println("lastCommandReceivedIndex: " + lastCommandRecievedIndex);
+//            	System.out.println("getting commands for " + username + ": " + listOfSpecificUserCommands);
+//            	System.out.println("lastCommandReceivedIndex: " + lastCommandRecievedIndex);
 
             }
 		} catch (Exception e) {
