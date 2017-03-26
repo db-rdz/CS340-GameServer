@@ -40,4 +40,9 @@ public class DestCardDeck {
         }
         shuffle();
     }
+    
+    public void returnCard(DestCard card)
+    {
+    	_L_Deck.add(card);
+    }
 }

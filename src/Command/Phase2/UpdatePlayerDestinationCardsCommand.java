@@ -20,11 +20,11 @@ import java.util.List;
 public class UpdatePlayerDestinationCardsCommand implements ICommand {
 
     //Data members
-    private DestCard destCard;
+    private List<DestCard> destCards;
 
     //Constructor
-    public UpdatePlayerDestinationCardsCommand(DestCard destCard) {
-        this.destCard = destCard;
+    public UpdatePlayerDestinationCardsCommand(List<DestCard> destCards) {
+        this.destCards = destCards;
     }
 
     //Functions
@@ -46,7 +46,7 @@ public class UpdatePlayerDestinationCardsCommand implements ICommand {
     }
 
 
-    public DestCard getDestCard() {
-        return destCard;
+    public List<DestCard> getDestCards() {
+        return destCards;
     }
 }

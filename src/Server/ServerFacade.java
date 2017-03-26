@@ -513,9 +513,8 @@ public class ServerFacade implements IServer {
 	@Override
 	public List<ICommand> broadcastToChatCommand(int gameId, String authenticationToken, String message) {
 		// Sends back the entire list of messages, prepends message with the username shows who sent the message
-		
+		List<ICommand> returnCommands = new ArrayList<>();
 		Game theGame = Game.getGameWithId(gameId);
-		List<String> chatRoom = theGame.getChatRoom();
 		UserModel.User theUser;
 		String username = "";
 		try {
@@ -525,8 +524,9 @@ public class ServerFacade implements IServer {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+		
+		List<String> chatRoom = theGame.getChatRoom();
 		chatRoom.add(message);
-		List<ICommand> returnCommands = new ArrayList<>();
 		returnCommands.add(new ShowMessageCommand(chatRoom));
 		
 		// send to all users in game
@@ -550,7 +550,7 @@ public class ServerFacade implements IServer {
 	
 	@Override
 	public List<ICommand> claimRoute(int gameId, String authenticationCode, String routeMappingName) {
-		// TODO Need the route model
+		List<ICommand> returnCommands = new ArrayList<>();
 		Game theGame = Game.getGameWithId(gameId);
 		String username = "";
 		UserModel.User theUser = null;
@@ -558,27 +558,22 @@ public class ServerFacade implements IServer {
 			theUser = DAO._SINGLETON.getUserByAccessToken(authenticationCode);
 			username = theUser.get_S_username();
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		AllRoutes gameRoutes = theGame.getAllRoutes(); // need to update the route in this list.
-		Route route = gameRoutes.get_RoutesMap().get(routeMappingName);
+		
+		// gets the route from the list in the game and sets the owner
+		Route route = theGame.getAllRoutes().get_RoutesMap().get(routeMappingName);
 		route.set_Owner(username);
 		
 		// tells the other players that the route was claimed (maybe make a toast with the message)
-		List<ICommand> returnCommands = new ArrayList<>();
 		returnCommands.add(new NotifyRouteClaimedCommand("The route from " + route.get_ConnectingCities().getLeft() + " to " 
 							+ route.get_ConnectingCities().getRight() + " has been claimed by " + username + ".", route));
+		theGame.get_M_PlayerScoreboards().get(username).addPoints(route.get_i_pointValue());
 		
-		// TODO: how many points is each route worth?
-		int points = 0; 
-//		points = route.getPoints();
-		theGame.get_M_PlayerScoreboards().get(username).addPoints(points);
 		// increments the player's points on every player's screen
-		List<Scoreboard> sList = new ArrayList<>(theGame.get_M_PlayerScoreboards().values());
-		returnCommands.add(new UpdateScoreboardCommand(sList));
+		returnCommands.add(new UpdateScoreboardCommand(new ArrayList<>(theGame.get_M_PlayerScoreboards().values())));
 				
-		// send to all users in game
+		// send to all users in game (NotifyRouteClaimed and UpdateScoreboard)
 		int currentPlayerNumber = 0;
 		for (int i = 1; i <= theGame.get_numberOfPlayers(); i++)
 		{
@@ -590,7 +585,7 @@ public class ServerFacade implements IServer {
 			}
 			else 
 			{
-				currentPlayerNumber = i;
+				currentPlayerNumber = i; // identifies the player whose turn it is
 			}
 		}
 		
@@ -616,11 +611,8 @@ public class ServerFacade implements IServer {
 	@Override
 	public List<ICommand> getTopDeckTrainCard(int gameId, String authenticationCode, int turnNumber) {
 		//gets the game, gets the deck from the game, and draws the top card 
-		Game theGame = Game.getGameWithId(gameId);
-		TrainCard theCard = theGame.getDeck().drawTop();
 		List<ICommand> returnCommands = new ArrayList<>();
-		// TODO: update player count for that card on the server
-		
+		Game theGame = Game.getGameWithId(gameId);
 		UserModel.User theUser = null;
 		String username = "";
 		try {
@@ -630,10 +622,11 @@ public class ServerFacade implements IServer {
 			e.printStackTrace();
 		}
 		
+		// TODO: update player count for that card on the server
+		
+		// updates the scoreboard
 		theGame.get_M_PlayerScoreboards().get(username).addTrainCards(1);
-		// increments the player's trainCards on every player's screen
-		List<Scoreboard> sList = new ArrayList<>(theGame.get_M_PlayerScoreboards().values());
-		returnCommands.add(new UpdateScoreboardCommand(sList));
+		returnCommands.add(new UpdateScoreboardCommand(new ArrayList<>(theGame.get_M_PlayerScoreboards().values())));
 		
 		int currentPlayerNumber = 0;
 		for (int i = 1; i <= theGame.get_numberOfPlayers(); i++)
@@ -650,7 +643,8 @@ public class ServerFacade implements IServer {
 			}
 		}
 		
-		returnCommands.add(new UpdatePlayerTrainCardsCommand(theCard));
+		// adds top train card to current user's hand
+		returnCommands.add(new UpdatePlayerTrainCardsCommand(theGame.getDeck().drawTop()));
 		if (turnNumber == 2)
 		{
 			if (currentPlayerNumber == theGame.get_numberOfPlayers())
@@ -662,11 +656,11 @@ public class ServerFacade implements IServer {
 				currentPlayerNumber++; // goes to next player
 			}
 			ClientProxy.SINGLETON.get_m_usersCommands().get(theGame.getPlayer(currentPlayerNumber).get_S_username()).add(new NotifyTurnCommand());
-			returnCommands.add(new EndTurnCommand());
+			returnCommands.add(new EndTurnCommand()); // ends current player's turn
 		}
 		else
 		{
-			returnCommands.add(new NotifyTurnCommand());
+			returnCommands.add(new NotifyTurnCommand()); // the current player can draw another card
 		}
 		
 		return returnCommands;
@@ -675,17 +669,8 @@ public class ServerFacade implements IServer {
 	// Ryan
 	@Override
 	public List<ICommand> getFaceUpTableTrainCard(int gameId, int cardIndex, boolean isWild, String authenticationCode, int turnNumber) {
-		Game theGame = Game.getGameWithId(gameId);
-		TrainCardDeck theDeck = theGame.getDeck();
-		TrainCard theCard = theDeck.getFromTheFiveCards(cardIndex);
-		// TODO: update the card count of that type for that player
-		
-		List<TrainCard> fiveCards = theDeck.getFiveCards();
-		
 		List<ICommand> returnCommands = new ArrayList<>();
-		
-		returnCommands.add(new UpdateFaceUpTableTrainCardsCommand(fiveCards));
-		
+		Game theGame = Game.getGameWithId(gameId);
 		String username = "";
 		UserModel.User theUser = null;
 		try {
@@ -695,11 +680,15 @@ public class ServerFacade implements IServer {
 			e.printStackTrace();
 		} 
 		
-		theGame.get_M_PlayerScoreboards().get(username).addTrainCards(1);
-		// increments the player's trainCards on every player's screen
-		List<Scoreboard> sList = new ArrayList<>(theGame.get_M_PlayerScoreboards().values());
-		returnCommands.add(new UpdateScoreboardCommand(sList));
+		TrainCardDeck theDeck = theGame.getDeck();
+		TrainCard theCard = theDeck.getFromTheFiveCards(cardIndex);
+		returnCommands.add(new UpdateFaceUpTableTrainCardsCommand(theDeck.getFiveCards()));
 		
+		// updates the scoreboard
+		theGame.get_M_PlayerScoreboards().get(username).addTrainCards(1);
+		returnCommands.add(new UpdateScoreboardCommand(new ArrayList<>(theGame.get_M_PlayerScoreboards().values())));
+		
+		// sends new set of face up 5 cards to all players, as well as the updated scoreboard
 		int currentPlayerNumber = 0;
 		for (int i = 1; i <= theGame.get_numberOfPlayers(); i++)
 		{
@@ -715,7 +704,10 @@ public class ServerFacade implements IServer {
 			}
 		}
 		
+		// adds the card sele
+		// TODO: update the card count of that type for that player on the server
 		returnCommands.add(new UpdatePlayerTrainCardsCommand(theCard));
+		
 		if (turnNumber == 2)
 		{
 			if (currentPlayerNumber == theGame.get_numberOfPlayers())
@@ -727,16 +719,103 @@ public class ServerFacade implements IServer {
 				currentPlayerNumber++; // goes to next player
 			}
 			ClientProxy.SINGLETON.get_m_usersCommands().get(theGame.getPlayer(currentPlayerNumber).get_S_username()).add(new NotifyTurnCommand());
-			returnCommands.add(new EndTurnCommand());
+			returnCommands.add(new EndTurnCommand()); // ends current player's turn
 		}
 		else
 		{
-			returnCommands.add(new NotifyTurnCommand());
+			returnCommands.add(new NotifyTurnCommand()); // the current player can draw another card
 		}
 		
 		return returnCommands;
 	}
     
+    public List<ICommand> rejectDestCard(int gameId, String authenticationCode, DestCard rejectedCard)
+    {
+    	List<ICommand> returnCommands = new ArrayList<>();
+    	Game theGame = Game.getGameWithId(gameId);
+    	UserModel.User theUser;
+    	String username = "";
+		try {
+			theUser = DAO._SINGLETON.getUserByAccessToken(authenticationCode);
+			username = theUser.get_S_username();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		//returns the card to the DestCardDeck in the game
+		theGame.getDestCards().returnCard(rejectedCard);
+		
+		// updates the scoreboard, but doesn't send until all destination cards are kept/rejected
+		theGame.get_M_PlayerScoreboards().get(username).addDestCards(-1);
+		
+    	return returnCommands;
+    }
     
+    public List<ICommand> getDestCards(int gameId, String authenticationCode)
+    {
+    	List<ICommand> returnCommands = new ArrayList<>();
+    	Game theGame = Game.getGameWithId(gameId);
+    	UserModel.User theUser;
+    	String username = "";
+		try {
+			theUser = DAO._SINGLETON.getUserByAccessToken(authenticationCode);
+			username = theUser.get_S_username();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		// gets the three top cards
+		DestCardDeck theDeck = theGame.getDestCards();
+		returnCommands.add(new UpdatePlayerDestinationCardsCommand(theDeck.drawTop3()));
+		
+		// updates the scoreboard, but doesn't send until all destination cards are kept/rejected
+		theGame.get_M_PlayerScoreboards().get(username).addDestCards(3);
+		
+    	return returnCommands;
+    }
+    
+    public List<ICommand> keepAllDestCards(int gameId, String authenticationCode)
+    {
+    	List<ICommand> returnCommands = new ArrayList<>();
+    	Game theGame = Game.getGameWithId(gameId);
+    	UserModel.User theUser;
+    	String username = "";
+		try {
+			theUser = DAO._SINGLETON.getUserByAccessToken(authenticationCode);
+			username = theUser.get_S_username();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+    	
+		returnCommands.add(new UpdateScoreboardCommand(new ArrayList<>(theGame.get_M_PlayerScoreboards().values())));
+
+		int currentPlayerNumber = 0;
+		for (int i = 1; i <= theGame.get_numberOfPlayers(); i++)
+		{
+			UserModel.User player = theGame.getPlayer(i);
+			String newUsername = player.get_S_username();
+			if (newUsername != username)
+			{
+				ClientProxy.SINGLETON.get_m_usersCommands().get(newUsername).addAll(returnCommands);
+			}
+			else
+			{
+				currentPlayerNumber = i; // shows whose turn it is
+			}
+		}
+		
+		if (currentPlayerNumber == theGame.get_numberOfPlayers())
+		{
+			currentPlayerNumber = 1; // starts over at player 1
+		}
+		else
+		{
+			currentPlayerNumber++; // goes to next player
+		}
+		ClientProxy.SINGLETON.get_m_usersCommands().get(theGame.getPlayer(currentPlayerNumber).get_S_username()).add(new NotifyTurnCommand());
+		returnCommands.add(new EndTurnCommand()); // ends current player's turn
+		
+		return returnCommands;
+    }
 
 }
