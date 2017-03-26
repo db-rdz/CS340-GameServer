@@ -4,44 +4,67 @@ import Client.IClient;
 import Client.User;
 import Command.ICommand;
 import Command.Phase1.AddGameToJoinableListCommand;
-import Command.Phase1.SwitchToWaitingActivityCommand;
 import Command.Phase1.AddPlayerToClientCommand;
 import Command.Phase1.DeleteGameCommand;
 import Command.Phase1.ListJoinableCommand;
 import Command.Phase1.LoginRegisterResponseCommand;
 import Command.Phase1.LogoutResponseCommand;
+import Command.Phase1.SwitchToWaitingActivityCommand;
 import Command.Phase2.*;
 import Database.DAO;
 import GameModels.Game;
 import ServerModel.*;
+import ServerModel.GameModels.BoardModel.Scoreboard;
 import ServerModel.GameModels.CardsModel.DestCard;
 import ServerModel.GameModels.CardsModel.DestCardDeck;
 import ServerModel.GameModels.CardsModel.TrainCard;
 import ServerModel.GameModels.CardsModel.TrainCardDeck;
+import ServerModel.GameModels.RouteModel.AllRoutes;
+import ServerModel.GameModels.RouteModel.Route;
 import ServerModel.GameModels.RouteModel.iRoute;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import com.sun.corba.se.pept.transport.EventHandler;
-
 
 /**
+ * ServerFacade implements IServer
  * Created by RyanBlaser on 2/5/17.
  */
 
 public class ServerFacade implements IServer {
     
-    public static ServerFacade SINGLETON = new ServerFacade();
+    /**
+     * public static ServerFacade SINGLETON
+     */
+	public static ServerFacade SINGLETON = new ServerFacade();
     
+	/**
+	 * This method is used to log a user in given the username and password.
+	 * 
+	 * Pre: The username and password are formatted correctly (see username and password class)
+	 * Pre: The Username exists in the database
+	 * Pre: THe password matches the username
+	 * 
+	 * Post: The user will be logged in and the list of joinable games will appear on the screen.
+	 * 
+	 * @param username The username of the person trying to login
+	 * @param password The password of the person trying to login
+	 * @return List<ICommand> Returns the list of commands necessary to initialize the ClientModel
+	 * @exception IClient.InvalidUsername This is thrown if the given username does not match any username in the database
+	 * @exception IClient.InvalidPassword This is thrown if the given password is not the correct password for that user
+	 * @exception UserAlreadyLoggedIn This is thrown if the user is already logged in on another device
+	 */
     @Override
     public List<ICommand> login(String username, String password) throws IClient.InvalidUsername, IClient.InvalidPassword, UserAlreadyLoggedIn {
-    	List<ICommand> commands = new ArrayList<>(); //Will be used for sending back bad logins
-        try {
+        List<ICommand> commands = new ArrayList<>();
+
+    	try {
             // tries to retrieve the user from the database
             if (DAO._SINGLETON.login(username, password))
             {
@@ -50,8 +73,6 @@ public class ServerFacade implements IServer {
                 user.setUsername(theUser.get_S_username());
                 user.setPassword(theUser.get_S_password());
                 user.setStr_authentication_code(theUser.get_S_token());
-                             
-               
 
                 if (theUser.get_L_joinedGames().isEmpty())
                 {
@@ -92,9 +113,12 @@ public class ServerFacade implements IServer {
                 
                 ClientProxy.SINGLETON.get_m_usersCommands().put(username, new ArrayList<ICommand>());
                 ServerModel.SINGLETON.logIn(theUser.get_S_username());
-                System.out.println("\nLogging in user: " + theUser.get_S_username());
+                
+                System.out.println("Logging in user: " + theUser.get_S_username());
                 System.out.println("Authorization code: " + theUser.get_S_token());
-                                
+                
+//                new GetCommandsCommand(theUser.get_S_username()).execute();
+                
                 return commands;
             }
         } catch (SQLException e) {
@@ -103,27 +127,42 @@ public class ServerFacade implements IServer {
         }
         catch (IClient.InvalidPassword e) {
         	commands.clear();
-        	commands.add(new LoginRegisterResponseCommand(null, false, true, false));
+        	commands.add(new LoginRegisterResponseCommand(null, false, false, false));
             return commands;
         } catch (IClient.InvalidUsername e) {
         	commands.clear();
-        	commands.add(new LoginRegisterResponseCommand(null, false, true, false));
+        	commands.add(new LoginRegisterResponseCommand(null, false, false, false));
             return commands;
         } catch (UserAlreadyLoggedIn e) {
         	commands.clear();
         	commands.add(new LoginRegisterResponseCommand(null, true, true, false));
             return commands;
         }
-        return null; //Returns null if the try doesn't catch any defined error.
+        return null; //Returns null if the try catches the error.
     }
     
+    /**
+	 * This method is used to register a user in given the username and password.
+	 * 
+	 * Pre: The username and password are formatted correctly (see username and password class)
+	 * Pre: The Username does not exists in the database
+	 * 
+	 * Post: The user will be registered, logged in, and the list of joinable games will appear on the screen.
+	 * 
+	 * @param username The username of the person trying to register
+	 * @param password The password of the person trying to register
+	 * @return List<ICommand> Returns the list of commands necessary to initialize the ClientModel
+	 * @exception IClient.UsernameAlreadyExists This is thrown if the given username already exists in the database
+	 * @exception UserAlreadyLoggedIn This is thrown if the user is already logged in on another device
+	 */
     @Override
     public List<ICommand> register(String username, String password) throws IClient.UsernameAlreadyExists, UserAlreadyLoggedIn {
-    	List<ICommand> commands = new ArrayList<>(); //Will be used for sending back bad registering
-        try {
+        List<ICommand> commands = new ArrayList<>();
+
+    	try {
             if (!DAO._SINGLETON.registerUser(username, password)) {
             	commands.clear();
-            	commands.add(new LoginRegisterResponseCommand(null, false, false, true));
+            	commands.add(new LoginRegisterResponseCommand(null, true, true, true));
                 return commands;
             }
             
@@ -132,8 +171,7 @@ public class ServerFacade implements IServer {
             user.setUsername(theUser.get_S_username());
             user.setPassword(theUser.get_S_password());
             user.setStr_authentication_code(theUser.get_S_token());
-            
-                        
+                                    
             
             LoginRegisterResponseCommand lrsc = new LoginRegisterResponseCommand(user, true, false, false);
             commands.add(lrsc);
@@ -155,57 +193,63 @@ public class ServerFacade implements IServer {
             return commands;
             
         } catch (SQLException e) {
-        	System.err.println("@registerUser");
-            e.printStackTrace();
+        	commands.clear();
+        	commands.add(new LoginRegisterResponseCommand(null, true, true, true));
+            return commands;
         }
         
-        return null;
     }
    
-    
+
     @Override
     public List<ICommand> removeGame(Game game) {
-        try {
-        	ICommand deleteGameCommand = new DeleteGameCommand(game.get_i_gameId());
-        	
-        	List<ICommand> commands = new ArrayList<>();
-        	commands.add(deleteGameCommand);
-        	
-        	String username = "";
-        	List<UserModel.User> users = DAO._SINGLETON.getAllUsers();
-        	for (int i = 0; i < users.size(); i++) {
-        		username = users.get(i).get_S_username();
-        		ClientProxy.SINGLETON.get_m_usersCommands().get(username).addAll(commands);
-        	}
-        	
-        	return commands;
-			
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-        return null;
+        
+        ICommand deleteGameCommand = new DeleteGameCommand(game.get_i_gameId());
+        
+        List<ICommand> commands = new ArrayList<>();
+        commands.add(deleteGameCommand);
+
+        String username = "";
+        
+        for (int i = 0; i < UserModel.User.get_L_listOfAllUsers().size(); i++) {
+            username = UserModel.User.get_L_listOfAllUsers().get(i).get_S_username();
+    		ClientProxy.SINGLETON.get_m_usersCommands().get(username).addAll(commands);
+        } //TODO: Include this in the ServerCommunicator.
+        
+        return commands;
     }
     
+    /**
+	 * This method is used to start a game with a given gameId
+	 * 
+	 * Pre: the gameId is valid
+	 * 
+	 * Post: The game will start, the game board will be displayed on each player's screen
+	 * 
+	 * @param gameId The id of the Game to be retrieved from the model.
+	 * @param usernamesInGame Shows each user the usernames of the other players in the game.
+	 * @param strAuthenticationCode Authenticates the user starting the game.
+	 * @return List<ICommand> Returns the list of commands necessary to initialize the game.
+	 */
     @Override
     public List<ICommand> startGame(int gameId, List<String> usernamesInGame, String strAuthenticationCode) {
 		//TODO put authentication code in startGameCommand on client side
     	try {
 			Game theGame = Game.getGameWithId(gameId);
 	        
-	        // send to all users in game	        
-	        List<ICommand> otherPlayerCommands = null;
-	        List<ICommand> returnCommands = new ArrayList<>();
-
+			List<ICommand> returnCommands = new ArrayList<>();
+			List<ICommand> otherPlayerCommands = new ArrayList<>();
+			
 	        List<TrainCard> trainCards = null;
 	        List<DestCard> destCards = null;
 	        
 	        TrainCardDeck theTrainCardDeck = theGame.getDeck();
 	        DestCardDeck theDestCardDeck = theGame.getDestCards();
-	        
+
         	trainCards = new ArrayList<>();
             for (int j = 0; j < 4; j++)
             {
-            	trainCards.add(theTrainCardDeck.drawTop());
+            	trainCards.add(theTrainCardDeck.drawTop()); //The game creator's train cards
             }
             destCards = theDestCardDeck.drawTop3();
             
@@ -251,11 +295,22 @@ public class ServerFacade implements IServer {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-    System.err.println("Error @StartGame");
 	return null; //Meaning something went wrong here.
 }
 
-    
+    /**
+	 * This method is used to add a player to a game.
+	 * 
+	 * Pre: The user is not already in the game
+	 * Pre: The game is not already full
+	 * 
+	 * Post: The user will be added to the game and the game lobby will display on that user's screen. All other players will be notified.
+	 * 
+	 * @param str_authentication_code The authentication code of the user being added.
+	 * @param intGameId The id of the game to which the user is being added
+	 * @return List<ICommand> Returns the list of commands necessary to notify the other players of the added player.
+	 * @exception GameIsFullException This is thrown if the game already has 5 players.
+	 */
     @Override
     public List<ICommand> addPlayer(String str_authentication_code, int intGameId) throws GameIsFullException {
     	
@@ -271,7 +326,7 @@ public class ServerFacade implements IServer {
         	
                 theUser.set_B_isInGame(true); //The user is now in the game
                 
-                //Update the game then update the database
+//                theGame = DAO._SINGLETON.getGamebyGameId(intGameId); //Get the game from id
                 theGame.addPlayerToGame(theUser.get_S_username(), theUser); //Adds creator to the game
               	DAO._SINGLETON.updateGameNumberOfPlayers(intGameId, theGame.get_numberOfPlayers());
                 DAO._SINGLETON.UpdateGamePlayer(theGame.get_i_gameId(), theUser.get_S_username(), theGame.get_numberOfPlayers());
@@ -294,10 +349,10 @@ public class ServerFacade implements IServer {
                 	
                 	//Only gives the AddPlayerToClientCommand to users that are in a specific game.
                 	if (!user.get_S_token().equals(theUser.get_S_token())) {
-//                		System.out.println(user.get_S_username() + " receiving commmands: " + commands);
                 		ClientProxy.SINGLETON.get_m_usersCommands().get(user.get_S_username()).addAll(commands);
                 	}
-                }
+                	
+            }
 
             // send to user who joined
 //            DeleteGameCommand deleteGameCommand = new DeleteGameCommand(intGameId);
@@ -319,14 +374,24 @@ public class ServerFacade implements IServer {
         return null;
     }
     
-    
+    /**
+	 * This method is used when a user creates a game so it can be stored on the server.
+	 * 
+	 * Pre: none
+	 * 
+	 * Post: A newly created game will exist on the server and in the database. All other users will be notified of the new game.
+	 * 
+	 * @param str_authentication_code The authentication code of the user being added.
+	 * @param game The game which is being added.
+	 * @return List<ICommand> Returns the list of commands necessary to notify the other users that a new game was created.
+	 */
     @Override
-    public List<ICommand> addJoinableGameToServer(String str_authentication_code) {
+    public List<ICommand> addJoinableGameToServer(Game game, String str_authentication_code) {
         
         try {
             @SuppressWarnings("unused")
 			Boolean value = DAO._SINGLETON.addGame(new Game());
-            Game theGame = new Game(); //initialize
+            Game theGame = new Game();
             
             Integer gameId = DAO._SINGLETON.getAllGames().size(); //The size == gameid
             UserModel.User theUser = DAO._SINGLETON.getUserByAccessToken(str_authentication_code);
@@ -348,29 +413,28 @@ public class ServerFacade implements IServer {
             }
             Game.insertInAvailableGames(theGame);
             Game.mapGameToId(theGame, gameId);
-           
+            
             List<ICommand> commands = new ArrayList<>();
-            commands.add(new AddGameToJoinableListCommand(theGame.get_i_gameId()));
+            commands.add(new AddGameToJoinableListCommand(gameId));
             
             String username = "";
             Map<String, List<ICommand>> copy = new HashMap<>();
             
             //Sends AddGameToJoinableListCommand to only logged in users.
             Iterator iterator = UserModel.User.get_M_usernameToLoggedInUser().values().iterator();
-//            Map<String, List<ICommand>> putIntoClientProxy = ClientProxy.SINGLETON.get_m_usersCommands();
-            
             while (iterator.hasNext())
             {
             	UserModel.User newUser = (UserModel.User) iterator.next();
-            	if (!newUser.get_S_token().equals(str_authentication_code)) { //Doesn't send the game command to the creator
-            		username = newUser.get_S_username();
-            		ClientProxy.SINGLETON.get_m_usersCommands().get(username).addAll(commands);            		
+            	if (!newUser.get_S_token().equals(str_authentication_code)) {
+            		ClientProxy.SINGLETON.get_m_usersCommands().get(username).addAll(commands);
+            		
             	}
             }
-//            ClientProxy.SINGLETON.set_m_usersCommands(putIntoClientProxy);
             
             
             List<ICommand> returnCommands = new ArrayList<>();
+//            returnCommands.add(new AddPlayerToClientCommand(theUser.get_S_username(), theGame.get_i_gameId())); //The creator needs to be in the game he created
+//            returnCommands.add(new AddWaitingToClientCommand(theGame));
             List<String> usernames = new ArrayList<>();
             for (int i = 1; i <= theGame.get_numberOfPlayers(); i++) {
             	usernames.add(theGame.getPlayer(i).get_S_username());
@@ -391,41 +455,58 @@ public class ServerFacade implements IServer {
     public List<ICommand> addWaitingGame(Game game) {
         // send to user who called this function only
         ICommand deleteGameCommand = new DeleteGameCommand(game.get_i_gameId());
+//        ICommand addWaitingToClientCommand = new AddWaitingToClientCommand(game);
         
         List<ICommand> commands = new ArrayList<>();
         commands.add(deleteGameCommand);
+//        commands.add(addWaitingToClientCommand);
         
         return commands;
     }
     
-    
+    /**
+	 * This method is used to log a player out of the server.
+	 * 
+	 * Pre: none
+	 * 
+	 * Post: The user will be logged out and the screen will return to the Login View
+	 * 
+	 * @param str_authentication_code The authentication code of the user being logged out.
+	 * @return List<ICommand> Returns the list of commands necessary to log the player out.
+	 */
     @Override
-    public List<ICommand> logout(User user) {
-    	try {
-    		System.out.println("Logging out user: " + user.getUsername());
-    		System.out.println("Authorization code: " + user.getStr_authentication_code());
-    		
-	        ServerModel.SINGLETON.logOut(user.getStr_authentication_code());
-	        DAO._SINGLETON.updateUserToken(user.getUsername(), ""); //empty token means user is logged out
-	
-	        List<ICommand> commands = new ArrayList<>();
-	        commands.add(new LogoutResponseCommand());
-	        
+    public List<ICommand> logout(String str_authentication_code) {
+        ServerModel.SINGLETON.logOut(str_authentication_code);
+
+        List<ICommand> commands = new ArrayList<>();
+        
+        try {
+        	UserModel.User user = DAO._SINGLETON.getUserByAccessToken(str_authentication_code);
+            System.out.println("Logging out user: " + user.get_S_username());
+            System.out.println("Authorization code: " + user.get_S_token());
             
-            
-            return commands;
-            
-        } catch (Exception e) {
+            DAO._SINGLETON.updateUserToken(user.get_S_username(), null);
+            commands.add(new LogoutResponseCommand());
+        } catch (SQLException e) {
         	System.err.println("@logout");
             e.printStackTrace();
         }
-        return null;
+        
+        
+        return commands;
     }
 
- // Ryan
+ /*
+  * -------------------------------------------Phase 3------------------------------------------------------------
+  */
+    
+    /* 
+     * Ryan
+     * takes a message sent by a player, adds it to the game's chatroom, and sends the list to the other players
+     */
 	@Override
 	public List<ICommand> broadcastToChatCommand(int gameId, String authenticationToken, String message) {
-		// TODO Sends back the entire list of messages, prepends message with the username shows who sent the message
+		// Sends back the entire list of messages, prepends message with the username shows who sent the message
 		
 		Game theGame = Game.getGameWithId(gameId);
 		List<String> chatRoom = theGame.getChatRoom();
@@ -436,7 +517,6 @@ public class ServerFacade implements IServer {
 			username = theUser.get_S_username();
 			message = username + ": " + message;
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		chatRoom.add(message);
@@ -444,10 +524,10 @@ public class ServerFacade implements IServer {
 		returnCommands.add(new ShowMessageCommand(chatRoom));
 		
 		// send to all users in game
-		Iterator iter = theGame.get_M_idToUserInGame().keySet().iterator();
-		while(iter.hasNext())
+		for (int i = 1; i <= theGame.get_numberOfPlayers(); i++)
 		{
-			String newUsername = (String) iter.next();
+			UserModel.User player = theGame.getPlayer(i);
+			String newUsername = player.get_S_username();
 			if (newUsername != username)
 			{
 				ClientProxy.SINGLETON.get_m_usersCommands().get(newUsername).addAll(returnCommands);
@@ -457,9 +537,13 @@ public class ServerFacade implements IServer {
 		return returnCommands;
 	}
 
-	// Ryan
+	/*
+	 * Ryan
+	 * Allows a player to claim a route, route color will be set on the client side
+	 */
+	
 	@Override
-	public List<ICommand> claimRoute(int gameId, String authenticationCode, iRoute route) {
+	public List<ICommand> claimRoute(int gameId, String authenticationCode, String routeMappingName) {
 		// TODO Need the route model
 		Game theGame = Game.getGameWithId(gameId);
 		String username = "";
@@ -471,63 +555,179 @@ public class ServerFacade implements IServer {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		AllRoutes gameRoutes = theGame.getAllRoutes(); // need to update the route in this list.
+		Route route = gameRoutes.get_RoutesMap().get(routeMappingName);
+		route.set_Owner(username);
 		
-		// tells the other players that the route was claimed
-		String routeName = "";
+		// tells the other players that the route was claimed (maybe make a toast with the message)
 		List<ICommand> returnCommands = new ArrayList<>();
-		returnCommands.add(new NotifyRouteClaimedCommand("The route from " + routeName + " has been claimed by " + username + "."));
+		returnCommands.add(new NotifyRouteClaimedCommand("The route from " + route.get_ConnectingCities().getLeft() + " to " 
+							+ route.get_ConnectingCities().getRight() + " has been claimed by " + username + ".", route));
 		
+		// TODO: how many points is each route worth?
+		int points = 0; 
+//		points = route.getPoints();
+		theGame.get_M_PlayerScoreboards().get(username).addPoints(points);
 		// increments the player's points on every player's screen
-		int points = 0;
-		//points - route.getPoints();	
-		returnCommands.add(new UpdatePointsCommand(points, username));
+		List<Scoreboard> sList = new ArrayList<>(theGame.get_M_PlayerScoreboards().values());
+		returnCommands.add(new UpdateScoreboardCommand(sList));
 				
 		// send to all users in game
-		Iterator iter = theGame.get_M_idToUserInGame().keySet().iterator();
-		while(iter.hasNext())
+		int currentPlayerNumber = 0;
+		for (int i = 1; i <= theGame.get_numberOfPlayers(); i++)
 		{
-			String newUsername = (String) iter.next();
+			UserModel.User player = theGame.getPlayer(i);
+			String newUsername = player.get_S_username();
 			if (newUsername != username)
 			{
 				ClientProxy.SINGLETON.get_m_usersCommands().get(newUsername).addAll(returnCommands);
 			}
+			else 
+			{
+				currentPlayerNumber = i;
+			}
 		}
 		
-		// decrease car count by the weight of the route claimed
-		int weight = 0;
-		//weight = route.getWeight();
-		returnCommands.add(new UpdateCarCountCommand(weight));
+		// notify next player that it is their turn
+		if (currentPlayerNumber == theGame.get_numberOfPlayers())
+		{
+			currentPlayerNumber = 1; // starts over at player 1
+		}
+		else
+		{
+			currentPlayerNumber++; // goes to next player
+		}
+		ClientProxy.SINGLETON.get_m_usersCommands().get(theGame.getPlayer(currentPlayerNumber).get_S_username()).add(new NotifyTurnCommand());
 		
+		// decrease car count of player who claimed route by the weight of the route claimed
+		returnCommands.add(new UpdateCarCountCommand(route.get_Weight()));
+		returnCommands.add(new EndTurnCommand());
 		
 		return returnCommands;
 	}
 
 	// Ryan
 	@Override
-	public List<ICommand> getTopDeckTrainCard(int gameId) {
-		// TODO Do we need to increment the number of train cards each player has on the other player's screens?
-		
+	public List<ICommand> getTopDeckTrainCard(int gameId, String authenticationCode, int turnNumber) {
 		//gets the game, gets the deck from the game, and draws the top card 
-		TrainCard theCard = Game.getGameWithId(gameId).getDeck().drawTop();
+		Game theGame = Game.getGameWithId(gameId);
+		TrainCard theCard = theGame.getDeck().drawTop();
 		List<ICommand> returnCommands = new ArrayList<>();
+		// TODO: update player count for that card on the server
+		
+		UserModel.User theUser = null;
+		String username = "";
+		try {
+			theUser = DAO._SINGLETON.getUserByAccessToken(authenticationCode);
+			username = theUser.get_S_username();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		theGame.get_M_PlayerScoreboards().get(username).addTrainCards(1);
+		// increments the player's trainCards on every player's screen
+		List<Scoreboard> sList = new ArrayList<>(theGame.get_M_PlayerScoreboards().values());
+		returnCommands.add(new UpdateScoreboardCommand(sList));
+		
+		int currentPlayerNumber = 0;
+		for (int i = 1; i <= theGame.get_numberOfPlayers(); i++)
+		{
+			UserModel.User player = theGame.getPlayer(i);
+			String newUsername = player.get_S_username();
+			if (newUsername != username)
+			{
+				ClientProxy.SINGLETON.get_m_usersCommands().get(newUsername).addAll(returnCommands);
+			}
+			else
+			{
+				currentPlayerNumber = i; // shows whose turn it is
+			}
+		}
+		
 		returnCommands.add(new UpdatePlayerTrainCardsCommand(theCard));
+		if (turnNumber == 2)
+		{
+			if (currentPlayerNumber == theGame.get_numberOfPlayers())
+			{
+				currentPlayerNumber = 1; // starts over at player 1
+			}
+			else
+			{
+				currentPlayerNumber++; // goes to next player
+			}
+			ClientProxy.SINGLETON.get_m_usersCommands().get(theGame.getPlayer(currentPlayerNumber).get_S_username()).add(new NotifyTurnCommand());
+			returnCommands.add(new EndTurnCommand());
+		}
+		else
+		{
+			returnCommands.add(new NotifyTurnCommand());
+		}
+		
 		return returnCommands;
 	}
 
 	// Ryan
 	@Override
-	public List<ICommand> getFaceUpTableTrainCard(int gameId, int cardIndex, boolean isWild) {
-		// TODO Do we need to increment the number of train cards each player has on the other player's screens?
-		
+	public List<ICommand> getFaceUpTableTrainCard(int gameId, int cardIndex, boolean isWild, String authenticationCode, int turnNumber) {
 		Game theGame = Game.getGameWithId(gameId);
 		TrainCardDeck theDeck = theGame.getDeck();
 		TrainCard theCard = theDeck.getFromTheFiveCards(cardIndex);
-		// update the card count of that type for that player
+		// TODO: update the card count of that type for that player
 		
 		List<TrainCard> fiveCards = theDeck.getFiveCards();
 		
 		List<ICommand> returnCommands = new ArrayList<>();
+		
 		returnCommands.add(new UpdateFaceUpTableTrainCardsCommand(fiveCards));
+		
+		String username = "";
+		UserModel.User theUser = null;
+		try {
+			theUser = DAO._SINGLETON.getUserByAccessToken(authenticationCode);
+			username = theUser.get_S_username();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} 
+		
+		theGame.get_M_PlayerScoreboards().get(username).addTrainCards(1);
+		// increments the player's trainCards on every player's screen
+		List<Scoreboard> sList = new ArrayList<>(theGame.get_M_PlayerScoreboards().values());
+		returnCommands.add(new UpdateScoreboardCommand(sList));
+		
+		int currentPlayerNumber = 0;
+		for (int i = 1; i <= theGame.get_numberOfPlayers(); i++)
+		{
+			UserModel.User player = theGame.getPlayer(i);
+			String newUsername = player.get_S_username();
+			if (newUsername != username)
+			{
+				ClientProxy.SINGLETON.get_m_usersCommands().get(newUsername).addAll(returnCommands);
+			}
+			else
+			{
+				currentPlayerNumber = i; // shows whose turn it is
+			}
+		}
+		
+		returnCommands.add(new UpdatePlayerTrainCardsCommand(theCard));
+		if (turnNumber == 2)
+		{
+			if (currentPlayerNumber == theGame.get_numberOfPlayers())
+			{
+				currentPlayerNumber = 1; // starts over at player 1
+			}
+			else
+			{
+				currentPlayerNumber++; // goes to next player
+			}
+			ClientProxy.SINGLETON.get_m_usersCommands().get(theGame.getPlayer(currentPlayerNumber).get_S_username()).add(new NotifyTurnCommand());
+			returnCommands.add(new EndTurnCommand());
+		}
+		else
+		{
+			returnCommands.add(new NotifyTurnCommand());
+		}
+		
 		return returnCommands;
 	}
     

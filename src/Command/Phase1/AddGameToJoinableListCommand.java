@@ -1,12 +1,14 @@
 package Command.Phase1;
 
-import Client.User;
 import Command.ICommand;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import Client.User;
 
 import java.util.List;
 
 /**
+ * This command is only received by NEWLY logged in users
  * Created by natha on 3/16/2017.
  */
 

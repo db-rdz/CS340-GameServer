@@ -21,8 +21,8 @@ public class NotifyTurnCommand implements ICommand {
     private String str_notify_message;
 
     //Constructor
-    public NotifyTurnCommand(String str_notify_message) {
-        this.str_notify_message = str_notify_message;
+    public NotifyTurnCommand() {
+        this.str_notify_message = "It's your turn!";
     }
 
     //Functions

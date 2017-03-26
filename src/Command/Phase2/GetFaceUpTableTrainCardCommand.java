@@ -26,23 +26,27 @@ public class GetFaceUpTableTrainCardCommand implements ICommand {
 	//Ryan: changed TrainCard to cardIndex to match the model
 	private int _i_cardIndex;
     private Boolean isWild; //Is the traincard a wild or normal card?
+    private String _S_authenticationCode;
+    private int _i_turnNumber;
 
     //Constructors
     public GetFaceUpTableTrainCardCommand(){}
-    public GetFaceUpTableTrainCardCommand(int g, int index, Boolean wild) {
+    public GetFaceUpTableTrainCardCommand(int g, int index, Boolean wild, String code, int num) {
     	_i_cardIndex = index;
         isWild = wild;
         _i_gameId = g;
+        _S_authenticationCode = code;
+        _i_turnNumber = num;
     }
     @Override
     public List<ICommand> execute() throws IServer.GameIsFullException {
-        return ServerFacade.SINGLETON.getFaceUpTableTrainCard(_i_gameId, _i_cardIndex, isWild);
+        return ServerFacade.SINGLETON.getFaceUpTableTrainCard(_i_gameId, _i_cardIndex, isWild, _S_authenticationCode, _i_turnNumber);
     }
 
     @JsonIgnore
     @Override
     public String getAuthenticationCode() {
-        return null;
+        return _S_authenticationCode;
     }
 
     @JsonIgnore
@@ -62,6 +66,11 @@ public class GetFaceUpTableTrainCardCommand implements ICommand {
     public int getGameId()
     {
     	return _i_gameId;
+    }
+    
+    public String get_S_authenticationCode()
+    {
+    	return _S_authenticationCode;
     }
 
 

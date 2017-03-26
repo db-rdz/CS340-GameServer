@@ -2,7 +2,6 @@ package Server;
 
 import Command.ICommand;
 import Command.Phase1.AddGameToServerCommand;
-import Command.Phase1.SwitchToWaitingActivityCommand;
 import Command.Phase1.AddPlayerToServerCommand;
 import Command.Phase1.DeleteGameCommand;
 import Command.Phase1.GetCommandsCommand;
@@ -72,7 +71,9 @@ public class ServerCommunicator {
     
     public static void main(String[] args)
     {
-    	
+
+        //   	SERVER_PORT_NUMBER = Integer.parseInt(args[0]);
+
         SERVER_PORT_NUMBER = 8080;
         SINGLETON.run();
     }
@@ -146,7 +147,7 @@ public class ServerCommunicator {
             else
             {
                 System.out.println("Host ip address: " + probableAddress);
-                System.out.println("Host server port: " + SERVER_PORT_NUMBER);
+                System.out.println("Host server port: " + SERVER_PORT_NUMBER + "\n");
             }
             
         } catch (IOException e) {
@@ -173,6 +174,7 @@ public class ServerCommunicator {
         
     			input = objectMapper.readValue(exchange.getRequestBody(), ICommand.class);
 //    			System.out.println("\nExecuting " + input);
+
         
     		} catch (Exception e) {
     			e.printStackTrace();
@@ -205,6 +207,7 @@ public class ServerCommunicator {
 		    } catch (Exception e) {
 		    	e.printStackTrace();
 		    }
+
 	    
 //	    System.out.println("Sending back to client!");
     	}
@@ -219,6 +222,7 @@ public class ServerCommunicator {
 			try {
 				input = objectMapper.readValue(exchange.getRequestBody(), ICommand.class);
 //    			System.out.println("\nExecuting " + input);
+
 				List<ICommand> response = input.execute();
 				
 			    OutputStream os = exchange.getResponseBody();

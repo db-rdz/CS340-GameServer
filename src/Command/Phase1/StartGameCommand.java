@@ -14,11 +14,9 @@ public class StartGameCommand implements ICommand {
     private String _strAuthenticationCode;
     
     private StartGameCommand(){}
-    public StartGameCommand(int g, List<String> k, String code){
+    public StartGameCommand(int g, List<String> k){
         gameId = g;
-        usernamesInGame = k;
-        _strAuthenticationCode = code;
-    }
+        usernamesInGame = k;}
 
     @JsonIgnore
     @Override

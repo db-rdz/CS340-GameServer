@@ -10,8 +10,8 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 import Client.User;
 import Client.IClient.InvalidPassword;
 import Client.IClient.InvalidUsername;
+import Command.Phase1.AddGameToJoinableListCommand;
 import Command.Phase1.AddGameToServerCommand;
-import Command.Phase1.SwitchToWaitingActivityCommand;
 import Command.Phase1.AddPlayerToServerCommand;
 import Command.Phase1.GetCommandsCommand;
 import Command.Phase1.ListJoinableCommand;
@@ -30,7 +30,6 @@ import Server.IServer.UserAlreadyLoggedIn;
 @JsonSubTypes({
 	@Type(value = LoginCommand.class),
 	@Type(value = LoginRegisterResponseCommand.class),
-	@Type(value = SwitchToWaitingActivityCommand.class),
 	@Type(value = ListJoinableCommand.class),
 	@Type(value = AddGameToServerCommand.class),
 	@Type(value = AddPlayerToServerCommand.class),
