@@ -3,6 +3,7 @@ package Command.Phase2;
 import Client.User;
 import Command.ICommand;
 import Server.IServer;
+import Server.ServerFacade;
 import GameModels.Game;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -17,15 +18,19 @@ import java.util.List;
  */
 
 public class GetDestinationCardsCommand implements ICommand {
-    @Override
+    private String _s_authenticationCode;
+    private int _i_gameId;
+ 
+	
+	@Override
     public List<ICommand> execute() throws IServer.GameIsFullException {
-        return null;
+        return ServerFacade.SINGLETON.getDestCards(_i_gameId, _s_authenticationCode);
     }
 
     @JsonIgnore
     @Override
     public String getAuthenticationCode() {
-        return null;
+        return _s_authenticationCode;
     }
 
     @JsonIgnore
@@ -34,4 +39,13 @@ public class GetDestinationCardsCommand implements ICommand {
         return null;
     }
 
+    public int get_i_gameId()
+    {
+    	return _i_gameId;
+    }
+    
+    public String get_s_authenticationCode()
+    {
+    	return _s_authenticationCode;
+    }
 }
