@@ -19,6 +19,9 @@ import java.util.List;
 
 public class GetTopDeckTrainCardCommand implements ICommand {
 	private int gameId;
+	private String authenticationCode;
+	// added turn number to check what turn you're doing
+	private int turnNumber;
 	
 	public GetTopDeckTrainCardCommand(int g)
 	{
@@ -27,13 +30,13 @@ public class GetTopDeckTrainCardCommand implements ICommand {
 	
 	@Override
     public List<ICommand> execute() throws IServer.GameIsFullException {
-        return ServerFacade.SINGLETON.getTopDeckTrainCard(gameId);
+        return ServerFacade.SINGLETON.getTopDeckTrainCard(gameId, authenticationCode, turnNumber);
     }
 
     @JsonIgnore
     @Override
     public String getAuthenticationCode() {
-        return null;
+        return authenticationCode;
     }
 
     @JsonIgnore

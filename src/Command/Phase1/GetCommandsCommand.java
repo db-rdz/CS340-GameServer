@@ -46,6 +46,7 @@ public class GetCommandsCommand implements ICommand{
     public List<ICommand> execute(){
         List<ICommand> listOfSpecificUserCommands = new ArrayList<>();
         int mapSize = ClientProxy.SINGLETON.get_m_usersCommands().size();
+        System.out.println("mapSize is: " + mapSize);
         
         try {
             if (mapSize > 0 && UserModel.User.get_M_usernameToLoggedInUser().containsKey(username)) { //If there's commands for that logged in user, get them

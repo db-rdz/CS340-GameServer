@@ -85,7 +85,8 @@ public class ServerModel implements iModel {
 
     @Override
     public Boolean logOut(String username){
-    	UserModel.User.get_M_usernameToLoggedInUser().remove(username);
+    	
+//        User.get_L_listOfAllUsers().remove(username);
     	return false;
     }
 
