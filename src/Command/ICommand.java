@@ -24,9 +24,12 @@ import Command.Phase2.BroadcastToChatCommand;
 import Command.Phase2.ClaimRouteCommand;
 import Command.Phase2.GetFaceUpTableTrainCardCommand;
 import Command.Phase2.GetTopDeckTrainCardCommand;
+import Command.Phase2.KeepAllDestCardsCommand;
+import Command.Phase2.RejectDestinationCardCommand;
 import GameModels.Game;
 import Server.IServer.GameIsFullException;
 import Server.IServer.UserAlreadyLoggedIn;
+import sun.net.www.http.KeepAliveCache;
 
 @JsonTypeInfo(use = Id.NAME,
 		   	  include = JsonTypeInfo.As.PROPERTY,
@@ -44,6 +47,8 @@ import Server.IServer.UserAlreadyLoggedIn;
 	@Type(value = BroadcastToChatCommand.class),
 	@Type(value = ClaimRouteCommand.class),
 	@Type(value = GetFaceUpTableTrainCardCommand.class),
+	@Type(value = RejectDestinationCardCommand.class),
+	@Type(value = KeepAllDestCardsCommand.class),
 	@Type(value = GetTopDeckTrainCardCommand.class)
 })
 public interface ICommand {
