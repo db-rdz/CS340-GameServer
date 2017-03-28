@@ -219,6 +219,17 @@ public class ServerFacade implements IServer {
         return commands;
     }
     
+    private String findPlayerColor(int index) {
+    	List<String> colors = new ArrayList<>(); 
+		colors.add("red");
+		colors.add("yellow");
+		colors.add("blue");
+		colors.add("green");
+		colors.add("magenta");
+		
+		return colors.get(index);
+    }
+    
     /**
 	 * This method is used to start a game with a given gameId
 	 * 
@@ -245,6 +256,14 @@ public class ServerFacade implements IServer {
 	        
 	        TrainCardDeck theTrainCardDeck = theGame.getDeck();
 	        DestCardDeck theDestCardDeck = theGame.getDestCards();
+	      	    	
+	        
+	        List<Scoreboard> scoreboards = new ArrayList<>();
+            for (int i = 0; i < usernamesInGame.size(); i++) {
+            	Scoreboard scoreboard = new Scoreboard(findPlayerColor(i));
+            	theGame.get_M_PlayerScoreboards().put(usernamesInGame.get(i), scoreboard);
+            	scoreboards.add(scoreboard);
+            }
 
         	trainCards = new ArrayList<>();
             for (int j = 0; j < 4; j++)
@@ -259,8 +278,8 @@ public class ServerFacade implements IServer {
             {
             	faceupTrainCards.add(theTrainCardDeck.drawTop());
             }
-
-            returnCommands.add(new InitializeGameCommand(trainCards, destCards, faceupTrainCards)); //The creator's cards
+            
+            returnCommands.add(new InitializeGameCommand(trainCards, destCards, faceupTrainCards, scoreboards)); //The creator's cards
 
             for (int i = 1; i < usernamesInGame.size(); i++) { //Ignore the game creator, start at Player 2
                 // initialize each player's hand
@@ -272,10 +291,12 @@ public class ServerFacade implements IServer {
                 destCards = theDestCardDeck.drawTop3();
                                 
                 otherPlayerCommands = new ArrayList<>();
-                otherPlayerCommands.add(new InitializeGameCommand(trainCards, destCards, faceupTrainCards));
+                otherPlayerCommands.add(new InitializeGameCommand(trainCards, destCards, faceupTrainCards, scoreboards));
 //        		System.out.println(usernamesInGame.get(i) + " receiving commmands: " + otherPlayerCommands);
                 ClientProxy.SINGLETON.get_m_usersCommands().get(usernamesInGame.get(i)).addAll(otherPlayerCommands);  
             }
+            
+
             
 	        //TODO: send delete game command to all users not in game
 //	        ICommand deleteGameCommand = new DeleteGameCommand(gameId);
@@ -739,10 +760,13 @@ public class ServerFacade implements IServer {
 		
 		//returns the card to the DestCardDeck in the game
 		theGame.getDestCards().returnCard(rejectedCard);
+		List<DestCard> rejected = new ArrayList<>();
+		rejected.add(rejectedCard);
 		
 		// updates the scoreboard, but doesn't send until all destination cards are kept/rejected
 		theGame.get_M_PlayerScoreboards().get(username).addDestCards(-1);
 		
+		returnCommands.add(new UpdatePlayerDestinationCardsCommand(rejected));
     	return returnCommands;
     }
     

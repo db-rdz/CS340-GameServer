@@ -7,6 +7,7 @@ import Command.ICommand;
 import GameModels.Game;
 import Server.IServer.GameIsFullException;
 import Server.IServer.UserAlreadyLoggedIn;
+import ServerModel.GameModels.BoardModel.Scoreboard;
 import ServerModel.GameModels.CardsModel.DestCard;
 import ServerModel.GameModels.CardsModel.TrainCard;
 
@@ -27,12 +28,14 @@ public class InitializeGameCommand implements ICommand {
 	private List<TrainCard> hand;
 	private List<DestCard> destinationCards;
 	private List<TrainCard> faceupTrainCards;
+	private List<Scoreboard> scoreboards;
 	
-	public InitializeGameCommand(List<TrainCard> hand, List<DestCard> dc, List<TrainCard> faceup)
+	public InitializeGameCommand(List<TrainCard> hand, List<DestCard> dc, List<TrainCard> faceup, List<Scoreboard> boards)
 	{
 		this.hand = hand;
 		destinationCards = dc;
 		faceupTrainCards = faceup;
+		scoreboards = boards;
 	}
 	
 	@Override
@@ -64,6 +67,10 @@ public class InitializeGameCommand implements ICommand {
 	
 	public List<TrainCard> getFaceupTrainCards() {
 		return faceupTrainCards;
+	}
+	
+	public List<Scoreboard> getScoreboards() {
+		return scoreboards;
 	}
 
 }

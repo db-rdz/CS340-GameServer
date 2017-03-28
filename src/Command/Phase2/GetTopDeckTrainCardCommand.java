@@ -23,6 +23,7 @@ public class GetTopDeckTrainCardCommand implements ICommand {
 	// added turn number to check what turn you're doing
 	private int turnNumber;
 	
+	public GetTopDeckTrainCardCommand(){}
 	public GetTopDeckTrainCardCommand(int g)
 	{
 		gameId = g;
@@ -33,7 +34,6 @@ public class GetTopDeckTrainCardCommand implements ICommand {
         return ServerFacade.SINGLETON.getTopDeckTrainCard(gameId, authenticationCode, turnNumber);
     }
 
-    @JsonIgnore
     @Override
     public String getAuthenticationCode() {
         return authenticationCode;
@@ -49,4 +49,8 @@ public class GetTopDeckTrainCardCommand implements ICommand {
     {
     	return gameId;
     }
+    
+    public int getTurnNumber() {
+		return turnNumber;
+	}
 }
