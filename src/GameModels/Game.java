@@ -338,5 +338,10 @@ public class Game implements iGame {
     {
     	return _str_chatRoom;
     }
+    
+    public Map<Integer, Game> get_M_idToGame()
+    {
+    	return _M_idToGame;
+    }
 
 }

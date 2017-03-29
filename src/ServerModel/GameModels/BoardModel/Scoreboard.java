@@ -11,7 +11,7 @@ public class Scoreboard {
 	public Scoreboard(){}
 	public Scoreboard(String playerColor) {
 		points = 0;
-		numberOfDestCards = 3; //Each player starts with 3 at the beginning
+		numberOfDestCards = 0; //Each player starts with 0, will get updated with firstTurn()
 		numberOfTrainCards = 4; //Each player starts with 4
 		this.playerColor = playerColor;
 	}

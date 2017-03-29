@@ -22,10 +22,21 @@ import Command.Phase1.RegisterCommand;
 import Command.Phase1.StartGameCommand;
 import Command.Phase2.BroadcastToChatCommand;
 import Command.Phase2.ClaimRouteCommand;
+import Command.Phase2.EndTurnCommand;
+import Command.Phase2.FirstTurnCommand;
+import Command.Phase2.GetDestinationCardsCommand;
 import Command.Phase2.GetFaceUpTableTrainCardCommand;
 import Command.Phase2.GetTopDeckTrainCardCommand;
+import Command.Phase2.InitializeGameCommand;
 import Command.Phase2.KeepAllDestCardsCommand;
+import Command.Phase2.NotifyRouteClaimedCommand;
+import Command.Phase2.NotifyTurnCommand;
 import Command.Phase2.RejectDestinationCardCommand;
+import Command.Phase2.ShowMessageCommand;
+import Command.Phase2.UpdateCarCountAndHandCommand;
+import Command.Phase2.UpdateFaceUpTableTrainCardsCommand;
+import Command.Phase2.UpdatePlayerDestinationCardsCommand;
+import Command.Phase2.UpdatePlayerTrainCardsCommand;
 import GameModels.Game;
 import Server.IServer.GameIsFullException;
 import Server.IServer.UserAlreadyLoggedIn;
@@ -49,6 +60,17 @@ import sun.net.www.http.KeepAliveCache;
 	@Type(value = GetFaceUpTableTrainCardCommand.class),
 	@Type(value = RejectDestinationCardCommand.class),
 	@Type(value = KeepAllDestCardsCommand.class),
+	@Type(value = EndTurnCommand.class),
+	@Type(value = GetDestinationCardsCommand.class),
+	@Type(value = InitializeGameCommand.class),
+	@Type(value = NotifyRouteClaimedCommand.class),
+	@Type(value = NotifyTurnCommand.class),
+	@Type(value = ShowMessageCommand.class),
+	@Type(value = UpdateCarCountAndHandCommand.class),
+	@Type(value = UpdateFaceUpTableTrainCardsCommand.class),
+	@Type(value = UpdatePlayerDestinationCardsCommand.class),
+	@Type(value = UpdatePlayerTrainCardsCommand.class),
+	@Type(value = FirstTurnCommand.class),
 	@Type(value = GetTopDeckTrainCardCommand.class)
 })
 public interface ICommand {

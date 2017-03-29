@@ -353,6 +353,7 @@ public class ServerFacade implements IServer {
                 DAO._SINGLETON.UpdateGamePlayer(theGame.get_i_gameId(), theUser.get_S_username(), theGame.get_numberOfPlayers());
                 theGame.setPlayer(theGame.get_numberOfPlayers(), theUser);
                 theGame = DAO._SINGLETON.getGamebyGameId(intGameId);
+                theGame.get_M_idToGame().replace(theGame.get_i_gameId(), theGame);
 
                 List<UserModel.User> users = new ArrayList<>(); //The users in the game
                 for (int i = 1; i <= theGame.get_numberOfPlayers(); i++) {
@@ -549,7 +550,7 @@ public class ServerFacade implements IServer {
 		{
 			UserModel.User player = theGame.getPlayer(i);
 			String newUsername = player.get_S_username();
-			if (newUsername != username)
+			if (!newUsername.equals(username))
 			{
 				ClientProxy.SINGLETON.get_m_usersCommands().get(newUsername).addAll(returnCommands);
 			}
@@ -559,12 +560,12 @@ public class ServerFacade implements IServer {
 	}
 
 	/*
-	 * Ryan
-	 * Allows a player to claim a route, route color will be set on the client side
-	 */
+	* Ryan
+	* Allows a player to claim a route, route color will be set on the client side
+	*/
 	
 	@Override
-	public List<ICommand> claimRoute(int gameId, String authenticationCode, String routeMappingName) {
+	public List<ICommand> claimRoute(int gameId, String authenticationCode, Route theRoute, List<TrainCard> cardsUsedToClaimRoute) {
 		List<ICommand> returnCommands = new ArrayList<>();
 		Game theGame = Game.getGameWithId(gameId);
 		String username = "";
@@ -577,29 +578,33 @@ public class ServerFacade implements IServer {
 		}
 		
 		// gets the route from the list in the game and sets the owner
-		Route route = theGame.getAllRoutes().get_RoutesMap().get(routeMappingName);
+		Route route = theGame.getAllRoutes().get_RoutesMap().get(theRoute.get_S_MappingName());
 		route.set_Owner(username);
 		
 		// tells the other players that the route was claimed (maybe make a toast with the message)
-		returnCommands.add(new NotifyRouteClaimedCommand("The route from " + route.get_ConnectingCities().getLeft() + " to " 
+		returnCommands.add(new NotifyRouteClaimedCommand("The route from " + route.get_ConnectingCities().getLeft() + " to "
 							+ route.get_ConnectingCities().getRight() + " has been claimed by " + username + ".", route));
 		theGame.get_M_PlayerScoreboards().get(username).addPoints(route.get_i_pointValue());
-		theGame.get_M_PlayerScoreboards().get(username).addTrainCards(-(route.get_Weight()));
+		// subtracts the number of cards used from the players total on the scoreboard
+		theGame.get_M_PlayerScoreboards().get(username).addTrainCards(-cardsUsedToClaimRoute.size());
 		
-		// increments the player's points on every player's screen
+		// updates the scoreboard
 		returnCommands.add(new UpdateScoreboardCommand(new ArrayList<>(theGame.get_M_PlayerScoreboards().values())));
-				
+		
+		// puts the cards used to claim the route in the discard pile
+		theGame.getDeck().getDiscardPile().addAll(cardsUsedToClaimRoute);
+		
 		// send to all users in game (NotifyRouteClaimed and UpdateScoreboard)
 		int currentPlayerNumber = 0;
 		for (int i = 1; i <= theGame.get_numberOfPlayers(); i++)
 		{
 			UserModel.User player = theGame.getPlayer(i);
 			String newUsername = player.get_S_username();
-			if (newUsername != username)
+			if (!newUsername.equals(username))
 			{
 				ClientProxy.SINGLETON.get_m_usersCommands().get(newUsername).addAll(returnCommands);
 			}
-			else 
+			else
 			{
 				currentPlayerNumber = i; // identifies the player whose turn it is
 			}
@@ -616,12 +621,13 @@ public class ServerFacade implements IServer {
 		}
 		ClientProxy.SINGLETON.get_m_usersCommands().get(theGame.getPlayer(currentPlayerNumber).get_S_username()).add(new NotifyTurnCommand());
 		
-		// decrease car count of player who claimed route by the weight of the route claimed
-		returnCommands.add(new UpdateCarCountCommand(route.get_Weight()));
+		// decrease car count of player who claimed route by the weight of the route claimed, updates player hand
+		returnCommands.add(new UpdateCarCountAndHandCommand(route.get_Weight(), cardsUsedToClaimRoute));
 		returnCommands.add(new EndTurnCommand());
 		
 		return returnCommands;
 	}
+
 
 	// Ryan
 	@Override
@@ -649,7 +655,7 @@ public class ServerFacade implements IServer {
 		{
 			UserModel.User player = theGame.getPlayer(i);
 			String newUsername = player.get_S_username();
-			if (newUsername != username)
+			if (!newUsername.equals(username))
 			{
 				ClientProxy.SINGLETON.get_m_usersCommands().get(newUsername).addAll(returnCommands);
 			}
@@ -710,7 +716,7 @@ public class ServerFacade implements IServer {
 		{
 			UserModel.User player = theGame.getPlayer(i);
 			String newUsername = player.get_S_username();
-			if (newUsername != username)
+			if (!newUsername.equals(username))
 			{
 				ClientProxy.SINGLETON.get_m_usersCommands().get(newUsername).addAll(returnCommands);
 			}
@@ -813,7 +819,7 @@ public class ServerFacade implements IServer {
 		{
 			UserModel.User player = theGame.getPlayer(i);
 			String newUsername = player.get_S_username();
-			if (newUsername != username)
+			if (!newUsername.equals(username))
 			{
 				ClientProxy.SINGLETON.get_m_usersCommands().get(newUsername).addAll(returnCommands);
 			}
@@ -836,5 +842,52 @@ public class ServerFacade implements IServer {
 		
 		return returnCommands;
     }
+
+	public List<ICommand> firstTurn(int gameId, String authenticationCode, List<DestCard> destCards, String type) {
+    	List<ICommand> returnCommands = new ArrayList<>();
+    	Game theGame = Game.getGameWithId(gameId);
+    	UserModel.User theUser;
+    	String username = "";
+		try {
+			theUser = DAO._SINGLETON.getUserByAccessToken(authenticationCode);
+			username = theUser.get_S_username();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		if (type.equals("KEEP"))
+		{
+			theGame.get_M_PlayerScoreboards().get(username).addDestCards(destCards.size());
+			returnCommands.add(new UpdateScoreboardCommand(new ArrayList<>(theGame.get_M_PlayerScoreboards().values())));
+			
+			int playersThatCompletedFirstTurn = 0;
+			// sends new set of face up 5 cards to all players, as well as the updated scoreboard
+			for (int i = 1; i <= theGame.get_numberOfPlayers(); i++)
+			{
+				UserModel.User player = theGame.getPlayer(i);
+				String newUsername = player.get_S_username();
+				if (!newUsername.equals(username))
+				{
+					ClientProxy.SINGLETON.get_m_usersCommands().get(newUsername).addAll(returnCommands);
+				}
+				if (theGame.get_M_PlayerScoreboards().get(newUsername).getNumberOfDestCards() > 0)
+				{
+					playersThatCompletedFirstTurn++;
+				}
+			}
+			if (playersThatCompletedFirstTurn == theGame.get_numberOfPlayers())
+			{
+				ClientProxy.SINGLETON.get_m_usersCommands().get(theGame.getPlayer1().get_S_username()).add(new NotifyTurnCommand());
+			}
+			returnCommands.add(new EndTurnCommand());
+		}
+		else
+		{
+			theGame.getDestCards().returnCard(destCards.get(0));
+			
+		}
+		
+		return returnCommands;
+	}
 
 }

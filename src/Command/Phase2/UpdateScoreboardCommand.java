@@ -24,6 +24,7 @@ public class UpdateScoreboardCommand implements ICommand {
     private List<Scoreboard> scoreboards;
 
     //Constructor
+    public UpdateScoreboardCommand(){}
     public UpdateScoreboardCommand(List<Scoreboard> s) {
         scoreboards = s;
     }

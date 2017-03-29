@@ -4,6 +4,9 @@ import Client.User;
 import Command.ICommand;
 import Server.IServer;
 import Server.ServerFacade;
+import ServerModel.GameModels.CardsModel.TrainCard;
+import ServerModel.GameModels.RouteModel.Route;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.util.List;
@@ -18,22 +21,24 @@ import java.util.List;
 
 public class ClaimRouteCommand implements ICommand {
     //Data members
-    private String mappingName;
+    private Route route;
     private int gameId;
     String authenticationCode;
+    List<TrainCard> cardsUsedToClaimRoute;
 
     //Constructors
     public ClaimRouteCommand(){}
-    public ClaimRouteCommand(int g, String code, String route1) {
-    	mappingName = route1;
+    public ClaimRouteCommand(int g, String code, Route route1, List<TrainCard> cardsUsedToClaimRoute) {
+    	route = route1;
         gameId = g;
         authenticationCode = code;
+        this.cardsUsedToClaimRoute = cardsUsedToClaimRoute;
     }
 
     //Functions
     @Override
     public List<ICommand> execute() throws IServer.GameIsFullException {
-        return ServerFacade.SINGLETON.claimRoute(gameId, authenticationCode, mappingName);
+        return ServerFacade.SINGLETON.claimRoute(gameId, authenticationCode, route, cardsUsedToClaimRoute);
     }
 
     @JsonIgnore
@@ -48,8 +53,8 @@ public class ClaimRouteCommand implements ICommand {
         return null;
     }
 
-    public String getMappingName() {
-		return mappingName;
+    public Route getRoute() {
+		return route;
 	}
     
     public int getGameId()
@@ -60,6 +65,11 @@ public class ClaimRouteCommand implements ICommand {
     public String getStrAuthenticationCode()
     {
     	return authenticationCode;
+    }
+    
+    public List<TrainCard> getCardsUsedToClaimRoute()
+    {
+    	return cardsUsedToClaimRoute;
     }
 
 }

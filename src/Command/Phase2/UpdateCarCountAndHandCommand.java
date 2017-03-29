@@ -3,6 +3,7 @@ package Command.Phase2;
 import Client.User;
 import Command.ICommand;
 import Server.IServer;
+import ServerModel.GameModels.CardsModel.TrainCard;
 import GameModels.Game;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -18,14 +19,18 @@ import java.util.List;
  * Created by natha on 2/27/2017.
  */
 
-public class UpdateCarCountCommand implements ICommand {
+public class UpdateCarCountAndHandCommand implements ICommand {
 
     //Data members
     private int int_cars_used;
+    private List<TrainCard> cardsUsedToClaimRoute;
+    
+    public UpdateCarCountAndHandCommand(){}
 
     //Constructor
-    public UpdateCarCountCommand(int int_used_cars) {
+    public UpdateCarCountAndHandCommand(int int_used_cars, List<TrainCard> cardsUsedToClaimRoute) {
         this.int_cars_used = int_used_cars;
+        this.cardsUsedToClaimRoute = cardsUsedToClaimRoute;
     }
     //Functions
     @Override
@@ -49,5 +54,10 @@ public class UpdateCarCountCommand implements ICommand {
 
     public int getInt_cars_used() {
         return int_cars_used;
+    }
+    
+    public List<TrainCard> getCardsUsedToClaimRoute()
+    {
+    	return cardsUsedToClaimRoute;
     }
 }
