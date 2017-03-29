@@ -10,10 +10,14 @@ public class Node {
 
     public Node(String name){
         _nodeName = name;
+        _visited = false;
+        _reached = false;
     }
 
     private String _nodeName;
     private List<Edge> _edges;
+    private Boolean _visited;
+    private Boolean _reached;
 
     //--------------------------------------MODIFIERS---------------------------------------//
     public void addEdge(Edge e){
@@ -26,6 +30,12 @@ public class Node {
 
     public List<Edge> get_edges() { return _edges; }
     public void set_edges(List<Edge> _edges) { this._edges = _edges; }
+
+    public Boolean get_visited(){ return _visited; }
+    public void set_visited(Boolean v){ _visited = v; }
+
+    public Boolean get_reached() { return _reached; }
+    public void set_reached(Boolean _iterate) { this._reached = _iterate; }
 
     //--------------------------------------CLASS FUNCTIONS---------------------------------//
     public Boolean addEdge(int weight, Node nodePointer){

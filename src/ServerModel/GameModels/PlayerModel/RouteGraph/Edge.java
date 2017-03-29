@@ -19,7 +19,7 @@ public class Edge {
     public int get_weight() { return _weight; }
     public void set_weight(int _weight) { this._weight = _weight; }
 
-    public Node get_n1() { return _nodePointer; }
+    public Node get_pointingNode() { return _nodePointer; }
     public void set_n1(Node _n1) { this._nodePointer = _n1; }
 
 }
