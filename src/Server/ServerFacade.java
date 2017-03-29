@@ -448,7 +448,7 @@ public class ServerFacade implements IServer {
             {
             	UserModel.User newUser = (UserModel.User) iterator.next();
             	if (!newUser.get_S_token().equals(str_authentication_code)) {
-            		ClientProxy.SINGLETON.get_m_usersCommands().get(username).addAll(commands);
+            		ClientProxy.SINGLETON.get_m_usersCommands().get(newUser.get_S_username()).addAll(commands);
             		
             	}
             }
@@ -791,7 +791,7 @@ public class ServerFacade implements IServer {
 		
 		// gets the three top cards
 		DestCardDeck theDeck = theGame.getDestCards();
-		returnCommands.add(new UpdatePlayerDestinationCardsCommand(theDeck.drawTop3()));
+		returnCommands.add(new UpdateServerDestCardsCommand(theDeck.drawTop3()));
 		
 		// updates the scoreboard, but doesn't send until all destination cards are kept/rejected
 		theGame.get_M_PlayerScoreboards().get(username).addDestCards(3);
@@ -799,7 +799,7 @@ public class ServerFacade implements IServer {
     	return returnCommands;
     }
     
-    public List<ICommand> keepAllDestCards(int gameId, String authenticationCode)
+    public List<ICommand> keepAllDestCards(int gameId, String authenticationCode, List<DestCard> cardsKept)
     {
     	List<ICommand> returnCommands = new ArrayList<>();
     	Game theGame = Game.getGameWithId(gameId);
@@ -838,6 +838,7 @@ public class ServerFacade implements IServer {
 			currentPlayerNumber++; // goes to next player
 		}
 		ClientProxy.SINGLETON.get_m_usersCommands().get(theGame.getPlayer(currentPlayerNumber).get_S_username()).add(new NotifyTurnCommand());
+		returnCommands.add(new UpdatePlayerDestinationCardsCommand(cardsKept));
 		returnCommands.add(new EndTurnCommand()); // ends current player's turn
 		
 		return returnCommands;
@@ -879,12 +880,12 @@ public class ServerFacade implements IServer {
 			{
 				ClientProxy.SINGLETON.get_m_usersCommands().get(theGame.getPlayer1().get_S_username()).add(new NotifyTurnCommand());
 			}
+			returnCommands.add(new UpdatePlayerDestinationCardsCommand(destCards));
 			returnCommands.add(new EndTurnCommand());
 		}
 		else
 		{
 			theGame.getDestCards().returnCard(destCards.get(0));
-			
 		}
 		
 		return returnCommands;

@@ -47,7 +47,7 @@ public class UpdateFaceUpTableTrainCardsCommand implements ICommand {
 
 
 
-    public List<TrainCard> getTrainCard() {
+    public List<TrainCard> getTrainCards() {
         return trainCards;
     }
 }

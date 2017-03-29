@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Map;
 
 public class Route implements iRoute {
+	
+	public Route(){}
 	public Route(int color, int weight, String owner, Pair<String, String> p, Point p1, Point p2, 
 			String sColor, String mName, int points){
         _i_Color = color;
