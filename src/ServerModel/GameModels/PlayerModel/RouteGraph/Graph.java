@@ -40,9 +40,10 @@ public class Graph {
     }
 
     public Boolean evaluateDestCar(DestCard card){
-        String from = card.get_destination().first();
-        String to = card.get_destination().second();
-        return findPath(getNode(from),getNode(to));
+//        String from = card.get_destination().first();
+//        String to = card.get_destination().second();
+//        return findPath(getNode(from),getNode(to));
+        return null;
     }
 
     public Boolean findPath(Node n1, Node n2){
