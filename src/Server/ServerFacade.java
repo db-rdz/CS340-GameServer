@@ -31,6 +31,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import com.sun.org.apache.xml.internal.security.keys.keyresolver.implementations.PrivateKeyResolver;
+
 
 /**
  * ServerFacade implements IServer
@@ -558,18 +560,53 @@ public class ServerFacade implements IServer {
 		
 		return returnCommands;
 	}
+	
+	//Nathan: Changes route color string to train card type color string
+	private void convertToCardType(List<TrainCard> cardsUsedToClaimRoute) {
+		for (int i = 0; i < cardsUsedToClaimRoute.size(); i++) {
+			switch (cardsUsedToClaimRoute.get(i).getType()) {
+			case "RED":
+				cardsUsedToClaimRoute.get(i).setType("redcard");
+				break;
+			case "ORANGE":
+				cardsUsedToClaimRoute.get(i).setType("orangecard");
+				break;
+			case "YELLOW":
+				cardsUsedToClaimRoute.get(i).setType("yellowcard");
+				break;
+			case "GREEN":
+				cardsUsedToClaimRoute.get(i).setType("greencard");
+				break;
+			case "BLUE":
+				cardsUsedToClaimRoute.get(i).setType("bluecard");
+				break;
+			case "WHITE":
+				cardsUsedToClaimRoute.get(i).setType("whitecard");
+				break;
+			case "BLACK":
+				cardsUsedToClaimRoute.get(i).setType("blackcard");
+				break;
+			case "RAINBOW":
+				cardsUsedToClaimRoute.get(i).setType("rainbowcard");
+				break;
+			case "PINK":
+				cardsUsedToClaimRoute.get(i).setType("pinkcard");
+				break;
+			}
+		}
+	}
 
 	/*
 	* Ryan
 	* Allows a player to claim a route, route color will be set on the client side
 	*/
-	
 	@Override
 	public List<ICommand> claimRoute(int gameId, String authenticationCode, Route theRoute, List<TrainCard> cardsUsedToClaimRoute) {
 		List<ICommand> returnCommands = new ArrayList<>();
 		Game theGame = Game.getGameWithId(gameId);
 		String username = "";
 		UserModel.User theUser = null;
+		convertToCardType(cardsUsedToClaimRoute);
 		try {
 			theUser = DAO._SINGLETON.getUserByAccessToken(authenticationCode);
 			username = theUser.get_S_username();
