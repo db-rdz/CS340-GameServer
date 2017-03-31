@@ -74,7 +74,7 @@ public class ServerCommunicator {
 
         //   	SERVER_PORT_NUMBER = Integer.parseInt(args[0]);
 
-        SERVER_PORT_NUMBER = 8080;
+        SERVER_PORT_NUMBER = 8081;
         SINGLETON.run();
     }
     

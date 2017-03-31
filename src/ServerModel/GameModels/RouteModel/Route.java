@@ -32,6 +32,7 @@ public class Route implements iRoute {
     private Pair<String, String> _P_ConnectingCities = null;
     private String _S_MappingName = null;
     private int _i_pointValue;
+    private Boolean isClaimed = false;
 
     private Point point1;
     private Point point2;
@@ -64,5 +65,13 @@ public class Route implements iRoute {
     
     public int get_i_pointValue() { return _i_pointValue; }
     public void set_i_pointValue(int p) { _i_pointValue = p; }
+    
+    public Boolean getClaimed() {
+        return isClaimed;
+    }
+
+    public void setClaimed(Boolean claimed) {
+        isClaimed = claimed;
+    }
 
 }

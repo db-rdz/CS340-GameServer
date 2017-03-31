@@ -33,7 +33,7 @@ public class DestCardTypes {
                     (Arrays.asList("Portland", "Nashville", "17"))
             );
             _destCards.put(6, new ArrayList<String>
-                    (Arrays.asList("Vancouver", "Montréal", "20"))
+                    (Arrays.asList("Vancouver", "Montreal", "20"))
             );
             _destCards.put(7, new ArrayList<String>
                     (Arrays.asList("Duluth", "ElPaso", "10"))

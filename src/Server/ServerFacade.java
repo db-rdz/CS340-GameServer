@@ -617,6 +617,7 @@ public class ServerFacade implements IServer {
 		// gets the route from the list in the game and sets the owner
 		Route route = theGame.getAllRoutes().get_RoutesMap().get(theRoute.get_S_MappingName());
 		route.set_Owner(username);
+		route.setClaimed(true);
 		
 		// tells the other players that the route was claimed (maybe make a toast with the message)
 		returnCommands.add(new NotifyRouteClaimedCommand("The route from " + route.get_ConnectingCities().getLeft() + " to "
