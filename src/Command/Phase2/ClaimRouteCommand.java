@@ -41,7 +41,6 @@ public class ClaimRouteCommand implements ICommand {
         return ServerFacade.SINGLETON.claimRoute(gameId, authenticationCode, route, cardsUsedToClaimRoute);
     }
 
-    @JsonIgnore
     @Override
     public String getAuthenticationCode() {
         return authenticationCode;
@@ -62,10 +61,6 @@ public class ClaimRouteCommand implements ICommand {
     	return gameId;
     }
     
-    public String getStrAuthenticationCode()
-    {
-    	return authenticationCode;
-    }
     
     public List<TrainCard> getCardsUsedToClaimRoute()
     {

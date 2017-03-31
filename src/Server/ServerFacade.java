@@ -257,7 +257,7 @@ public class ServerFacade implements IServer {
 	        TrainCardDeck theTrainCardDeck = theGame.getDeck();
 	        DestCardDeck theDestCardDeck = theGame.getDestCards();
 	      	    	
-	        
+	        //Nathan: Initilize the scoreboard map in theGame
 	        List<Scoreboard> scoreboards = new ArrayList<>();
             for (int i = 0; i < usernamesInGame.size(); i++) {
             	Scoreboard scoreboard = new Scoreboard(findPlayerColor(i));
@@ -276,7 +276,7 @@ public class ServerFacade implements IServer {
         	List<TrainCard> faceupTrainCards = new ArrayList<>();
             for (int j = 0; j < 5; j++)
             {
-            	faceupTrainCards.add(theTrainCardDeck.drawTop());
+            	faceupTrainCards = theTrainCardDeck.getFiveCards();
             }
             
             returnCommands.add(new InitializeGameCommand(trainCards, destCards, faceupTrainCards, scoreboards)); //The creator's cards
@@ -587,6 +587,8 @@ public class ServerFacade implements IServer {
 		theGame.get_M_PlayerScoreboards().get(username).addPoints(route.get_i_pointValue());
 		// subtracts the number of cards used from the players total on the scoreboard
 		theGame.get_M_PlayerScoreboards().get(username).addTrainCards(-cardsUsedToClaimRoute.size());
+		//Subtracts the number of cars used from the player's total on the scoreboard
+		theGame.get_M_PlayerScoreboards().get(username).subPlayerCarCount(route.get_Weight());
 		
 		// updates the scoreboard
 		returnCommands.add(new UpdateScoreboardCommand(new ArrayList<>(theGame.get_M_PlayerScoreboards().values())));

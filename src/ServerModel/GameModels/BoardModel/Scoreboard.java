@@ -48,4 +48,8 @@ public class Scoreboard {
     public int getPlayerCarCount() {
         return playerCarCount;
     }
+	public void subPlayerCarCount(int carsUsed)
+	{
+		playerCarCount -= carsUsed;
+	}
 }

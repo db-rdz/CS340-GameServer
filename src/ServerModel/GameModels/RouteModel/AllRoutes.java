@@ -16,6 +16,10 @@ public class AllRoutes {
 	final int FOUR = 7;
 	final int FIVE = 10;
 	final int SIX = 15;
+	
+	public AllRoutes() {
+		initAllRoutes();
+	}
 
     //---------------------------------------CLASS VARIABLES------------------------------------//
     private Boolean _B_areRoutesSet = false;
