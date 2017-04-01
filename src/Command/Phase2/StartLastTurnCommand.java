@@ -20,46 +20,21 @@ import java.util.List;
 
 public class StartLastTurnCommand implements ICommand {
 
-    //Data members
-    private Route route;
-    private int gameId;
-    private String authenticationCode;
-    private List<TrainCard> cardsUsed;
-
     //Constructors
     public StartLastTurnCommand(){}
-    public StartLastTurnCommand(int g, String code, Route route1, List<TrainCard> cards) {
-        route = route1;
-        gameId = g;
-        authenticationCode = code;
-        cardsUsed = cards;
-    }
 
     @Override
     public List<ICommand> execute() throws GameIsFullException, UserAlreadyLoggedIn {
-        return ServerFacade.SINGLETON.startLastTurn(gameId, authenticationCode, route, cardsUsed);
+        return null;
     }
 
     @Override
     public String getAuthenticationCode() {
-        return authenticationCode;
+        return null;
     }
 
     @JsonIgnore
     @Override
     public User getUser() {
         return null;
-    }
-
-    public Route getRoute() {
-        return route;
-    }
-
-    public int getGameId() {
-        return gameId;
-    }
-
-    public List<TrainCard> getCardsUsed() {
-        return cardsUsed;
-    }
 }
