@@ -631,6 +631,8 @@ public class ServerFacade implements IServer {
 		// updates the scoreboard
 		returnCommands.add(new UpdateScoreboardCommand(new ArrayList<>(theGame.get_M_PlayerScoreboards().values())));
 		
+		//TODO: Should we put the check for the last turn here??
+		
 		// puts the cards used to claim the route in the discard pile
 		theGame.getDeck().getDiscardPile().addAll(cardsUsedToClaimRoute);
 		
@@ -931,6 +933,7 @@ public class ServerFacade implements IServer {
 		return returnCommands;
 	}
 	
+	//Nathan: The last turn only starts once a player has less than 3 cars
 	public List<ICommand> startLastTurn(int gameId, String authenticationCode, Route theRoute, List<TrainCard> cardsUsed) {
 		List<ICommand> returnCommands = new ArrayList<>();
 		Game theGame = Game.getGameWithId(gameId);
