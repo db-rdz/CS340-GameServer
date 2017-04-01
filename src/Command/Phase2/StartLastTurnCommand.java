@@ -37,4 +37,5 @@ public class StartLastTurnCommand implements ICommand {
     @Override
     public User getUser() {
         return null;
+    }
 }
