@@ -930,5 +930,74 @@ public class ServerFacade implements IServer {
 		
 		return returnCommands;
 	}
+	
+	public List<ICommand> startLastTurn(int gameId, String authenticationCode, Route theRoute, List<TrainCard> cardsUsed) {
+		List<ICommand> returnCommands = new ArrayList<>();
+		Game theGame = Game.getGameWithId(gameId);
+		String username = "";
+		UserModel.User theUser = null;
+		convertToCardType(cardsUsed);
+		try {
+			theUser = DAO._SINGLETON.getUserByAccessToken(authenticationCode);
+			username = theUser.get_S_username();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		// gets the route from the list in the game and sets the owner
+		Route route = theGame.getAllRoutes().get_RoutesMap().get(theRoute.get_S_MappingName());
+		route.set_Owner(username);
+		route.setClaimed(true);
+		
+		// tells the other players that the route was claimed (maybe make a toast with the message)
+		returnCommands.add(new NotifyRouteClaimedCommand("The route from " + route.get_ConnectingCities().getLeft() + " to "
+							+ route.get_ConnectingCities().getRight() + " has been claimed by " + username + ".", route));
+		theGame.get_M_PlayerScoreboards().get(username).addPoints(route.get_i_pointValue());
+		// subtracts the number of cards used from the players total on the scoreboard
+		theGame.get_M_PlayerScoreboards().get(username).addTrainCards(-cardsUsed.size());
+		//Subtracts the number of cars used from the player's total on the scoreboard
+		theGame.get_M_PlayerScoreboards().get(username).subPlayerCarCount(route.get_Weight());
+		
+		// updates the scoreboard
+		returnCommands.add(new UpdateScoreboardCommand(new ArrayList<>(theGame.get_M_PlayerScoreboards().values())));
+		returnCommands.add(new StartLastTurnCommand());
+		
+		// puts the cards used to claim the route in the discard pile
+		theGame.getDeck().getDiscardPile().addAll(cardsUsed);
+		
+		// send to all users in game (NotifyRouteClaimed and UpdateScoreboard)
+		int currentPlayerNumber = 0;
+		for (int i = 1; i <= theGame.get_numberOfPlayers(); i++)
+		{
+			UserModel.User player = theGame.getPlayer(i);
+			String newUsername = player.get_S_username();
+			if (!newUsername.equals(username))
+			{
+				ClientProxy.SINGLETON.get_m_usersCommands().get(newUsername).addAll(returnCommands);
+			}
+			else
+			{
+				currentPlayerNumber = i; // identifies the player whose turn it is
+			}
+		}
+		
+		// notify next player that it is their turn
+		if (currentPlayerNumber == theGame.get_numberOfPlayers())
+		{
+			currentPlayerNumber = 1; // starts over at player 1
+		}
+		else
+		{
+			currentPlayerNumber++; // goes to next player
+		}
+		ClientProxy.SINGLETON.get_m_usersCommands().get(theGame.getPlayer(currentPlayerNumber).get_S_username()).add(new NotifyTurnCommand());
+		
+		// decrease car count of player who claimed route by the weight of the route claimed, updates player hand
+		returnCommands.add(new UpdateCarCountAndHandCommand(route.get_Weight(), cardsUsed));
+		returnCommands.add(new EndTurnCommand());
+		
+		
+		return returnCommands;
+	}
 
 }
