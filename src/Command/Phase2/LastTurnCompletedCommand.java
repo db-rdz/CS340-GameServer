@@ -1,6 +1,8 @@
 package Command.Phase2;
 
 
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import Client.User;
@@ -8,29 +10,26 @@ import Command.ICommand;
 import Server.ServerFacade;
 import Server.IServer.GameIsFullException;
 import Server.IServer.UserAlreadyLoggedIn;
-import ServerModel.GameModels.CardsModel.TrainCard;
-import ServerModel.GameModels.RouteModel.Route;
-
-import java.util.List;
 
 /**
- * Do we need this class??
- * Created by natha on 3/30/2017.
+ * Created by natha on 4/1/2017.
  */
 
-public class StartLastTurnCommand implements ICommand {
+public class LastTurnCompletedCommand implements ICommand {
+	
+    private int gameId;
+    private String authenticationCode;
 
-    //Constructors
-    public StartLastTurnCommand(){}
+    public LastTurnCompletedCommand(){}
 
     @Override
     public List<ICommand> execute() throws GameIsFullException, UserAlreadyLoggedIn {
-        return null;
+        return ServerFacade.SINGLETON.lastTurnCompleted(gameId, authenticationCode);
     }
 
     @Override
     public String getAuthenticationCode() {
-        return null;
+        return authenticationCode;
     }
 
     @JsonIgnore
@@ -38,4 +37,9 @@ public class StartLastTurnCommand implements ICommand {
     public User getUser() {
         return null;
     }
+    
+    public int getGameId() {
+        return gameId;
+    }
+
 }

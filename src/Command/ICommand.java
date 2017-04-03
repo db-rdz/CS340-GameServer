@@ -29,6 +29,7 @@ import Command.Phase2.GetFaceUpTableTrainCardCommand;
 import Command.Phase2.GetTopDeckTrainCardCommand;
 import Command.Phase2.InitializeGameCommand;
 import Command.Phase2.KeepAllDestCardsCommand;
+import Command.Phase2.LastTurnCompletedCommand;
 import Command.Phase2.NotifyRouteClaimedCommand;
 import Command.Phase2.NotifyTurnCommand;
 import Command.Phase2.RejectDestinationCardCommand;
@@ -71,6 +72,7 @@ import sun.net.www.http.KeepAliveCache;
 	@Type(value = UpdatePlayerDestinationCardsCommand.class),
 	@Type(value = UpdatePlayerTrainCardsCommand.class),
 	@Type(value = FirstTurnCommand.class),
+	@Type(value = LastTurnCompletedCommand.class),
 	@Type(value = GetTopDeckTrainCardCommand.class)
 })
 public interface ICommand {

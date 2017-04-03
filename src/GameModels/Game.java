@@ -43,6 +43,8 @@ public class Game implements iGame {
      *  This contains all the usernames in a list. Used to send back to the client.
      */
     public static List<String> usernames;
+    
+  
 
     //-----------------------------------------CLASS VARIABLES-----------------------------------------//
     /** _M_idToUserInGame maps a username string to a User. It only maps the user's of the people in the game */
@@ -60,6 +62,8 @@ public class Game implements iGame {
     private String _S_gameName;
 
     private Boolean _S_active = true;
+    
+    private int _i_playersThatHaveCompletedLastTurn = 0;
 
     /**
      * Nathan
@@ -258,6 +262,14 @@ public class Game implements iGame {
     }
     
     public Map<String, Scoreboard> get_M_PlayerScoreboards() { return _M_playerScoreboards; }
+    
+    public int get_i_playersThatHaveCompletedLastTurn() {
+		return _i_playersThatHaveCompletedLastTurn;
+	}
+    
+    public void set_i_playersThatHaveCompletedLastTurn(int _i_playersThatHaveCompletedLastTurn) {
+		this._i_playersThatHaveCompletedLastTurn = _i_playersThatHaveCompletedLastTurn;
+	}
 
 
     //-----------------------------------------CLASS FUNCTIONS----------------------------------------//
