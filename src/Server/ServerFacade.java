@@ -596,16 +596,6 @@ public class ServerFacade implements IServer {
 		}
 	}
 	
-	//Nathan: Determines if the last turn should start or not
-	private Boolean shouldLastTurnStart(Game theGame) {
-		for (int i = 1; i <= theGame.get_M_PlayerScoreboards().size(); i++) {
-			String username = theGame.getPlayer(i).get_S_username();
-			if (theGame.get_M_PlayerScoreboards().get(username).getPlayerCarCount() < 3) {
-				return true;
-			}
-		}
-		return false;
-	}
 
 	/*
 	* Ryan
@@ -637,12 +627,11 @@ public class ServerFacade implements IServer {
 		// subtracts the number of cards used from the players total on the scoreboard
 		theGame.get_M_PlayerScoreboards().get(username).addTrainCards(-cardsUsedToClaimRoute.size());
 		//Subtracts the number of cars used from the player's total on the scoreboard
-//		theGame.get_M_PlayerScoreboards().get(username).subPlayerCarCount(route.get_Weight());
-		theGame.get_M_PlayerScoreboards().get(username).subPlayerCarCount(43);
+		theGame.get_M_PlayerScoreboards().get(username).subPlayerCarCount(route.get_Weight());
+//		theGame.get_M_PlayerScoreboards().get(username).subPlayerCarCount(43); //DEBUG
 		
 		// updates the scoreboard
 		returnCommands.add(new UpdateScoreboardCommand(new ArrayList<>(theGame.get_M_PlayerScoreboards().values())));
-		if (shouldLastTurnStart(theGame)) { returnCommands.add(new NotifyLastTurnCommand()); }
 		
 		// puts the cards used to claim the route in the discard pile
 		theGame.getDeck().getDiscardPile().addAll(cardsUsedToClaimRoute);
@@ -676,6 +665,7 @@ public class ServerFacade implements IServer {
 		
 		// decrease car count of player who claimed route by the weight of the route claimed, updates player hand
 		returnCommands.add(new UpdateCarCountAndHandCommand(route.get_Weight(), cardsUsedToClaimRoute));
+//		returnCommands.add(new UpdateCarCountAndHandCommand(43, cardsUsedToClaimRoute));
 		returnCommands.add(new EndTurnCommand());
 		
 		return returnCommands;
@@ -940,6 +930,50 @@ public class ServerFacade implements IServer {
 		{
 			theGame.getDestCards().returnCard(destCards.get(0));
 		}
+		
+		return returnCommands;
+	}
+	
+	public List<ICommand> initiateLastTurn(int gameId, String authenticationCode) {
+		List<ICommand> returnCommands = new ArrayList<>();
+
+		Game theGame = Game.getGameWithId(gameId);
+    	UserModel.User theUser;
+    	String username = "";
+		try {
+			theUser = DAO._SINGLETON.getUserByAccessToken(authenticationCode);
+			username = theUser.get_S_username();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		int currPlayer = -1;
+		
+		returnCommands.add(new NotifyLastTurnCommand());
+		for (int i = 1; i <= theGame.get_numberOfPlayers(); i++)
+		{
+			UserModel.User player = theGame.getPlayer(i);
+			String newUsername = player.get_S_username();
+			if (!newUsername.equals(username))
+			{
+				ClientProxy.SINGLETON.get_m_usersCommands().get(newUsername).addAll(returnCommands);
+			}
+			else 
+			{
+				currPlayer = i;
+			}
+			
+		}
+		if (currPlayer == theGame.get_numberOfPlayers())
+		{
+			currPlayer = 1; // starts over at player 1
+		}
+		else
+		{
+			currPlayer++; // goes to next player
+		}
+		ClientProxy.SINGLETON.get_m_usersCommands().get(theGame.getPlayer(currPlayer).get_S_username()).add(new NotifyTurnCommand());
+		
 		
 		return returnCommands;
 	}
