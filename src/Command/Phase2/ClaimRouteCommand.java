@@ -46,12 +46,6 @@ public class ClaimRouteCommand implements ICommand {
         return authenticationCode;
     }
 
-    @JsonIgnore
-    @Override
-    public User getUser() {
-        return null;
-    }
-
     public Route getRoute() {
 		return route;
 	}

@@ -8,23 +8,17 @@ import Client.User;
 import Command.ICommand;
 import Server.IServer.GameIsFullException;
 import Server.IServer.UserAlreadyLoggedIn;
+import Server.ServerFacade;
 
 public class SwitchToEndGameViewCommand implements ICommand {
 
 	@Override
 	public List<ICommand> execute() throws GameIsFullException, UserAlreadyLoggedIn, InvalidUsername, InvalidPassword {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public String getAuthenticationCode() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public User getUser() {
 		// TODO Auto-generated method stub
 		return null;
 	}

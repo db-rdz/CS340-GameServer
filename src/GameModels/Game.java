@@ -30,7 +30,7 @@ public class Game implements iGame {
 
     //-----------------------------------------STATIC VARIABLES----------------------------------------//
     /** _M_idToGame maps a game id to a game. */
-    private static Map<Integer, Game> _M_idToGame = new HashMap<>();
+    public static Map<Integer, Game> _M_idToGame = new HashMap<>();
     /**  These are all the games that haven't started */
     private static List<Game> _L_listOfAvailableGames = new ArrayList<>();
     /**  These are all the games that have already started */
@@ -335,6 +335,7 @@ public class Game implements iGame {
                 return null;
         }
     }
+    
     
     public TrainCardDeck getDeck()
     {

@@ -31,12 +31,6 @@ public class GetDestinationCardsCommand implements ICommand {
     public String getAuthenticationCode() {
         return authenticationCode;
     }
-
-    @JsonIgnore
-    @Override
-    public User getUser() {
-        return null;
-    }
     
     public int getGameId() {
         return gameId;

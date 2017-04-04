@@ -19,19 +19,11 @@ public class LogoutCommand implements ICommand{
   public String getAuthenticationCode() {
     return null;
   }
-
-  @Override
-  public User getUser() {
-    return null;
-  }
   
   @Override
   public List<ICommand> execute(){
     return ServerFacade.SINGLETON.logout(str_authentication_code);
     }
   
-//  @JsonIgnore
-//  @Override
-//  public Game getGame() { return null; }
   
 }

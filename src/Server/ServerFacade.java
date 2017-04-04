@@ -45,6 +45,19 @@ public class ServerFacade implements IServer {
      * public static ServerFacade SINGLETON
      */
 	public static ServerFacade SINGLETON = new ServerFacade();
+	
+	/**
+	 * Nathan: simply gets all the game ids from the server
+	 * @return A List of Integers which contain gameIds
+	 */
+	private List<Integer> listJoinableGames() {
+        List<Game> games = ServerModel.SINGLETON.getAvailableGames();
+        List<Integer> gameIds = new ArrayList<>();
+        for (Game game : games) {
+        	gameIds.add(game.get_i_gameId());
+        }
+        return gameIds;
+	}
     
 	/**
 	 * This method is used to log a user in given the username and password.
@@ -78,12 +91,7 @@ public class ServerFacade implements IServer {
 
                 if (theUser.get_L_joinedGames().isEmpty())
                 {
-                    List<Game> games = ServerModel.SINGLETON.getAvailableGames();
-                    List<Integer> gameIds = new ArrayList<>();
-                    for (Game game : games) {
-                    	gameIds.add(game.get_i_gameId());
-                    }
-                    ListJoinableCommand listJoinableCommand = new ListJoinableCommand(gameIds);
+                    ListJoinableCommand listJoinableCommand = new ListJoinableCommand(listJoinableGames());
                     commands.add(listJoinableCommand); //Need to update what games there are first before login
                 }
                 else
@@ -1006,6 +1014,46 @@ public class ServerFacade implements IServer {
 			}
 		}
 		
+		return returnCommands;
+	}
+	
+	public List<ICommand> endGame(int gameId, String authenticationCode) {
+		List<ICommand> returnCommands = new ArrayList<>();
+		
+		Game theGame = Game.getGameWithId(gameId); //Get the game data first
+		
+    	UserModel.User theUser;
+    	String username = "";
+		try {
+			theUser = DAO._SINGLETON.getUserByAccessToken(authenticationCode);
+			username = theUser.get_S_username();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		
+		//Delete game off of lobby list
+
+		//Sends command to switch the client back to the lobby
+        if (Game._M_idToGame.containsKey(gameId)) {
+    		Game._M_idToGame.remove(gameId); //Delete game from server
+
+        	ServerModel.SINGLETON.getAvailableGames().remove(gameId-1); //Delete game from server
+            ListJoinableCommand listJoinableCommand = new ListJoinableCommand(listJoinableGames());
+            returnCommands.add(listJoinableCommand); //Need to update what games there are first before login
+    		for (int i = 1; i <= theGame.get_numberOfPlayers(); i++) //Sends to everyone else in the game but the creator
+    		{
+    			UserModel.User player = theGame.getPlayer(i);
+    			String newUsername = player.get_S_username();
+    			if (!newUsername.equals(username))
+    			{
+    				ClientProxy.SINGLETON.get_m_usersCommands().get(newUsername).addAll(returnCommands);
+    			}
+    		}
+        }
+
+		returnCommands.add(new SwitchBackToLobbyViewCommand());
+        
 		return returnCommands;
 	}
 

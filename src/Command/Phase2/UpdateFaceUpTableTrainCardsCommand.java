@@ -39,14 +39,6 @@ public class UpdateFaceUpTableTrainCardsCommand implements ICommand {
         return null;
     }
 
-    @JsonIgnore
-    @Override
-    public User getUser() {
-        return null;
-    }
-
-
-
     public List<TrainCard> getTrainCards() {
         return trainCards;
     }

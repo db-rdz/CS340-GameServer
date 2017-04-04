@@ -31,10 +31,6 @@ public class RejectDestinationCardCommand implements ICommand {
 	public String getAuthenticationCode() {
 		return authenticationCode;
 	}
-	@Override
-	public User getUser() {
-		return null;
-	}
 	
 	public int get_i_gameId()
 	{

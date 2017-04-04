@@ -44,12 +44,6 @@ public class BroadcastToChatCommand implements ICommand {
         return authenticationCode;
     }
 
-    @JsonIgnore
-    @Override
-    public User getUser() {
-        return null;
-    }
-
     public String getMessage() {
         return message;
     }

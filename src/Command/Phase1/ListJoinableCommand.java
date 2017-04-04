@@ -25,12 +25,6 @@ public class ListJoinableCommand implements ICommand{ // sent to clients after l
 	  public String getAuthenticationCode() {
 	    return null;
 	  }
-	
-	  @JsonIgnore
-	  @Override
-	  public User getUser() {
-	    return null;
-	  }
 	  
 	  @Override
 	  public List<ICommand> execute(){

@@ -27,12 +27,6 @@ public class AddGameToServerCommand implements ICommand {
     public String getAuthenticationCode() {
         return str_authentication_code;
     }
-
-    @JsonIgnore
-    @Override
-    public User getUser() {
-        return null;
-    }
     //
     @Override
     public List<ICommand> execute() {

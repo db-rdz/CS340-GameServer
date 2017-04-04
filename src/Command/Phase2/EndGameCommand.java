@@ -10,31 +10,27 @@ import Client.User;
 import Command.ICommand;
 import Server.IServer.GameIsFullException;
 import Server.IServer.UserAlreadyLoggedIn;
-import ServerModel.GameModels.CardsModel.DestCard;
+import Server.ServerFacade;
 
-public class UpdateServerDestCardsCommand implements ICommand {
+public class EndGameCommand implements ICommand {
 	
-	private List<DestCard> destCards;
+	private int gameId;
+	private String authenticationCode;
 	
-	public UpdateServerDestCardsCommand(List<DestCard> cards) {
-		destCards = cards;
-	}
+	public EndGameCommand() {}
 
 	@Override
 	public List<ICommand> execute() throws GameIsFullException, UserAlreadyLoggedIn, InvalidUsername, InvalidPassword {
-		// TODO Auto-generated method stub
-		return null;
+		return ServerFacade.SINGLETON.endGame(gameId, authenticationCode);
 	}
 
-	@JsonIgnore
 	@Override
 	public String getAuthenticationCode() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 	
-	public List<DestCard> getDestCards() {
-		return destCards;
+	public int getGameId() {
+		return gameId;
 	}
 
 }

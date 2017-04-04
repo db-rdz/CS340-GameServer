@@ -22,6 +22,7 @@ import Command.Phase1.RegisterCommand;
 import Command.Phase1.StartGameCommand;
 import Command.Phase2.BroadcastToChatCommand;
 import Command.Phase2.ClaimRouteCommand;
+import Command.Phase2.EndGameCommand;
 import Command.Phase2.EndTurnCommand;
 import Command.Phase2.FirstTurnCommand;
 import Command.Phase2.GetDestinationCardsCommand;
@@ -75,11 +76,10 @@ import sun.net.www.http.KeepAliveCache;
 	@Type(value = FirstTurnCommand.class),
 	@Type(value = InitiateLastTurnCommand.class),
 	@Type(value = LastTurnCompletedCommand.class),
+	@Type(value = EndGameCommand.class),
 	@Type(value = GetTopDeckTrainCardCommand.class)
 })
 public interface ICommand {
     public List<ICommand> execute() throws GameIsFullException, UserAlreadyLoggedIn, InvalidUsername, InvalidPassword;
     public String getAuthenticationCode();
-    public User getUser();
-//    public Game getGame();
 }

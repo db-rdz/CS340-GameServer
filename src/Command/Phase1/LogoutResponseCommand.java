@@ -18,13 +18,4 @@ public class LogoutResponseCommand implements ICommand{
   public String getAuthenticationCode() {
     return null;
   }
-
-  @Override
-  public User getUser() {
-    return null;
-  }
-  
-//  @JsonIgnore
-//  @Override
-//  public Game getGame() { return null; }
 }

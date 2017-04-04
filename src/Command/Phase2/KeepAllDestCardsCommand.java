@@ -35,12 +35,6 @@ public class KeepAllDestCardsCommand implements ICommand {
 		// TODO Auto-generated method stub
 		return authenticationCode;
 	}
-
-	@Override
-	public User getUser() {
-		// TODO Auto-generated method stub
-		return null;
-	}
 	
 	public int getGameId()
 	{

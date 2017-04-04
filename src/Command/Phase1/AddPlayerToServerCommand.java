@@ -18,12 +18,7 @@ public class AddPlayerToServerCommand implements ICommand{
 	  public AddPlayerToServerCommand(){}
 	  public AddPlayerToServerCommand(int gameId, String k){
 		  i_game_id = gameId;
-		  str_authentication_code = k;}
-	
-	  @JsonIgnore
-	  @Override
-	  public User getUser() {
-	    return null;
+		  str_authentication_code = k;
 	  }
 	
 	  @Override
