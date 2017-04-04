@@ -274,8 +274,6 @@ public class DAO implements iDAO {
     	String playerNumber = String.valueOf(numberOfPlayersInGame); //PlayerNumber == number of players in the game.
         PreparedStatement registerGameStatement = null;
 
-//        String registerUserSQL = "insert into Games (numberOfPlayers, player1, player2, player3, player4, player5)"
-//        		+ "values (?, ?, ?, ?, ?, ?)";
         String updateGamesSQL = "Update Games set player" + playerNumber +  " = ? where Games.gameId = ?";
         
         try {
