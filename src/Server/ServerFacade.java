@@ -890,6 +890,7 @@ public class ServerFacade implements IServer {
 		{
 			currentPlayerNumber++; // goes to next player
 		}
+		
 		ClientProxy.SINGLETON.get_m_usersCommands().get(theGame.getPlayer(currentPlayerNumber).get_S_username()).add(new NotifyTurnCommand());
 		returnCommands.add(new UpdatePlayerDestinationCardsCommand(cardsKept));
 		returnCommands.add(new EndTurnCommand()); // ends current player's turn
