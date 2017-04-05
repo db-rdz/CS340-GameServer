@@ -636,7 +636,6 @@ public class ServerFacade implements IServer {
 		theGame.get_M_PlayerScoreboards().get(username).addTrainCards(-cardsUsedToClaimRoute.size());
 		//Subtracts the number of cars used from the player's total on the scoreboard
 		theGame.get_M_PlayerScoreboards().get(username).subPlayerCarCount(route.get_Weight());
-//		theGame.get_M_PlayerScoreboards().get(username).subPlayerCarCount(43); //DEBUG
 		
 		// updates the scoreboard
 		returnCommands.add(new UpdateScoreboardCommand(new ArrayList<>(theGame.get_M_PlayerScoreboards().values())));
@@ -733,7 +732,8 @@ public class ServerFacade implements IServer {
 		}
 		else
 		{
-			returnCommands.add(new NotifyTurnCommand()); // the current player can draw another card
+//			returnCommands.add(new NotifyTurnCommand()); // the current player can draw another card
+			returnCommands.add(new NotifyTrainCardPickedCommand()); // the current player can draw another card
 		}
 		
 		return returnCommands;
@@ -777,11 +777,11 @@ public class ServerFacade implements IServer {
 			}
 		}
 		
-		// adds the card sele
+		// adds the card selected
 		// TODO: update the card count of that type for that player on the server
 		returnCommands.add(new UpdatePlayerTrainCardsCommand(theCard));
 		
-		if (turnNumber == 2)
+		if (turnNumber == 2 || isWild)
 		{
 			if (currentPlayerNumber == theGame.get_numberOfPlayers())
 			{
@@ -796,7 +796,8 @@ public class ServerFacade implements IServer {
 		}
 		else
 		{
-			returnCommands.add(new NotifyTurnCommand()); // the current player can draw another card
+//			returnCommands.add(new NotifyTurnCommand()); // the current player can draw another card
+			returnCommands.add(new NotifyTrainCardPickedCommand()); // the current player can draw another card
 		}
 		
 		return returnCommands;
@@ -843,6 +844,7 @@ public class ServerFacade implements IServer {
 		// gets the three top cards
 		DestCardDeck theDeck = theGame.getDestCards();
 		returnCommands.add(new UpdateServerDestCardsCommand(theDeck.drawTop3()));
+		returnCommands.add(new NotifyDestCardCommand());
 		
 		// updates the scoreboard, but doesn't send until all destination cards are kept/rejected
 		theGame.get_M_PlayerScoreboards().get(username).addDestCards(3);
