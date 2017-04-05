@@ -88,6 +88,10 @@ public class ServerFacade implements IServer {
                 user.setUsername(theUser.get_S_username());
                 user.setPassword(theUser.get_S_password());
                 user.setStr_authentication_code(theUser.get_S_token());
+                
+                //Update games first then have the user login
+                LoginRegisterResponseCommand lrsc = new LoginRegisterResponseCommand(user, true, false, true);
+                commands.add(lrsc);
 
                 if (theUser.get_L_joinedGames().isEmpty())
                 {
@@ -117,9 +121,6 @@ public class ServerFacade implements IServer {
                     }
                 }
                 
-                //Update games first then have the user login
-                LoginRegisterResponseCommand lrsc = new LoginRegisterResponseCommand(user, true, false, true);
-                commands.add(lrsc);
                 
                 ClientProxy.SINGLETON.get_m_usersCommands().put(username, new ArrayList<ICommand>());
                 ServerModel.SINGLETON.logIn(theUser.get_S_username());
@@ -307,20 +308,22 @@ public class ServerFacade implements IServer {
             }
             
 
+           
+	        List<ICommand> deleteGameFromLobby = new ArrayList<>();
             
-	        //TODO: send delete game command to all users not in game
-//	        ICommand deleteGameCommand = new DeleteGameCommand(gameId);
-//	        
-//	        List<ICommand> commands = new ArrayList<>();
-//	        commands.add(deleteGameCommand);
-//	        
-//	        String username = "";
-//	        List<UserModel.User> users = DAO._SINGLETON.getAllUsers();
-//	         
-//	        for (UserModel.User user : users) {
-//	        		username = user.get_S_username();
-//	            	ClientProxy.SINGLETON.get_m_usersCommands().get(username, commands);
-//	        }
+        	ServerModel.SINGLETON.getAvailableGames().remove(gameId-1); //Delete game from server list
+            ListJoinableCommand listJoinableCommand = new ListJoinableCommand(listJoinableGames());
+            deleteGameFromLobby.add(listJoinableCommand); //Need to update what games there are first before login
+            
+            Iterator iterator = UserModel.User.get_M_usernameToLoggedInUser().values().iterator();
+            while (iterator.hasNext())
+            {
+            	UserModel.User newUser = (UserModel.User) iterator.next();
+            	if (!newUser.get_S_token().equals(strAuthenticationCode)) { //Sends delete command to all logged in but creator of game
+            		ClientProxy.SINGLETON.get_m_usersCommands().get(newUser.get_S_username()).addAll(deleteGameFromLobby);
+            		
+            	}
+            }
             
 	        return returnCommands;
 		} catch (Exception e) {
@@ -1040,19 +1043,8 @@ public class ServerFacade implements IServer {
 		//Sends command to switch the client back to the lobby
         if (Game._M_idToGame.containsKey(gameId)) {
     		Game._M_idToGame.remove(gameId); //Delete game from server
-
-        	ServerModel.SINGLETON.getAvailableGames().remove(gameId-1); //Delete game from server
-            ListJoinableCommand listJoinableCommand = new ListJoinableCommand(listJoinableGames());
-            returnCommands.add(listJoinableCommand); //Need to update what games there are first before login
-    		for (int i = 1; i <= theGame.get_numberOfPlayers(); i++) //Sends to everyone else in the game but the creator
-    		{
-    			UserModel.User player = theGame.getPlayer(i);
-    			String newUsername = player.get_S_username();
-    			if (!newUsername.equals(username))
-    			{
-    				ClientProxy.SINGLETON.get_m_usersCommands().get(newUsername).addAll(returnCommands);
-    			}
-    		}
+    		
+    		//TODO: Delete game from databases in phase 4
         }
 
 		returnCommands.add(new SwitchBackToLobbyViewCommand());
