@@ -4,6 +4,7 @@ import ServerModel.GameModels.BoardModel.Scoreboard;
 import ServerModel.GameModels.CardsModel.DestCardDeck;
 import ServerModel.GameModels.CardsModel.TrainCardDeck;
 import ServerModel.GameModels.PlayerModel.Player;
+import ServerModel.GameModels.PlayerModel.RouteGraph.Graph;
 import ServerModel.GameModels.RouteModel.AllRoutes;
 import UserModel.User;
 import com.sun.org.apache.xpath.internal.operations.Bool;
@@ -93,7 +94,10 @@ public class Game implements iGame {
     private AllRoutes allRoutes = new AllRoutes();
     
     private Map<String, Scoreboard> _M_playerScoreboards = new LinkedHashMap<String, Scoreboard>();
+    
+    private Map<String, Graph> _M_usernameToGraph = new HashMap<>();
 
+    
     //-----------------------------------------STATIC FUNCTIONS----------------------------------------//
 
     /** Gets the corresponding game mapped to the specified id.  */
@@ -269,6 +273,10 @@ public class Game implements iGame {
     
     public void set_i_playersThatHaveCompletedLastTurn(int _i_playersThatHaveCompletedLastTurn) {
 		this._i_playersThatHaveCompletedLastTurn = _i_playersThatHaveCompletedLastTurn;
+	}
+    
+    public Map<String, Graph> get_M_usernameToGraph() {
+		return _M_usernameToGraph;
 	}
 
 

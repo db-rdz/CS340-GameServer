@@ -33,13 +33,14 @@ public class Graph {
 
     public Boolean addNode(String name){
         Node n = new Node(name);
-        if(_nodes.add(n)){
+        if(!_nodes.contains(n)){ //if the node is in the list
+        	_nodes.add(n);
             return true;
         }
         return false;
     }
 
-    public Boolean evaluateDestCar(DestCard card){
+    public Boolean evaluateDestCard(DestCard card){
         String from = card.get_destination().getLeft();
         String to = card.get_destination().getRight();
         return findPath(getNode(from),getNode(to));

@@ -4,6 +4,7 @@ import Client.User;
 import Command.ICommand;
 import Server.IServer;
 import Server.ServerFacade;
+import ServerModel.GameModels.CardsModel.DestCard;
 import ServerModel.GameModels.CardsModel.TrainCard;
 import ServerModel.GameModels.RouteModel.Route;
 
@@ -25,6 +26,7 @@ public class ClaimRouteCommand implements ICommand {
     private int gameId;
     private String authenticationCode;
     private List<TrainCard> cardsUsedToClaimRoute;
+    private List<DestCard> allDestCardsOfPlayer;
 
     //Constructors
     public ClaimRouteCommand(){}
@@ -38,7 +40,7 @@ public class ClaimRouteCommand implements ICommand {
     //Functions
     @Override
     public List<ICommand> execute() throws IServer.GameIsFullException {
-        return ServerFacade.SINGLETON.claimRoute(gameId, authenticationCode, route, cardsUsedToClaimRoute);
+        return ServerFacade.SINGLETON.claimRoute(gameId, authenticationCode, route, cardsUsedToClaimRoute, allDestCardsOfPlayer);
     }
 
     @Override
@@ -60,5 +62,9 @@ public class ClaimRouteCommand implements ICommand {
     {
     	return cardsUsedToClaimRoute;
     }
+    
+    public List<DestCard> getAllDestCardsOfPlayer() {
+		return allDestCardsOfPlayer;
+	}
 
 }

@@ -19,19 +19,16 @@ import ServerModel.GameModels.CardsModel.DestCard;
 import ServerModel.GameModels.CardsModel.DestCardDeck;
 import ServerModel.GameModels.CardsModel.TrainCard;
 import ServerModel.GameModels.CardsModel.TrainCardDeck;
-import ServerModel.GameModels.RouteModel.AllRoutes;
+import ServerModel.GameModels.PlayerModel.RouteGraph.Graph;
 import ServerModel.GameModels.RouteModel.Route;
-import ServerModel.GameModels.RouteModel.iRoute;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import com.sun.org.apache.xml.internal.security.keys.keyresolver.implementations.PrivateKeyResolver;
 
 
 /**
@@ -268,12 +265,18 @@ public class ServerFacade implements IServer {
 	        TrainCardDeck theTrainCardDeck = theGame.getDeck();
 	        DestCardDeck theDestCardDeck = theGame.getDestCards();
 	      	    	
-	        //Nathan: Initilize the scoreboard map in theGame
+	        //Nathan: Initialize the scoreboard map in theGame
 	        List<Scoreboard> scoreboards = new ArrayList<>();
             for (int i = 0; i < usernamesInGame.size(); i++) {
             	Scoreboard scoreboard = new Scoreboard(findPlayerColor(i));
             	theGame.get_M_PlayerScoreboards().put(usernamesInGame.get(i), scoreboard);
             	scoreboards.add(scoreboard);
+            }
+            
+            //Nathan: Initialize the graph map in the specific game.
+            for (int i = 0; i < usernamesInGame.size(); i++) {
+            	Graph graph = new Graph();
+            	theGame.get_M_usernameToGraph().put(usernamesInGame.get(i), graph);
             }
 
         	trainCards = new ArrayList<>();
@@ -613,7 +616,7 @@ public class ServerFacade implements IServer {
 	* Allows a player to claim a route, route color will be set on the client side
 	*/
 	@Override
-	public List<ICommand> claimRoute(int gameId, String authenticationCode, Route theRoute, List<TrainCard> cardsUsedToClaimRoute) {
+	public List<ICommand> claimRoute(int gameId, String authenticationCode, Route theRoute, List<TrainCard> cardsUsedToClaimRoute, List<DestCard> allDestCardsOfPlayer) {
 		List<ICommand> returnCommands = new ArrayList<>();
 		Game theGame = Game.getGameWithId(gameId);
 		String username = "";
@@ -630,6 +633,15 @@ public class ServerFacade implements IServer {
 		Route route = theGame.getAllRoutes().get_RoutesMap().get(theRoute.get_S_MappingName());
 		route.set_Owner(username);
 		route.setClaimed(true);
+		
+		//TODO: Need to figure out edges for the nodes.
+//		for (int i = 0; i < allDestCardsOfPlayer.size(); i++) {
+//			theGame.get_M_usernameToGraph().get(theUser.get_S_username()).addNode(allDestCardsOfPlayer.get(i).get_destination().getLeft());
+//			theGame.get_M_usernameToGraph().get(theUser.get_S_username()).addNode(allDestCardsOfPlayer.get(i).get_destination().getRight());
+//			if (theGame.get_M_usernameToGraph().get(theUser.get_S_username()).evaluateDestCard(allDestCardsOfPlayer.get(i))) {
+//				allDestCardsOfPlayer.get(i).set_isCompleted(true);
+//			}
+//		}
 		
 		// tells the other players that the route was claimed (maybe make a toast with the message)
 		returnCommands.add(new NotifyRouteClaimedCommand("The route from " + route.get_ConnectingCities().getLeft() + " to "
@@ -674,7 +686,7 @@ public class ServerFacade implements IServer {
 		ClientProxy.SINGLETON.get_m_usersCommands().get(theGame.getPlayer(currentPlayerNumber).get_S_username()).add(new NotifyTurnCommand());
 		
 		// decrease car count of player who claimed route by the weight of the route claimed, updates player hand
-		returnCommands.add(new UpdateCarCountAndHandCommand(route.get_Weight(), cardsUsedToClaimRoute));
+		returnCommands.add(new UpdateCarCountAndHandCommand(route.get_Weight(), cardsUsedToClaimRoute, allDestCardsOfPlayer));
 //		returnCommands.add(new UpdateCarCountAndHandCommand(43, cardsUsedToClaimRoute));
 		returnCommands.add(new EndTurnCommand());
 		
@@ -1038,7 +1050,7 @@ public class ServerFacade implements IServer {
 		}
 		
 		
-		//Delete game off of lobby list
+		
 
 		//Sends command to switch the client back to the lobby
         if (Game._M_idToGame.containsKey(gameId)) {

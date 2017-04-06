@@ -12,10 +12,12 @@ public class DestCard{
     @JsonProperty("_destination")
     private Pair<String, String> _destination;
     private int points;
+    private Boolean _isCompleted;
 
     public DestCard(){}
     public DestCard(String city1, String city2){
         _destination = Pair.of(city1, city2);
+        _isCompleted = false;
     }
 
     public int get_cardType() {
@@ -33,4 +35,12 @@ public class DestCard{
     public void setPoints(int points) {
         this.points = points;
     }
+    
+    public Boolean get_isCompleted() {
+        return _isCompleted;
+    }
+    
+    public void set_isCompleted(Boolean _isCompleted) {
+		this._isCompleted = _isCompleted;
+	}
 }

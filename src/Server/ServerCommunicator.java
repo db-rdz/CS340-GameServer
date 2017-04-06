@@ -126,7 +126,7 @@ public class ServerCommunicator {
     {
     	checkIfDbHasJournal();
     	addPairModule();
-    	eraseAllAuthenticationTokens();
+//    	eraseAllAuthenticationTokens();
     	deleteAllServerGames();
     	
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);

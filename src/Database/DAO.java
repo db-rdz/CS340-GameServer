@@ -50,7 +50,7 @@ public class DAO implements iDAO {
         	if (dbUser.get_S_username().equals(userName)) { isValid = true; }
         } catch (Exception e) { throw new InvalidUsername(); }
         
-        if (!dbUser.get_S_token().equals("")) { throw new UserAlreadyLoggedIn(); }
+//        if (!dbUser.get_S_token().equals("")) { throw new UserAlreadyLoggedIn(); }
         
         if(password.equals(dbUser.get_S_password())) {
         	updateUserToken(userName, makeToken());

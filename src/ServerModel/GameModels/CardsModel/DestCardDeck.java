@@ -45,4 +45,8 @@ public class DestCardDeck {
     {
     	_L_Deck.add(card);
     }
+    
+    public List<DestCard> get_L_Deck() {
+		return _L_Deck;
+	}
 }
