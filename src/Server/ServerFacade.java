@@ -19,6 +19,7 @@ import ServerModel.GameModels.CardsModel.DestCard;
 import ServerModel.GameModels.CardsModel.DestCardDeck;
 import ServerModel.GameModels.CardsModel.TrainCard;
 import ServerModel.GameModels.CardsModel.TrainCardDeck;
+import ServerModel.GameModels.PlayerModel.RouteGraph.Edge;
 import ServerModel.GameModels.PlayerModel.RouteGraph.Graph;
 import ServerModel.GameModels.RouteModel.Route;
 
@@ -635,13 +636,17 @@ public class ServerFacade implements IServer {
 		route.setClaimed(true);
 		
 		//TODO: Need to figure out edges for the nodes.
-//		for (int i = 0; i < allDestCardsOfPlayer.size(); i++) {
-//			theGame.get_M_usernameToGraph().get(theUser.get_S_username()).addNode(allDestCardsOfPlayer.get(i).get_destination().getLeft());
-//			theGame.get_M_usernameToGraph().get(theUser.get_S_username()).addNode(allDestCardsOfPlayer.get(i).get_destination().getRight());
-//			if (theGame.get_M_usernameToGraph().get(theUser.get_S_username()).evaluateDestCard(allDestCardsOfPlayer.get(i))) {
-//				allDestCardsOfPlayer.get(i).set_isCompleted(true);
-//			}
-//		}
+		for (int i = 0; i < allDestCardsOfPlayer.size(); i++) {
+			Graph playerGraph = theGame.get_M_usernameToGraph().get(theUser.get_S_username());
+			DestCard card = allDestCardsOfPlayer.get(i);
+			
+			playerGraph.addNode(card.get_destination().getLeft());
+			playerGraph.addNode(card.get_destination().getRight());
+			playerGraph.get_M_DestinationWithEdge().put(card.get_destination(), new Edge(route.get_Weight(), playerGraph.getNode(card.get_destination().getRight())));
+			if (theGame.get_M_usernameToGraph().get(theUser.get_S_username()).evaluateDestCard(allDestCardsOfPlayer.get(i))) {
+				allDestCardsOfPlayer.get(i).set_isCompleted(true);
+			}
+		}
 		
 		// tells the other players that the route was claimed (maybe make a toast with the message)
 		returnCommands.add(new NotifyRouteClaimedCommand("The route from " + route.get_ConnectingCities().getLeft() + " to "
