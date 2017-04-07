@@ -26,7 +26,6 @@ public class ClaimRouteCommand implements ICommand {
     private int gameId;
     private String authenticationCode;
     private List<TrainCard> cardsUsedToClaimRoute;
-    private List<DestCard> allDestCardsOfPlayer;
 
     //Constructors
     public ClaimRouteCommand(){}
@@ -40,7 +39,7 @@ public class ClaimRouteCommand implements ICommand {
     //Functions
     @Override
     public List<ICommand> execute() throws IServer.GameIsFullException {
-        return ServerFacade.SINGLETON.claimRoute(gameId, authenticationCode, route, cardsUsedToClaimRoute, allDestCardsOfPlayer);
+        return ServerFacade.SINGLETON.claimRoute(gameId, authenticationCode, route, cardsUsedToClaimRoute);
     }
 
     @Override
@@ -62,9 +61,5 @@ public class ClaimRouteCommand implements ICommand {
     {
     	return cardsUsedToClaimRoute;
     }
-    
-    public List<DestCard> getAllDestCardsOfPlayer() {
-		return allDestCardsOfPlayer;
-	}
 
 }

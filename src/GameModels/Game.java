@@ -1,6 +1,7 @@
 package GameModels;
 
 import ServerModel.GameModels.BoardModel.Scoreboard;
+import ServerModel.GameModels.CardsModel.DestCard;
 import ServerModel.GameModels.CardsModel.DestCardDeck;
 import ServerModel.GameModels.CardsModel.TrainCardDeck;
 import ServerModel.GameModels.PlayerModel.Player;
@@ -95,7 +96,11 @@ public class Game implements iGame {
     
     private Map<String, Scoreboard> _M_playerScoreboards = new LinkedHashMap<String, Scoreboard>();
     
+    //Nathan: every player in the game has his own graph for checking destination cards
     private Map<String, Graph> _M_usernameToGraph = new HashMap<>();
+    
+    //Nathan: every player's destination cards is stored in the game for checking if destination paths were completed
+    private Map<String, List<DestCard>> _M_usernameToDestCards = new HashMap<>();
 
     
     //-----------------------------------------STATIC FUNCTIONS----------------------------------------//
@@ -277,6 +282,10 @@ public class Game implements iGame {
     
     public Map<String, Graph> get_M_usernameToGraph() {
 		return _M_usernameToGraph;
+	}
+    
+    public Map<String, List<DestCard>> get_M_usernameToDestCards() {
+		return _M_usernameToDestCards;
 	}
 
 

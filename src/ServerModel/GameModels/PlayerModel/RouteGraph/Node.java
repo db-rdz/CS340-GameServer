@@ -1,5 +1,6 @@
 package ServerModel.GameModels.PlayerModel.RouteGraph;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -12,6 +13,7 @@ public class Node {
         _nodeName = name;
         _visited = false;
         _reached = false;
+        _edges = new ArrayList<>();
     }
 
     private String _nodeName;

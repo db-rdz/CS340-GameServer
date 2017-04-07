@@ -17,23 +17,21 @@ public class Graph {
 
     public Graph(){
         _nodes = new ArrayList<>();
-        _M_DestinationWithEdge = new HashMap<>();
     }
 
     List<Node> _nodes;
     
-    //Nathan: My idea is to have a map of the destination card path (_destination variable) and it's weight will be the route weight
     //If the Pair doesn't work out, the key could be the left city of _destination, then the right city of _destination will be the
     //Edge's _pointingNode and the route weight will be the Edge's weight.
-    Map<Pair<String, String>, Edge> _M_DestinationWithEdge; //Each pair of cities has an edge in between
 
     public Node getNode(String nodeName){
         if(_nodes.isEmpty()){
             return null;
         }
 
+        
         for(Node node : _nodes){
-            if(node.get_nodeName() == nodeName){
+            if(node.get_nodeName().equals(nodeName)){
                 return node;
             }
         }
@@ -51,23 +49,47 @@ public class Graph {
     }
 
     public Boolean evaluateDestCard(DestCard card){
-        String from = card.get_destination().getLeft();
-        String to = card.get_destination().getRight();
-        return findPath(getNode(from),getNode(to));
+        Node leftCity = getNode(card.get_destination().getLeft());
+        Node rightCity = getNode(card.get_destination().getRight());
+        
+        if (leftCity == null || rightCity == null) {
+        	return false;
+        }
+        return findPath(leftCity, rightCity);
     }
 
-    public Boolean findPath(Node n1, Node n2){
-        List<Edge> edgeList = n1.get_edges(); //Each node has an edge
-
-        for(Edge e: edgeList){
-            Node pointingNode = e.get_pointingNode();
-            if( pointingNode == n2){
-                return true;
-            }
-            if(!pointingNode.get_visited()) {
-                return findPath(pointingNode, n2);
-            }
-        }
+    public Boolean findPath(Node leftCity, Node rightCity){
+    	List<Edge> edgeList = new ArrayList<>();
+    	if (!leftCity.get_edges().isEmpty()) { //If the node has edges
+    		edgeList = leftCity.get_edges(); //Each node has an edge
+    	
+	        for(Edge e: edgeList){ //Checks from left most city to the right city
+	            Node pointingNode = e.get_pointingNode();
+	            if( pointingNode == rightCity){
+	                return true;
+	            }
+	            if(!pointingNode.get_visited()) {
+	            	pointingNode.set_visited(true);
+	                return findPath(pointingNode, rightCity);
+	            }
+	        }
+    	}
+    	
+    	resetNodeVisited(); //Reset so checking will work properly
+    	if (!rightCity.get_edges().isEmpty()) { //If the node has edges
+    		edgeList = rightCity.get_edges(); //Each node has an edge
+    	
+	        for(Edge e: edgeList){ //Checks from right most city to the left city
+	            Node pointingNode = e.get_pointingNode();
+	            if( pointingNode == leftCity){
+	                return true;
+	            }
+	            if(!pointingNode.get_visited()) {
+	            	pointingNode.set_visited(true);
+	                return findPath(pointingNode, leftCity);
+	            }
+	        }
+    	}
 
         return false;
     }
@@ -109,10 +131,24 @@ public class Graph {
         }
     }
 
+    public Boolean doesNodeExist(String nodeName) {
+        if(_nodes.isEmpty()){
+            return false; //Node doesn't exist if list is empty
+        }
 
-    public Map<Pair<String, String>, Edge> get_M_DestinationWithEdge() {
-		return _M_DestinationWithEdge;
-	}
-
+        
+        for(Node node : _nodes){
+            if(node.get_nodeName().equals(nodeName)){
+                return true; //Node found
+            }
+        }
+        return false; //List isn't empty but no node found
+    }
+    
+    public void resetNodeVisited() {
+    	for (Node node : _nodes) {
+    		node.set_visited(false);
+    	}
+    }
 
 }

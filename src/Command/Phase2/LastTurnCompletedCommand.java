@@ -10,6 +10,7 @@ import Command.ICommand;
 import Server.ServerFacade;
 import Server.IServer.GameIsFullException;
 import Server.IServer.UserAlreadyLoggedIn;
+import ServerModel.GameModels.CardsModel.DestCard;
 
 /**
  * Created by natha on 4/1/2017.

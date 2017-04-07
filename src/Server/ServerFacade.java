@@ -21,6 +21,7 @@ import ServerModel.GameModels.CardsModel.TrainCard;
 import ServerModel.GameModels.CardsModel.TrainCardDeck;
 import ServerModel.GameModels.PlayerModel.RouteGraph.Edge;
 import ServerModel.GameModels.PlayerModel.RouteGraph.Graph;
+import ServerModel.GameModels.PlayerModel.RouteGraph.Node;
 import ServerModel.GameModels.RouteModel.Route;
 
 import java.sql.SQLException;
@@ -281,7 +282,8 @@ public class ServerFacade implements IServer {
             }
 
         	trainCards = new ArrayList<>();
-            for (int j = 0; j < 4; j++)
+//            for (int j = 0; j < 4; j++)
+            	for (int j = 0; j < 50; j++)
             {
             	trainCards.add(theTrainCardDeck.drawTop()); //The game creator's train cards
             }
@@ -314,8 +316,13 @@ public class ServerFacade implements IServer {
 
            
 	        List<ICommand> deleteGameFromLobby = new ArrayList<>();
-            
-        	ServerModel.SINGLETON.getAvailableGames().remove(gameId-1); //Delete game from server list
+            List<Game> availableGames = ServerModel.SINGLETON.getAvailableGames();
+            for (int i = 0; i < availableGames.size(); i++) {
+            	if (availableGames.get(i).get_i_gameId() == theGame.get_i_gameId()) {
+            		availableGames.remove(i); //Delete game from server list
+            	}
+            	
+            }
             ListJoinableCommand listJoinableCommand = new ListJoinableCommand(listJoinableGames());
             deleteGameFromLobby.add(listJoinableCommand); //Need to update what games there are first before login
             
@@ -617,8 +624,9 @@ public class ServerFacade implements IServer {
 	* Allows a player to claim a route, route color will be set on the client side
 	*/
 	@Override
-	public List<ICommand> claimRoute(int gameId, String authenticationCode, Route theRoute, List<TrainCard> cardsUsedToClaimRoute, List<DestCard> allDestCardsOfPlayer) {
+	public List<ICommand> claimRoute(int gameId, String authenticationCode, Route theRoute, List<TrainCard> cardsUsedToClaimRoute) {
 		List<ICommand> returnCommands = new ArrayList<>();
+		List<ICommand> commandsForOthers = new ArrayList<>();
 		Game theGame = Game.getGameWithId(gameId);
 		String username = "";
 		UserModel.User theUser = null;
@@ -635,22 +643,37 @@ public class ServerFacade implements IServer {
 		route.set_Owner(username);
 		route.setClaimed(true);
 		
-		//TODO: Need to figure out edges for the nodes.
-		for (int i = 0; i < allDestCardsOfPlayer.size(); i++) {
-			Graph playerGraph = theGame.get_M_usernameToGraph().get(theUser.get_S_username());
-			DestCard card = allDestCardsOfPlayer.get(i);
-			
-			playerGraph.addNode(card.get_destination().getLeft());
-			playerGraph.addNode(card.get_destination().getRight());
-			playerGraph.get_M_DestinationWithEdge().put(card.get_destination(), new Edge(route.get_Weight(), playerGraph.getNode(card.get_destination().getRight())));
-			if (theGame.get_M_usernameToGraph().get(theUser.get_S_username()).evaluateDestCard(allDestCardsOfPlayer.get(i))) {
-				allDestCardsOfPlayer.get(i).set_isCompleted(true);
+        List<DestCard> destCardsofPlayer = theGame.get_M_usernameToDestCards().get(username);
+		Graph playerGraph = theGame.get_M_usernameToGraph().get(username);
+		
+		//Ensures nodes are only added once to the list
+		if (!playerGraph.doesNodeExist(route.get_ConnectingCities().getLeft())) {
+			playerGraph.addNode(route.get_ConnectingCities().getLeft());			
+		}
+		if (!playerGraph.doesNodeExist(route.get_ConnectingCities().getRight())) {
+			playerGraph.addNode(route.get_ConnectingCities().getRight());			
+		}
+		
+		Node rightCity = playerGraph.getNode(route.get_ConnectingCities().getRight());
+		Node leftCity = playerGraph.getNode(route.get_ConnectingCities().getLeft());
+		
+		rightCity.addEdge(new Edge(route.get_i_pointValue(), leftCity)); //Each city between one route must connect to each other both ways
+		leftCity.addEdge(new Edge(route.get_i_pointValue(), rightCity));
+		
+		for (int i = 0; i < destCardsofPlayer.size(); i++) {
+			if (theGame.get_M_usernameToGraph().get(username).evaluateDestCard(destCardsofPlayer.get(i)) && !destCardsofPlayer.get(i).get_isCompleted()) {
+				destCardsofPlayer.get(i).set_isCompleted(true); //update the player's cards to be sent back
+				returnCommands.add(new NotifyDestCardCompletedCommand("You completed the\n" + destCardsofPlayer.get(i).get_destination() + " path!"));
 			}
+			playerGraph.resetNodeVisited(); //Need to reset the visited nodes for evaluateDestCard to work properly
 		}
 		
 		// tells the other players that the route was claimed (maybe make a toast with the message)
-		returnCommands.add(new NotifyRouteClaimedCommand("The route from " + route.get_ConnectingCities().getLeft() + " to "
-							+ route.get_ConnectingCities().getRight() + " has been claimed by " + username + ".", route));
+		String message = "The route from " + route.get_ConnectingCities().getLeft() + " to "
+				+ route.get_ConnectingCities().getRight() + " has been claimed by " + username + ".";
+		returnCommands.add(new NotifyRouteClaimedCommand(message, route));
+		commandsForOthers.add(new NotifyRouteClaimedCommand(message, route));
+		
 		theGame.get_M_PlayerScoreboards().get(username).addPoints(route.get_i_pointValue());
 		// subtracts the number of cards used from the players total on the scoreboard
 		theGame.get_M_PlayerScoreboards().get(username).addTrainCards(-cardsUsedToClaimRoute.size());
@@ -659,6 +682,7 @@ public class ServerFacade implements IServer {
 		
 		// updates the scoreboard
 		returnCommands.add(new UpdateScoreboardCommand(new ArrayList<>(theGame.get_M_PlayerScoreboards().values())));
+		commandsForOthers.add(new UpdateScoreboardCommand(new ArrayList<>(theGame.get_M_PlayerScoreboards().values())));
 		
 		// puts the cards used to claim the route in the discard pile
 		theGame.getDeck().getDiscardPile().addAll(cardsUsedToClaimRoute);
@@ -671,7 +695,7 @@ public class ServerFacade implements IServer {
 			String newUsername = player.get_S_username();
 			if (!newUsername.equals(username))
 			{
-				ClientProxy.SINGLETON.get_m_usersCommands().get(newUsername).addAll(returnCommands);
+				ClientProxy.SINGLETON.get_m_usersCommands().get(newUsername).addAll(commandsForOthers);
 			}
 			else
 			{
@@ -691,8 +715,7 @@ public class ServerFacade implements IServer {
 		ClientProxy.SINGLETON.get_m_usersCommands().get(theGame.getPlayer(currentPlayerNumber).get_S_username()).add(new NotifyTurnCommand());
 		
 		// decrease car count of player who claimed route by the weight of the route claimed, updates player hand
-		returnCommands.add(new UpdateCarCountAndHandCommand(route.get_Weight(), cardsUsedToClaimRoute, allDestCardsOfPlayer));
-//		returnCommands.add(new UpdateCarCountAndHandCommand(43, cardsUsedToClaimRoute));
+		returnCommands.add(new UpdateCarCountAndHandCommand(route.get_Weight(), cardsUsedToClaimRoute, destCardsofPlayer));
 		returnCommands.add(new EndTurnCommand());
 		
 		return returnCommands;
@@ -876,7 +899,7 @@ public class ServerFacade implements IServer {
     {
     	List<ICommand> returnCommands = new ArrayList<>();
     	Game theGame = Game.getGameWithId(gameId);
-    	UserModel.User theUser;
+    	UserModel.User theUser = null;
     	String username = "";
 		try {
 			theUser = DAO._SINGLETON.getUserByAccessToken(authenticationCode);
@@ -884,6 +907,13 @@ public class ServerFacade implements IServer {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+		
+		//Nathan: Every new destination card kept will get added to the map in theGame variable
+        Map<String, List<DestCard>> destCardsMap = theGame.get_M_usernameToDestCards();
+        for (int i = 0; i < cardsKept.size(); i++) {
+            destCardsMap.get(username).add(cardsKept.get(i));
+
+        }
     	
 		returnCommands.add(new UpdateScoreboardCommand(new ArrayList<>(theGame.get_M_PlayerScoreboards().values())));
 
@@ -932,6 +962,21 @@ public class ServerFacade implements IServer {
 		
 		if (type.equals("KEEP"))
 		{
+			
+	        Map<String, List<DestCard>> destCardsMap = theGame.get_M_usernameToDestCards();
+	        for (int i = 0; i < destCards.size(); i++) {
+	            if (destCardsMap.containsKey(username) && !destCardsMap.get(username).contains(destCards.get(i))) { //If that destCard isn't in the list
+	            	destCardsMap.get(username).add(destCards.get(i));
+	            }
+	            else if (!destCardsMap.containsKey(username)) { //If List of DestCards doesn't exist yet
+	                List<DestCard> destCardsList = new ArrayList<>();
+	                destCardsList.add(destCards.get(i)); //Need to make a new List<String> for Map.put()
+	                destCardsMap.put(username, destCardsList);
+	            }
+	        }
+	        
+	        
+	        
 			theGame.get_M_PlayerScoreboards().get(username).addDestCards(destCards.size());
 			returnCommands.add(new UpdateScoreboardCommand(new ArrayList<>(theGame.get_M_PlayerScoreboards().values())));
 			
@@ -1024,6 +1069,29 @@ public class ServerFacade implements IServer {
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
+			
+	        List<DestCard> destCardsofPlayer = theGame.get_M_usernameToDestCards().get(username);
+			for (DestCard card : destCardsofPlayer) {
+				if (card.get_isCompleted()) { //If the route was completed, add points to the player 
+					theGame.get_M_PlayerScoreboards().get(username).addPoints(card.getPoints());
+				}
+				else { //If the route wasn't completed, subtract points from the player
+					theGame.get_M_PlayerScoreboards().get(username).addPoints(-card.getPoints());
+
+				}
+			}
+			returnCommands.add(new UpdateScoreboardCommand(new ArrayList<>(theGame.get_M_PlayerScoreboards().values())));
+			
+			for (int i = 1; i <= theGame.get_numberOfPlayers(); i++)
+			{
+				UserModel.User player = theGame.getPlayer(i);
+				String newUsername = player.get_S_username();
+				if (!newUsername.equals(username))
+				{
+					ClientProxy.SINGLETON.get_m_usersCommands().get(newUsername).addAll(returnCommands);
+				}
+			}
+
 			
 			returnCommands.add(new SwitchToEndGameViewCommand());
 			for (int i = 1; i <= theGame.get_numberOfPlayers(); i++)
