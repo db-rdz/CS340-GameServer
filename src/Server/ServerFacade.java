@@ -23,13 +23,16 @@ import ServerModel.GameModels.PlayerModel.RouteGraph.Edge;
 import ServerModel.GameModels.PlayerModel.RouteGraph.Graph;
 import ServerModel.GameModels.PlayerModel.RouteGraph.Node;
 import ServerModel.GameModels.RouteModel.Route;
+import sun.reflect.generics.tree.Tree;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 
 
@@ -1070,6 +1073,32 @@ public class ServerFacade implements IServer {
 				e.printStackTrace();
 			}
 			
+			//Find who has the longest path of routes in the game
+			TreeMap<Integer, String> longestRoute = new TreeMap<>(Collections.reverseOrder());
+			for (int i = 1; i <= theGame.get_numberOfPlayers(); i++)
+			{
+		        Graph graphOfPlayer = theGame.get_M_usernameToGraph().get(theGame.getPlayer(i).get_S_username());
+		        graphOfPlayer.resetNodeVisited(); //Reset for every node so it recurses through all nodes no matter what
+		        List<Node> nodesOfPlayer = graphOfPlayer.get_nodes();
+		        int longestPath = graphOfPlayer.findLongestPath(nodesOfPlayer.get(i), 0, 0); //Check the node, and its path and longest path are 0 at start.
+		        longestRoute.put(longestPath, theGame.getPlayer(i).get_S_username());
+			}
+			
+			int pointsKey = 0;
+			int playerPosition = 0;
+            Iterator iterator = longestRoute.keySet().iterator();
+	        if (iterator.hasNext()) { //Only do this once since there's only one player that can have the longest path
+	        	pointsKey = (Integer) iterator.next();
+	        	if (playerPosition == 0) { 
+	    			for (int i = 1; i <= theGame.get_numberOfPlayers(); i++) {
+		        		theGame.get_M_PlayerScoreboards().get(theGame.getPlayer(i).get_S_username()).addPoints(pointsKey);
+	    			}
+
+	        	}
+	        }
+
+			
+			//Calculate the destination card points of player
 	        List<DestCard> destCardsofPlayer = theGame.get_M_usernameToDestCards().get(username);
 			for (DestCard card : destCardsofPlayer) {
 				if (card.get_isCompleted()) { //If the route was completed, add points to the player 
@@ -1082,18 +1111,8 @@ public class ServerFacade implements IServer {
 			}
 			returnCommands.add(new UpdateScoreboardCommand(new ArrayList<>(theGame.get_M_PlayerScoreboards().values())));
 			
-			for (int i = 1; i <= theGame.get_numberOfPlayers(); i++)
-			{
-				UserModel.User player = theGame.getPlayer(i);
-				String newUsername = player.get_S_username();
-				if (!newUsername.equals(username))
-				{
-					ClientProxy.SINGLETON.get_m_usersCommands().get(newUsername).addAll(returnCommands);
-				}
-			}
-
 			
-			returnCommands.add(new SwitchToEndGameViewCommand());
+			returnCommands.add(new SwitchToEndGameViewCommand(longestRoute.get(pointsKey))); //person with highest path is in first index
 			for (int i = 1; i <= theGame.get_numberOfPlayers(); i++)
 			{
 				UserModel.User player = theGame.getPlayer(i);

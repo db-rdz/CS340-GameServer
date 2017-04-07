@@ -108,7 +108,7 @@ public class Graph {
         return longest_path;
     }
 
-    public void findLongestPath(Node node, int pathLength, int longestPath){
+    public int findLongestPath(Node node, int pathLength, int longestPath){
         if(!node.get_visited()){
             node.set_visited(true);
             node.set_reached(true);
@@ -129,6 +129,7 @@ public class Graph {
                 }
             }
         }
+        return longestPath;
     }
 
     public Boolean doesNodeExist(String nodeName) {
@@ -150,5 +151,9 @@ public class Graph {
     		node.set_visited(false);
     	}
     }
+    
+    public List<Node> get_nodes() {
+		return _nodes;
+	}
 
 }

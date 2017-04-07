@@ -11,6 +11,12 @@ import Server.IServer.UserAlreadyLoggedIn;
 import Server.ServerFacade;
 
 public class SwitchToEndGameViewCommand implements ICommand {
+	
+	private String longestPathHolder;
+	
+	public SwitchToEndGameViewCommand(String username) {
+		longestPathHolder = username;
+	}
 
 	@Override
 	public List<ICommand> execute() throws GameIsFullException, UserAlreadyLoggedIn, InvalidUsername, InvalidPassword {
@@ -23,4 +29,7 @@ public class SwitchToEndGameViewCommand implements ICommand {
 		return null;
 	}
 
+	public String getLongestPathHolder() {
+		return longestPathHolder;
+	}
 }
