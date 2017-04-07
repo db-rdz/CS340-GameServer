@@ -660,8 +660,8 @@ public class ServerFacade implements IServer {
 		Node rightCity = playerGraph.getNode(route.get_ConnectingCities().getRight());
 		Node leftCity = playerGraph.getNode(route.get_ConnectingCities().getLeft());
 		
-		rightCity.addEdge(new Edge(route.get_i_pointValue(), leftCity)); //Each city between one route must connect to each other both ways
-		leftCity.addEdge(new Edge(route.get_i_pointValue(), rightCity));
+		rightCity.addEdge(new Edge(route.get_Weight(), leftCity)); //Each city between one route must connect to each other both ways
+		leftCity.addEdge(new Edge(route.get_Weight(), rightCity));
 		
 		for (int i = 0; i < destCardsofPlayer.size(); i++) {
 			if (theGame.get_M_usernameToGraph().get(username).evaluateDestCard(destCardsofPlayer.get(i)) && !destCardsofPlayer.get(i).get_isCompleted()) {
@@ -1075,12 +1075,17 @@ public class ServerFacade implements IServer {
 			
 			//Find who has the longest path of routes in the game
 			TreeMap<Integer, String> longestRoute = new TreeMap<>(Collections.reverseOrder());
+			int holder = 0;
+			int longestPath = 0;
 			for (int i = 1; i <= theGame.get_numberOfPlayers(); i++)
 			{
 		        Graph graphOfPlayer = theGame.get_M_usernameToGraph().get(theGame.getPlayer(i).get_S_username());
-		        graphOfPlayer.resetNodeVisited(); //Reset for every node so it recurses through all nodes no matter what
-		        List<Node> nodesOfPlayer = graphOfPlayer.get_nodes();
-		        int longestPath = graphOfPlayer.findLongestPath(nodesOfPlayer.get(i), 0, 0); //Check the node, and its path and longest path are 0 at start.
+		        if (!graphOfPlayer.get_nodes().isEmpty()) {
+		        	List<Node> nodesOfPlayer = graphOfPlayer.get_nodes();
+		        	longestPath = graphOfPlayer.getLongestPath();
+		        	graphOfPlayer.resetNodeVisited(); //Reset for every node so it recurses through all nodes no matter what
+		        }
+		        
 		        longestRoute.put(longestPath, theGame.getPlayer(i).get_S_username());
 			}
 			
@@ -1091,7 +1096,7 @@ public class ServerFacade implements IServer {
 	        	pointsKey = (Integer) iterator.next();
 	        	if (playerPosition == 0) { 
 	    			for (int i = 1; i <= theGame.get_numberOfPlayers(); i++) {
-		        		theGame.get_M_PlayerScoreboards().get(theGame.getPlayer(i).get_S_username()).addPoints(pointsKey);
+		        		theGame.get_M_PlayerScoreboards().get(theGame.getPlayer(i).get_S_username()).addPoints(10); //10 points for longest route
 	    			}
 
 	        	}
@@ -1141,9 +1146,8 @@ public class ServerFacade implements IServer {
 			e.printStackTrace();
 		}
 		
+		theGame.get_M_idToUserInGame().remove(username);
 		
-		
-
 		//Sends command to switch the client back to the lobby
         if (Game._M_idToGame.containsKey(gameId)) {
     		Game._M_idToGame.remove(gameId); //Delete game from server

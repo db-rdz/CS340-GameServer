@@ -17,9 +17,11 @@ public class Graph {
 
     public Graph(){
         _nodes = new ArrayList<>();
+        longestPath = 0;
     }
 
     List<Node> _nodes;
+    private int longestPath;
     
     //If the Pair doesn't work out, the key could be the left city of _destination, then the right city of _destination will be the
     //Edge's _pointingNode and the route weight will be the Edge's weight.
@@ -95,23 +97,22 @@ public class Graph {
     }
 
     public int getLongestPath(){
-        int longest_path = 0;
         for(Node n : _nodes){
             if(!n.get_reached()) {
+                n.set_reached(true);
                 int currentPathLength = 0;
-                findLongestPath(n, 0, currentPathLength);
-                if (currentPathLength > longest_path) {
-                    longest_path = currentPathLength;
+                 currentPathLength = findLongestPath(n, 0); //Start path a
+                if (currentPathLength > longestPath) {
+                	longestPath = currentPathLength;
                 }
             }
         }
-        return longest_path;
+        return longestPath;
     }
 
-    public int findLongestPath(Node node, int pathLength, int longestPath){
+    public int findLongestPath(Node node, int pathLength){
         if(!node.get_visited()){
             node.set_visited(true);
-            node.set_reached(true);
             for(Edge e : node.get_edges()){
 
                 Node branch = e.get_pointingNode();
@@ -122,14 +123,14 @@ public class Graph {
                         longestPath = pathLength;
                     }
 
-                    findLongestPath(branch, pathLength, longestPath);
+                    findLongestPath(branch, pathLength);
 
-                    pathLength -= e.get_weight();
+//                    pathLength -= e.get_weight();
                     branch.set_visited(false);
                 }
             }
         }
-        return longestPath;
+        return pathLength;
     }
 
     public Boolean doesNodeExist(String nodeName) {
