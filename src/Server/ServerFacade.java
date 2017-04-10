@@ -5,7 +5,6 @@ import Client.User;
 import Command.ICommand;
 import Command.Phase1.AddGameToJoinableListCommand;
 import Command.Phase1.AddPlayerToClientCommand;
-import Command.Phase1.DeleteGameCommand;
 import Command.Phase1.ListJoinableCommand;
 import Command.Phase1.LoginRegisterResponseCommand;
 import Command.Phase1.LogoutResponseCommand;
@@ -23,7 +22,6 @@ import ServerModel.GameModels.PlayerModel.RouteGraph.Edge;
 import ServerModel.GameModels.PlayerModel.RouteGraph.Graph;
 import ServerModel.GameModels.PlayerModel.RouteGraph.Node;
 import ServerModel.GameModels.RouteModel.Route;
-import sun.reflect.generics.tree.Tree;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -33,6 +31,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+
 
 
 
@@ -130,7 +129,6 @@ public class ServerFacade implements IServer {
                 System.out.println("\nLogging in user: " + theUser.get_S_username());
                 System.out.println("Authorization code: " + theUser.get_S_token());
                 
-//                new GetCommandsCommand(theUser.get_S_username()).execute();
                 
                 return commands;
             }
@@ -186,7 +184,7 @@ public class ServerFacade implements IServer {
             user.setStr_authentication_code(theUser.get_S_token());
                                     
             
-            LoginRegisterResponseCommand lrsc = new LoginRegisterResponseCommand(user, true, false, false);
+            LoginRegisterResponseCommand lrsc = new LoginRegisterResponseCommand(user, true, false, true);
             commands.add(lrsc);
             
             List<Game> games = ServerModel.SINGLETON.getAvailableGames();
@@ -198,7 +196,6 @@ public class ServerFacade implements IServer {
             commands.add(listJoinableCommand);    
             
             Map<String, List<ICommand>> copy = ClientProxy.SINGLETON.get_m_usersCommands();
-            System.out.println(copy);
             
             ClientProxy.SINGLETON.get_m_usersCommands().put(username, new ArrayList<ICommand>());
             System.out.println("\nRegistering and logging in user: " + DAO._SINGLETON.getUserByAccessToken(theUser.get_S_token()).get_S_username());
@@ -217,17 +214,15 @@ public class ServerFacade implements IServer {
     @Override
     public List<ICommand> removeGame(Game game) {
         
-        ICommand deleteGameCommand = new DeleteGameCommand(game.get_i_gameId());
         
         List<ICommand> commands = new ArrayList<>();
-        commands.add(deleteGameCommand);
 
         String username = "";
         
         for (int i = 0; i < UserModel.User.get_L_listOfAllUsers().size(); i++) {
             username = UserModel.User.get_L_listOfAllUsers().get(i).get_S_username();
     		ClientProxy.SINGLETON.get_m_usersCommands().get(username).addAll(commands);
-        } //TODO: Include this in the ServerCommunicator.
+        } 
         
         return commands;
     }
@@ -503,11 +498,9 @@ public class ServerFacade implements IServer {
     @Override
     public List<ICommand> addWaitingGame(Game game) {
         // send to user who called this function only
-        ICommand deleteGameCommand = new DeleteGameCommand(game.get_i_gameId());
 //        ICommand addWaitingToClientCommand = new AddWaitingToClientCommand(game);
         
         List<ICommand> commands = new ArrayList<>();
-        commands.add(deleteGameCommand);
 //        commands.add(addWaitingToClientCommand);
         
         return commands;
@@ -525,8 +518,6 @@ public class ServerFacade implements IServer {
 	 */
     @Override
     public List<ICommand> logout(String str_authentication_code) {
-        ServerModel.SINGLETON.logOut(str_authentication_code);
-
         List<ICommand> commands = new ArrayList<>();
         
         try {
@@ -1090,30 +1081,33 @@ public class ServerFacade implements IServer {
 			}
 			
 			int pointsKey = 0;
-			int playerPosition = 0;
             Iterator iterator = longestRoute.keySet().iterator();
 	        if (iterator.hasNext()) { //Only do this once since there's only one player that can have the longest path
 	        	pointsKey = (Integer) iterator.next();
-	        	if (playerPosition == 0) { 
-	    			for (int i = 1; i <= theGame.get_numberOfPlayers(); i++) {
-		        		theGame.get_M_PlayerScoreboards().get(theGame.getPlayer(i).get_S_username()).addPoints(10); //10 points for longest route
-	    			}
-
+    			for (int i = 1; i <= theGame.get_numberOfPlayers(); i++) {
+    				if (theGame.getPlayer(i).get_S_username().equals(longestRoute.get(pointsKey))) {
+    					theGame.get_M_PlayerScoreboards().get(theGame.getPlayer(i).get_S_username()).addPoints(10); //10 points for longest route
+    				}
 	        	}
 	        }
 
 			
 			//Calculate the destination card points of player
-	        List<DestCard> destCardsofPlayer = theGame.get_M_usernameToDestCards().get(username);
-			for (DestCard card : destCardsofPlayer) {
-				if (card.get_isCompleted()) { //If the route was completed, add points to the player 
-					theGame.get_M_PlayerScoreboards().get(username).addPoints(card.getPoints());
+			for (int i = 1; i <= theGame.get_numberOfPlayers(); i++) {
+				List<DestCard> destCardsofPlayer = theGame.get_M_usernameToDestCards().get(theGame.getPlayer(i).get_S_username());
+				for (DestCard card : destCardsofPlayer) {
+					if (card.get_isCompleted()) { //If the route was completed, add points to the player 
+						theGame.get_M_PlayerScoreboards().get(theGame.getPlayer(i).get_S_username()).addPoints(card.getPoints());
+					}
+					else { //If the route wasn't completed, subtract points from the player
+						theGame.get_M_PlayerScoreboards().get(theGame.getPlayer(i).get_S_username()).addPoints(-card.getPoints());
+					}
+				
 				}
-				else { //If the route wasn't completed, subtract points from the player
-					theGame.get_M_PlayerScoreboards().get(username).addPoints(-card.getPoints());
-
-				}
+				
 			}
+
+				
 			returnCommands.add(new UpdateScoreboardCommand(new ArrayList<>(theGame.get_M_PlayerScoreboards().values())));
 			
 			
@@ -1146,7 +1140,7 @@ public class ServerFacade implements IServer {
 			e.printStackTrace();
 		}
 		
-		theGame.get_M_idToUserInGame().remove(username);
+		
 		
 		//Sends command to switch the client back to the lobby
         if (Game._M_idToGame.containsKey(gameId)) {
