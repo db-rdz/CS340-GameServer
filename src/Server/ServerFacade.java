@@ -126,6 +126,10 @@ public class ServerFacade implements IServer {
                 ClientProxy.SINGLETON.get_m_usersCommands().put(username, new ArrayList<ICommand>());
                 ServerModel.SINGLETON.logIn(theUser.get_S_username());
                 
+                if (!UserModel.User.get_M_authenticationToLoggedInUser().containsKey(user.getStr_authentication_code())) {
+                	UserModel.User.get_M_authenticationToLoggedInUser().put(user.getStr_authentication_code(), theUser);
+                }
+                
                 System.out.println("\nLogging in user: " + theUser.get_S_username());
                 System.out.println("Authorization code: " + theUser.get_S_token());
                 
@@ -522,6 +526,7 @@ public class ServerFacade implements IServer {
         
         try {
         	UserModel.User user = DAO._SINGLETON.getUserByAccessToken(str_authentication_code);
+
             System.out.println("Logging out user: " + user.get_S_username());
             System.out.println("Authorization code: " + user.get_S_token());
             
@@ -724,12 +729,14 @@ public class ServerFacade implements IServer {
 		Game theGame = Game.getGameWithId(gameId);
 		UserModel.User theUser = null;
 		String username = "";
-		try {
-			theUser = DAO._SINGLETON.getUserByAccessToken(authenticationCode);
+		
+//		try {
+//			theUser = DAO._SINGLETON.getUserByAccessToken(authenticationCode);
+			theUser = UserModel.User.get_M_authenticationToLoggedInUser().get(authenticationCode);
 			username = theUser.get_S_username();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+//		} catch (SQLException e) {
+//			e.printStackTrace();
+//		}
 		
 		// TODO: update player count for that card on the server
 		
@@ -783,12 +790,14 @@ public class ServerFacade implements IServer {
 		Game theGame = Game.getGameWithId(gameId);
 		String username = "";
 		UserModel.User theUser = null;
-		try {
-			theUser = DAO._SINGLETON.getUserByAccessToken(authenticationCode);
-			username = theUser.get_S_username();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} 
+		
+//		try {
+//		theUser = DAO._SINGLETON.getUserByAccessToken(authenticationCode);
+		theUser = UserModel.User.get_M_authenticationToLoggedInUser().get(authenticationCode);
+		username = theUser.get_S_username();
+//		} catch (SQLException e) {
+//			e.printStackTrace();
+//		}
 		
 		TrainCardDeck theDeck = theGame.getDeck();
 		TrainCard theCard = theDeck.getFromTheFiveCards(cardIndex);
@@ -815,7 +824,6 @@ public class ServerFacade implements IServer {
 		}
 		
 		// adds the card selected
-		// TODO: update the card count of that type for that player on the server
 		returnCommands.add(new UpdatePlayerTrainCardsCommand(theCard));
 		
 		if (turnNumber == 2 || isWild)
@@ -846,12 +854,14 @@ public class ServerFacade implements IServer {
     	Game theGame = Game.getGameWithId(gameId);
     	UserModel.User theUser;
     	String username = "";
-		try {
-			theUser = DAO._SINGLETON.getUserByAccessToken(authenticationCode);
-			username = theUser.get_S_username();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+    	
+//		try {
+//		theUser = DAO._SINGLETON.getUserByAccessToken(authenticationCode);
+		theUser = UserModel.User.get_M_authenticationToLoggedInUser().get(authenticationCode);
+		username = theUser.get_S_username();
+//		} catch (SQLException e) {
+//			e.printStackTrace();
+//		}
 		
 		//returns the card to the DestCardDeck in the game
 		theGame.getDestCards().returnCard(rejectedCard);
@@ -871,12 +881,14 @@ public class ServerFacade implements IServer {
     	Game theGame = Game.getGameWithId(gameId);
     	UserModel.User theUser;
     	String username = "";
-		try {
-			theUser = DAO._SINGLETON.getUserByAccessToken(authenticationCode);
-			username = theUser.get_S_username();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+    	
+//		try {
+//		theUser = DAO._SINGLETON.getUserByAccessToken(authenticationCode);
+		theUser = UserModel.User.get_M_authenticationToLoggedInUser().get(authenticationCode);
+		username = theUser.get_S_username();
+//		} catch (SQLException e) {
+//			e.printStackTrace();
+//		}
 		
 		// gets the three top cards
 		DestCardDeck theDeck = theGame.getDestCards();
@@ -895,12 +907,14 @@ public class ServerFacade implements IServer {
     	Game theGame = Game.getGameWithId(gameId);
     	UserModel.User theUser = null;
     	String username = "";
-		try {
-			theUser = DAO._SINGLETON.getUserByAccessToken(authenticationCode);
-			username = theUser.get_S_username();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+    	
+//		try {
+//		theUser = DAO._SINGLETON.getUserByAccessToken(authenticationCode);
+		theUser = UserModel.User.get_M_authenticationToLoggedInUser().get(authenticationCode);
+		username = theUser.get_S_username();
+//		} catch (SQLException e) {
+//			e.printStackTrace();
+//		}
 		
 		//Nathan: Every new destination card kept will get added to the map in theGame variable
         Map<String, List<DestCard>> destCardsMap = theGame.get_M_usernameToDestCards();
@@ -947,12 +961,14 @@ public class ServerFacade implements IServer {
     	Game theGame = Game.getGameWithId(gameId);
     	UserModel.User theUser;
     	String username = "";
-		try {
-			theUser = DAO._SINGLETON.getUserByAccessToken(authenticationCode);
-			username = theUser.get_S_username();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+    	
+//		try {
+//		theUser = DAO._SINGLETON.getUserByAccessToken(authenticationCode);
+		theUser = UserModel.User.get_M_authenticationToLoggedInUser().get(authenticationCode);
+		username = theUser.get_S_username();
+//		} catch (SQLException e) {
+//			e.printStackTrace();
+//		}
 		
 		if (type.equals("KEEP"))
 		{
@@ -1010,12 +1026,14 @@ public class ServerFacade implements IServer {
 		Game theGame = Game.getGameWithId(gameId);
     	UserModel.User theUser;
     	String username = "";
-		try {
-			theUser = DAO._SINGLETON.getUserByAccessToken(authenticationCode);
-			username = theUser.get_S_username();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+    	
+//		try {
+//		theUser = DAO._SINGLETON.getUserByAccessToken(authenticationCode);
+		theUser = UserModel.User.get_M_authenticationToLoggedInUser().get(authenticationCode);
+		username = theUser.get_S_username();
+//		} catch (SQLException e) {
+//			e.printStackTrace();
+//		}
 		
 		int currPlayer = -1;
 		
@@ -1057,12 +1075,14 @@ public class ServerFacade implements IServer {
 		if (theGame.get_i_playersThatHaveCompletedLastTurn() == theGame.get_numberOfPlayers()) {
 	    	UserModel.User theUser;
 	    	String username = "";
-			try {
-				theUser = DAO._SINGLETON.getUserByAccessToken(authenticationCode);
-				username = theUser.get_S_username();
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
+	    	
+//			try {
+//			theUser = DAO._SINGLETON.getUserByAccessToken(authenticationCode);
+			theUser = UserModel.User.get_M_authenticationToLoggedInUser().get(authenticationCode);
+			username = theUser.get_S_username();
+//			} catch (SQLException e) {
+//				e.printStackTrace();
+//			}
 			
 			//Find who has the longest path of routes in the game
 			TreeMap<Integer, String> longestRoute = new TreeMap<>(Collections.reverseOrder());
@@ -1133,12 +1153,14 @@ public class ServerFacade implements IServer {
 		
     	UserModel.User theUser;
     	String username = "";
-		try {
-			theUser = DAO._SINGLETON.getUserByAccessToken(authenticationCode);
-			username = theUser.get_S_username();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+    	
+//		try {
+//		theUser = DAO._SINGLETON.getUserByAccessToken(authenticationCode);
+		theUser = UserModel.User.get_M_authenticationToLoggedInUser().get(authenticationCode);
+		username = theUser.get_S_username();
+//		} catch (SQLException e) {
+//			e.printStackTrace();
+//		}
 		
 		
 		
