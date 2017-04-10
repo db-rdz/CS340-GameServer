@@ -14,6 +14,7 @@ public class LogoutResponseCommand implements ICommand{
   public List<ICommand> execute(){
     return null;}
 
+  @JsonIgnore
   @Override
   public String getAuthenticationCode() {
     return null;

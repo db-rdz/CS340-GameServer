@@ -10,19 +10,20 @@ import GameModels.Game;
 import Server.ServerFacade;
 
 public class LogoutCommand implements ICommand{
-  private String str_authentication_code;
+  private String authenticationCode;
+  
   public LogoutCommand(){}
   public LogoutCommand(String k){
-    str_authentication_code = k;}
+	  authenticationCode = k;}
 
   @Override
   public String getAuthenticationCode() {
-    return null;
+    return authenticationCode;
   }
   
   @Override
   public List<ICommand> execute(){
-    return ServerFacade.SINGLETON.logout(str_authentication_code);
+    return ServerFacade.SINGLETON.logout(authenticationCode);
     }
   
   

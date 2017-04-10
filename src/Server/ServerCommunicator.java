@@ -3,7 +3,6 @@ package Server;
 import Command.ICommand;
 import Command.Phase1.AddGameToServerCommand;
 import Command.Phase1.AddPlayerToServerCommand;
-import Command.Phase1.DeleteGameCommand;
 import Command.Phase1.GetCommandsCommand;
 import Command.Phase1.LoginCommand;
 import Command.Phase1.LogoutCommand;

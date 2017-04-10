@@ -32,6 +32,7 @@ public class RegisterCommand implements ICommand {
         return null;
     }
 
+    @JsonIgnore
     @Override
     public String getAuthenticationCode() {
         return null;
