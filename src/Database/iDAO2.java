@@ -7,10 +7,6 @@ package Database;
  */
 
 public interface iDAO2 {
-	
-	public IGameDAO getIGameDAO();
-	public void setIGameDAO(IGameDAO gameDAO);
-	public IUserDAO getIUserDAO();
-	public void setIUserDAO(IUserDAO userDAO);
+
 
 }
