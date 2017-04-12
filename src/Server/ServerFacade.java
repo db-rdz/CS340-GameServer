@@ -284,8 +284,8 @@ public class ServerFacade implements IServer {
             }
 
         	trainCards = new ArrayList<>();
-//            for (int j = 0; j < 4; j++)
-            	for (int j = 0; j < 50; j++)
+            for (int j = 0; j < 4; j++)
+//            	for (int j = 0; j < 50; j++)
             {
             	trainCards.add(theTrainCardDeck.drawTop()); //The game creator's train cards
             }
