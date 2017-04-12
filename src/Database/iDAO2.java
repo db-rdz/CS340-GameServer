@@ -9,8 +9,8 @@ package Database;
 public interface iDAO2 {
 	
 	public IGameDAO getIGameDAO();
-	public IGameDAO setIGameDAO(IGameDAO gameDAO);
+	public void setIGameDAO(IGameDAO gameDAO);
 	public IUserDAO getIUserDAO();
-	public IUserDAO setIUserDAO(IUserDAO userDAO);
+	public void setIUserDAO(IUserDAO userDAO);
 
 }
