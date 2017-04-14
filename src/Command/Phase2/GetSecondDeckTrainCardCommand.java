@@ -28,10 +28,4 @@ public class GetSecondDeckTrainCardCommand implements ICommand {
         return null;
     }
 
-    @JsonIgnore
-    @Override
-    public User getUser() {
-        return null;
-    }
-
 }

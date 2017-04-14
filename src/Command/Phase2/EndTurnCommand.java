@@ -22,10 +22,4 @@ public class EndTurnCommand implements ICommand {
 		return null;
 	}
 
-	@Override
-	public User getUser() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 }

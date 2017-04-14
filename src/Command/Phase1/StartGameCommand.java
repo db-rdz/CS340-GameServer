@@ -16,13 +16,9 @@ public class StartGameCommand implements ICommand {
     private StartGameCommand(){}
     public StartGameCommand(int g, List<String> k){
         gameId = g;
-        usernamesInGame = k;}
-
-    @JsonIgnore
-    @Override
-    public User getUser() {
-        return null;
+        usernamesInGame = k;
     }
+
 
     @Override
     public List<ICommand> execute(){

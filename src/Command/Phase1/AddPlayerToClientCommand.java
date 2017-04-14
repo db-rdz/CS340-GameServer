@@ -30,11 +30,6 @@ public class AddPlayerToClientCommand implements ICommand{ // sent after changes
 	}
 	
 	@Override
-	public User getUser() {
-	  return null;
-	}
-	
-	@Override
 	public List<ICommand> execute(){
 	//    ClientFacade.SINGLETON.addPlayer(str_authentication_code, str_game_id);
 	  return null; 

@@ -18,34 +18,22 @@ import java.util.List;
  */
 
 public class GetDestinationCardsCommand implements ICommand {
-    private String _s_authenticationCode;
-    private int _i_gameId;
+    private String authenticationCode;
+    private int gameId;
  
 	
 	@Override
     public List<ICommand> execute() throws IServer.GameIsFullException {
-        return ServerFacade.SINGLETON.getDestCards(_i_gameId, _s_authenticationCode);
+        return ServerFacade.SINGLETON.getDestCards(gameId, authenticationCode);
     }
 
-    @JsonIgnore
     @Override
     public String getAuthenticationCode() {
-        return _s_authenticationCode;
-    }
-
-    @JsonIgnore
-    @Override
-    public User getUser() {
-        return null;
-    }
-
-    public int get_i_gameId()
-    {
-    	return _i_gameId;
+        return authenticationCode;
     }
     
-    public String get_s_authenticationCode()
-    {
-    	return _s_authenticationCode;
+    public int getGameId() {
+        return gameId;
     }
+
 }

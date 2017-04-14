@@ -24,11 +24,6 @@ public class LoginRegisterResponseCommand implements ICommand {
 
 
     @Override
-    public User getUser() {
-    return user;
-    }
-
-    @Override
     public List<ICommand> execute(){
         return null;
     }
@@ -38,6 +33,10 @@ public class LoginRegisterResponseCommand implements ICommand {
     public String getAuthenticationCode(){
         return null;
     }
+    
+    public User getUser() {
+		return user;
+	}
 
     public Boolean getValidCredentials() {
         return validCredentials;

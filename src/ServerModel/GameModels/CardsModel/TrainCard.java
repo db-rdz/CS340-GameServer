@@ -11,6 +11,7 @@ public class TrainCard implements iTrainCard {
     List<TrainCard> _L_Deck = new ArrayList<>();
     private String type;
 
+    public TrainCard(){}
     public TrainCard(String typeStr) {
         type = typeStr;
     }

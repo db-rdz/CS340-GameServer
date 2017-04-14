@@ -3,7 +3,6 @@ package Server;
 import Command.ICommand;
 import Command.Phase1.AddGameToServerCommand;
 import Command.Phase1.AddPlayerToServerCommand;
-import Command.Phase1.DeleteGameCommand;
 import Command.Phase1.GetCommandsCommand;
 import Command.Phase1.LoginCommand;
 import Command.Phase1.LogoutCommand;
@@ -34,6 +33,7 @@ import Client.IClient.InvalidUsername;
 import Client.User;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -74,7 +74,7 @@ public class ServerCommunicator {
 
         //   	SERVER_PORT_NUMBER = Integer.parseInt(args[0]);
 
-        SERVER_PORT_NUMBER = 8080;
+        SERVER_PORT_NUMBER = 8081;
         SINGLETON.run();
     }
     
@@ -89,7 +89,7 @@ public class ServerCommunicator {
         objectMapper.registerModule(module);
     }
     
-    public void eraseAllAuthenticationTokens() {
+    private void eraseAllAuthenticationTokens() {
     	try {
     		List<UserModel.User> allUsers = DAO._SINGLETON.getAllUsers();
 			int amountOfUsers = DAO._SINGLETON.getAllUsers().size();
@@ -102,7 +102,7 @@ public class ServerCommunicator {
 		}
     }
     
-    public void deleteAllServerGames() { 
+    private void deleteAllServerGames() { 
     	try {
             DAO._SINGLETON.deleteAllGames();
 
@@ -111,10 +111,21 @@ public class ServerCommunicator {
 		}
     }
     
+    //Nathan: Checks if the database crashed while open, and deletes the journal file
+    private void checkIfDbHasJournal() {
+    	try {
+			File file = new File("db/database.sqlite-journal");
+			file.delete();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+    }
+    
     private void run()
     {
+    	checkIfDbHasJournal();
     	addPairModule();
-    	eraseAllAuthenticationTokens();
+//    	eraseAllAuthenticationTokens();
     	deleteAllServerGames();
     	
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);

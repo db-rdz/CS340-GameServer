@@ -30,12 +30,6 @@ public class SwitchToWaitingActivityCommand implements ICommand { // sent after 
     public String getAuthenticationCode() {
         return null;
     }
-    
-	@Override
-	public User getUser() {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 
     @Override

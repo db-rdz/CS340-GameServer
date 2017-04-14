@@ -4,6 +4,7 @@ import Client.User;
 import Command.ICommand;
 import Server.IServer;
 import ServerModel.GameModels.CardsModel.TrainCard;
+import sun.java2d.cmm.ProfileActivator;
 import GameModels.Game;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -20,7 +21,7 @@ import java.util.List;
 public class UpdatePlayerTrainCardsCommand implements ICommand {
 
     //Data members
-    private TrainCard trainCard; //TODO: Should be a List? Depends on Client implementation
+    private TrainCard trainCard;
 
     //Constructor
     public UpdatePlayerTrainCardsCommand(TrainCard trainCard) {
@@ -39,15 +40,8 @@ public class UpdatePlayerTrainCardsCommand implements ICommand {
         return null;
     }
 
-    @JsonIgnore
-    @Override
-    public User getUser() {
-        return null;
-    }
-
-
-
     public TrainCard getTrainCard() {
         return trainCard;
     }
+   
 }

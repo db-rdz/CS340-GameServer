@@ -1,9 +1,11 @@
 package GameModels;
 
 import ServerModel.GameModels.BoardModel.Scoreboard;
+import ServerModel.GameModels.CardsModel.DestCard;
 import ServerModel.GameModels.CardsModel.DestCardDeck;
 import ServerModel.GameModels.CardsModel.TrainCardDeck;
 import ServerModel.GameModels.PlayerModel.Player;
+import ServerModel.GameModels.PlayerModel.RouteGraph.Graph;
 import ServerModel.GameModels.RouteModel.AllRoutes;
 import UserModel.User;
 import com.sun.org.apache.xpath.internal.operations.Bool;
@@ -30,7 +32,7 @@ public class Game implements iGame {
 
     //-----------------------------------------STATIC VARIABLES----------------------------------------//
     /** _M_idToGame maps a game id to a game. */
-    private static Map<Integer, Game> _M_idToGame = new HashMap<>();
+    public static Map<Integer, Game> _M_idToGame = new HashMap<>();
     /**  These are all the games that haven't started */
     private static List<Game> _L_listOfAvailableGames = new ArrayList<>();
     /**  These are all the games that have already started */
@@ -43,6 +45,8 @@ public class Game implements iGame {
      *  This contains all the usernames in a list. Used to send back to the client.
      */
     public static List<String> usernames;
+    
+  
 
     //-----------------------------------------CLASS VARIABLES-----------------------------------------//
     /** _M_idToUserInGame maps a username string to a User. It only maps the user's of the people in the game */
@@ -60,6 +64,8 @@ public class Game implements iGame {
     private String _S_gameName;
 
     private Boolean _S_active = true;
+    
+    private int _i_playersThatHaveCompletedLastTurn = 0;
 
     /**
      * Nathan
@@ -89,7 +95,14 @@ public class Game implements iGame {
     private AllRoutes allRoutes = new AllRoutes();
     
     private Map<String, Scoreboard> _M_playerScoreboards = new LinkedHashMap<String, Scoreboard>();
+    
+    //Nathan: every player in the game has his own graph for checking destination cards
+    private Map<String, Graph> _M_usernameToGraph = new HashMap<>();
+    
+    //Nathan: every player's destination cards is stored in the game for checking if destination paths were completed
+    private Map<String, List<DestCard>> _M_usernameToDestCards = new HashMap<>();
 
+    
     //-----------------------------------------STATIC FUNCTIONS----------------------------------------//
 
     /** Gets the corresponding game mapped to the specified id.  */
@@ -258,6 +271,22 @@ public class Game implements iGame {
     }
     
     public Map<String, Scoreboard> get_M_PlayerScoreboards() { return _M_playerScoreboards; }
+    
+    public int get_i_playersThatHaveCompletedLastTurn() {
+		return _i_playersThatHaveCompletedLastTurn;
+	}
+    
+    public void set_i_playersThatHaveCompletedLastTurn(int _i_playersThatHaveCompletedLastTurn) {
+		this._i_playersThatHaveCompletedLastTurn = _i_playersThatHaveCompletedLastTurn;
+	}
+    
+    public Map<String, Graph> get_M_usernameToGraph() {
+		return _M_usernameToGraph;
+	}
+    
+    public Map<String, List<DestCard>> get_M_usernameToDestCards() {
+		return _M_usernameToDestCards;
+	}
 
 
     //-----------------------------------------CLASS FUNCTIONS----------------------------------------//
@@ -323,6 +352,7 @@ public class Game implements iGame {
                 return null;
         }
     }
+    
     
     public TrainCardDeck getDeck()
     {

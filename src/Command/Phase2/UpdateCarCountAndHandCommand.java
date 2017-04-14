@@ -3,6 +3,7 @@ package Command.Phase2;
 import Client.User;
 import Command.ICommand;
 import Server.IServer;
+import ServerModel.GameModels.CardsModel.DestCard;
 import ServerModel.GameModels.CardsModel.TrainCard;
 import GameModels.Game;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -24,13 +25,15 @@ public class UpdateCarCountAndHandCommand implements ICommand {
     //Data members
     private int int_cars_used;
     private List<TrainCard> cardsUsedToClaimRoute;
+    private List<DestCard> allDestCardsOfPlayer;
     
     public UpdateCarCountAndHandCommand(){}
 
     //Constructor
-    public UpdateCarCountAndHandCommand(int int_used_cars, List<TrainCard> cardsUsedToClaimRoute) {
+    public UpdateCarCountAndHandCommand(int int_used_cars, List<TrainCard> cardsUsedToClaimRoute, List<DestCard> allDestCardsOfPlayer) {
         this.int_cars_used = int_used_cars;
         this.cardsUsedToClaimRoute = cardsUsedToClaimRoute;
+        this.allDestCardsOfPlayer = allDestCardsOfPlayer;
     }
     //Functions
     @Override
@@ -44,12 +47,6 @@ public class UpdateCarCountAndHandCommand implements ICommand {
         return null;
     }
 
-    @JsonIgnore
-    @Override
-    public User getUser() {
-        return null;
-    }
-
 
 
     public int getInt_cars_used() {
@@ -60,4 +57,8 @@ public class UpdateCarCountAndHandCommand implements ICommand {
     {
     	return cardsUsedToClaimRoute;
     }
+    
+    public List<DestCard> getAllDestCardsOfPlayer() {
+		return allDestCardsOfPlayer;
+	}
 }

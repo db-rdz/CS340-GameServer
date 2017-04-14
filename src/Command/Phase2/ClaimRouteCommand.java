@@ -4,6 +4,7 @@ import Client.User;
 import Command.ICommand;
 import Server.IServer;
 import Server.ServerFacade;
+import ServerModel.GameModels.CardsModel.DestCard;
 import ServerModel.GameModels.CardsModel.TrainCard;
 import ServerModel.GameModels.RouteModel.Route;
 
@@ -23,8 +24,8 @@ public class ClaimRouteCommand implements ICommand {
     //Data members
     private Route route;
     private int gameId;
-    String authenticationCode;
-    List<TrainCard> cardsUsedToClaimRoute;
+    private String authenticationCode;
+    private List<TrainCard> cardsUsedToClaimRoute;
 
     //Constructors
     public ClaimRouteCommand(){}
@@ -41,16 +42,9 @@ public class ClaimRouteCommand implements ICommand {
         return ServerFacade.SINGLETON.claimRoute(gameId, authenticationCode, route, cardsUsedToClaimRoute);
     }
 
-    @JsonIgnore
     @Override
     public String getAuthenticationCode() {
         return authenticationCode;
-    }
-
-    @JsonIgnore
-    @Override
-    public User getUser() {
-        return null;
     }
 
     public Route getRoute() {
@@ -62,10 +56,6 @@ public class ClaimRouteCommand implements ICommand {
     	return gameId;
     }
     
-    public String getStrAuthenticationCode()
-    {
-    	return authenticationCode;
-    }
     
     public List<TrainCard> getCardsUsedToClaimRoute()
     {

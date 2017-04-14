@@ -32,17 +32,17 @@ public class RegisterCommand implements ICommand {
         return null;
     }
 
+    @JsonIgnore
     @Override
     public String getAuthenticationCode() {
         return null;
     }
-
-    @Override
-    public User getUser() {
-        return null;
-    }
     
-//    @JsonIgnore
-//    @Override
-//    public Game getGame() { return null; }
+    public String getUsername() {
+		return username;
+	}
+    
+    public String getPassword() {
+		return password;
+	}
 }

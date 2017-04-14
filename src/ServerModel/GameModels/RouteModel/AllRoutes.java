@@ -16,14 +16,18 @@ public class AllRoutes {
 	final int FOUR = 7;
 	final int FIVE = 10;
 	final int SIX = 15;
+	
+	public AllRoutes() {
+		initAllRoutes();
+	}
 
-    //---------------------------------------STATIC VARIABLES------------------------------------//
+    //---------------------------------------CLASS VARIABLES------------------------------------//
     private Boolean _B_areRoutesSet = false;
     private List<Route> _L_allRoutes = new ArrayList<>();
     private List<Route> _L_availableRoutes = new ArrayList<>();
     private Map<String, Route> _M_nameToRoute = new HashMap<>();
     
-    //---------------------------------------STATIC FUCNTIONS-------------------------------------//
+    //---------------------------------------CLASS FUCNTIONS-------------------------------------//
     public List<Route> get_allRoutes(){
         return new ArrayList<Route>(_M_nameToRoute.values()); }
 

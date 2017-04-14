@@ -27,11 +27,6 @@ public class GetCommandsCommand implements ICommand{
         return null;
     }
     
-    @Override
-    public User getUser() {
-        return null;
-    }
-    
     public int getLastCommandRecievedIndex() {
 		return lastCommandRecievedIndex;
 	}

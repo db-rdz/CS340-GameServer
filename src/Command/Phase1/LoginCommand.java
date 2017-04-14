@@ -47,13 +47,8 @@ public class LoginCommand implements ICommand {
     public String getAuthenticationCode() {
         return user.getStr_authentication_code();
     }
-
-    @Override
-    public User getUser() {
-        return user;
-    }
     
-//    @JsonIgnore
-//    @Override
-//    public Game getGame() { return null; }
+    public User getUser() {
+		return user;
+	}
 }

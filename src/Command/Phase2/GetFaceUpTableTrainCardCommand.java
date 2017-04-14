@@ -20,58 +20,50 @@ import java.util.List;
  */
 
 public class GetFaceUpTableTrainCardCommand implements ICommand {
-	//Data member
-	private int _i_gameId;
-	
-	//Ryan: changed TrainCard to cardIndex to match the model
-	private int _i_cardIndex;
+    //Data member
+    private int gameId;
+
+    //Ryan: changed TrainCard to cardIndex to match the model
+    private int cardIndex;
     private Boolean isWild; //Is the traincard a wild or normal card?
-    private String _S_authenticationCode;
-    private int _i_turnNumber;
+    private String authenticationCode;
+    private int turnNumber;
 
     //Constructors
-    public GetFaceUpTableTrainCardCommand(){}
-    public GetFaceUpTableTrainCardCommand(int g, int index, Boolean wild, String code, int num) {
-    	_i_cardIndex = index;
-        isWild = wild;
-        _i_gameId = g;
-        _S_authenticationCode = code;
-        _i_turnNumber = num;
+    public GetFaceUpTableTrainCardCommand() {
     }
+
+    public GetFaceUpTableTrainCardCommand(int g, int index, Boolean wild, String code, int num) {
+        cardIndex = index;
+        isWild = wild;
+        gameId = g;
+        authenticationCode = code;
+        turnNumber = num;
+    }
+
     @Override
     public List<ICommand> execute() throws IServer.GameIsFullException {
-        return ServerFacade.SINGLETON.getFaceUpTableTrainCard(_i_gameId, _i_cardIndex, isWild, _S_authenticationCode, _i_turnNumber);
+        return ServerFacade.SINGLETON.getFaceUpTableTrainCard(gameId, cardIndex, isWild, authenticationCode, turnNumber);
     }
 
-    @JsonIgnore
     @Override
     public String getAuthenticationCode() {
-        return _S_authenticationCode;
+        return authenticationCode;
     }
 
-    @JsonIgnore
-    @Override
-    public User getUser() {
-        return null;
+    public int getGameId() {
+        return gameId;
     }
 
     public int getCardIndex() {
-        return _i_cardIndex;
+        return cardIndex;
     }
 
-    public Boolean getWild() {
+    public Boolean getIsWild() {
         return isWild;
     }
-    
-    public int getGameId()
-    {
-    	return _i_gameId;
-    }
-    
-    public String get_S_authenticationCode()
-    {
-    	return _S_authenticationCode;
-    }
 
-
+    public int getTurnNumber() {
+        return turnNumber;
+    }
 }

@@ -28,11 +28,5 @@ public class SelectRequestedDestinationCardCommand implements ICommand {
         return null;
     }
 
-    @JsonIgnore
-    @Override
-    public User getUser() {
-        return null;
-    }
-
 
 }

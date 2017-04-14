@@ -5,7 +5,6 @@ import Client.User;
 import Command.ICommand;
 import Command.Phase1.AddGameToJoinableListCommand;
 import Command.Phase1.AddPlayerToClientCommand;
-import Command.Phase1.DeleteGameCommand;
 import Command.Phase1.ListJoinableCommand;
 import Command.Phase1.LoginRegisterResponseCommand;
 import Command.Phase1.LogoutResponseCommand;
@@ -19,17 +18,21 @@ import ServerModel.GameModels.CardsModel.DestCard;
 import ServerModel.GameModels.CardsModel.DestCardDeck;
 import ServerModel.GameModels.CardsModel.TrainCard;
 import ServerModel.GameModels.CardsModel.TrainCardDeck;
-import ServerModel.GameModels.RouteModel.AllRoutes;
+import ServerModel.GameModels.PlayerModel.RouteGraph.Edge;
+import ServerModel.GameModels.PlayerModel.RouteGraph.Graph;
+import ServerModel.GameModels.PlayerModel.RouteGraph.Node;
 import ServerModel.GameModels.RouteModel.Route;
-import ServerModel.GameModels.RouteModel.iRoute;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
+
+
 
 
 /**
@@ -43,6 +46,19 @@ public class ServerFacade implements IServer {
      * public static ServerFacade SINGLETON
      */
 	public static ServerFacade SINGLETON = new ServerFacade();
+	
+	/**
+	 * Nathan: simply gets all the game ids from the server
+	 * @return A List of Integers which contain gameIds
+	 */
+	private List<Integer> listJoinableGames() {
+        List<Game> games = ServerModel.SINGLETON.getAvailableGames();
+        List<Integer> gameIds = new ArrayList<>();
+        for (Game game : games) {
+        	gameIds.add(game.get_i_gameId());
+        }
+        return gameIds;
+	}
     
 	/**
 	 * This method is used to log a user in given the username and password.
@@ -73,15 +89,14 @@ public class ServerFacade implements IServer {
                 user.setUsername(theUser.get_S_username());
                 user.setPassword(theUser.get_S_password());
                 user.setStr_authentication_code(theUser.get_S_token());
+                
+                //Update games first then have the user login
+                LoginRegisterResponseCommand lrsc = new LoginRegisterResponseCommand(user, true, false, true);
+                commands.add(lrsc);
 
                 if (theUser.get_L_joinedGames().isEmpty())
                 {
-                    List<Game> games = ServerModel.SINGLETON.getAvailableGames();
-                    List<Integer> gameIds = new ArrayList<>();
-                    for (Game game : games) {
-                    	gameIds.add(game.get_i_gameId());
-                    }
-                    ListJoinableCommand listJoinableCommand = new ListJoinableCommand(gameIds);
+                    ListJoinableCommand listJoinableCommand = new ListJoinableCommand(listJoinableGames());
                     commands.add(listJoinableCommand); //Need to update what games there are first before login
                 }
                 else
@@ -107,17 +122,17 @@ public class ServerFacade implements IServer {
                     }
                 }
                 
-                //Update games first then have the user login
-                LoginRegisterResponseCommand lrsc = new LoginRegisterResponseCommand(user, true, false, true);
-                commands.add(lrsc);
                 
                 ClientProxy.SINGLETON.get_m_usersCommands().put(username, new ArrayList<ICommand>());
                 ServerModel.SINGLETON.logIn(theUser.get_S_username());
                 
+                if (!UserModel.User.get_M_authenticationToLoggedInUser().containsKey(user.getStr_authentication_code())) {
+                	UserModel.User.get_M_authenticationToLoggedInUser().put(user.getStr_authentication_code(), theUser);
+                }
+                
                 System.out.println("\nLogging in user: " + theUser.get_S_username());
                 System.out.println("Authorization code: " + theUser.get_S_token());
                 
-//                new GetCommandsCommand(theUser.get_S_username()).execute();
                 
                 return commands;
             }
@@ -173,7 +188,7 @@ public class ServerFacade implements IServer {
             user.setStr_authentication_code(theUser.get_S_token());
                                     
             
-            LoginRegisterResponseCommand lrsc = new LoginRegisterResponseCommand(user, true, false, false);
+            LoginRegisterResponseCommand lrsc = new LoginRegisterResponseCommand(user, true, false, true);
             commands.add(lrsc);
             
             List<Game> games = ServerModel.SINGLETON.getAvailableGames();
@@ -185,7 +200,6 @@ public class ServerFacade implements IServer {
             commands.add(listJoinableCommand);    
             
             Map<String, List<ICommand>> copy = ClientProxy.SINGLETON.get_m_usersCommands();
-            System.out.println(copy);
             
             ClientProxy.SINGLETON.get_m_usersCommands().put(username, new ArrayList<ICommand>());
             System.out.println("\nRegistering and logging in user: " + DAO._SINGLETON.getUserByAccessToken(theUser.get_S_token()).get_S_username());
@@ -204,17 +218,15 @@ public class ServerFacade implements IServer {
     @Override
     public List<ICommand> removeGame(Game game) {
         
-        ICommand deleteGameCommand = new DeleteGameCommand(game.get_i_gameId());
         
         List<ICommand> commands = new ArrayList<>();
-        commands.add(deleteGameCommand);
 
         String username = "";
         
         for (int i = 0; i < UserModel.User.get_L_listOfAllUsers().size(); i++) {
             username = UserModel.User.get_L_listOfAllUsers().get(i).get_S_username();
     		ClientProxy.SINGLETON.get_m_usersCommands().get(username).addAll(commands);
-        } //TODO: Include this in the ServerCommunicator.
+        } 
         
         return commands;
     }
@@ -257,16 +269,23 @@ public class ServerFacade implements IServer {
 	        TrainCardDeck theTrainCardDeck = theGame.getDeck();
 	        DestCardDeck theDestCardDeck = theGame.getDestCards();
 	      	    	
-	        
+	        //Nathan: Initialize the scoreboard map in theGame
 	        List<Scoreboard> scoreboards = new ArrayList<>();
             for (int i = 0; i < usernamesInGame.size(); i++) {
             	Scoreboard scoreboard = new Scoreboard(findPlayerColor(i));
             	theGame.get_M_PlayerScoreboards().put(usernamesInGame.get(i), scoreboard);
             	scoreboards.add(scoreboard);
             }
+            
+            //Nathan: Initialize the graph map in the specific game.
+            for (int i = 0; i < usernamesInGame.size(); i++) {
+            	Graph graph = new Graph();
+            	theGame.get_M_usernameToGraph().put(usernamesInGame.get(i), graph);
+            }
 
         	trainCards = new ArrayList<>();
             for (int j = 0; j < 4; j++)
+//            	for (int j = 0; j < 50; j++)
             {
             	trainCards.add(theTrainCardDeck.drawTop()); //The game creator's train cards
             }
@@ -276,7 +295,7 @@ public class ServerFacade implements IServer {
         	List<TrainCard> faceupTrainCards = new ArrayList<>();
             for (int j = 0; j < 5; j++)
             {
-            	faceupTrainCards.add(theTrainCardDeck.drawTop());
+            	faceupTrainCards = theTrainCardDeck.getFiveCards();
             }
             
             returnCommands.add(new InitializeGameCommand(trainCards, destCards, faceupTrainCards, scoreboards)); //The creator's cards
@@ -297,20 +316,27 @@ public class ServerFacade implements IServer {
             }
             
 
+           
+	        List<ICommand> deleteGameFromLobby = new ArrayList<>();
+            List<Game> availableGames = ServerModel.SINGLETON.getAvailableGames();
+            for (int i = 0; i < availableGames.size(); i++) {
+            	if (availableGames.get(i).get_i_gameId() == theGame.get_i_gameId()) {
+            		availableGames.remove(i); //Delete game from server list
+            	}
+            	
+            }
+            ListJoinableCommand listJoinableCommand = new ListJoinableCommand(listJoinableGames());
+            deleteGameFromLobby.add(listJoinableCommand); //Need to update what games there are first before login
             
-	        //TODO: send delete game command to all users not in game
-//	        ICommand deleteGameCommand = new DeleteGameCommand(gameId);
-//	        
-//	        List<ICommand> commands = new ArrayList<>();
-//	        commands.add(deleteGameCommand);
-//	        
-//	        String username = "";
-//	        List<UserModel.User> users = DAO._SINGLETON.getAllUsers();
-//	         
-//	        for (UserModel.User user : users) {
-//	        		username = user.get_S_username();
-//	            	ClientProxy.SINGLETON.get_m_usersCommands().get(username, commands);
-//	        }
+            Iterator iterator = UserModel.User.get_M_usernameToLoggedInUser().values().iterator();
+            while (iterator.hasNext())
+            {
+            	UserModel.User newUser = (UserModel.User) iterator.next();
+            	if (!newUser.get_S_token().equals(strAuthenticationCode)) { //Sends delete command to all logged in but creator of game
+            		ClientProxy.SINGLETON.get_m_usersCommands().get(newUser.get_S_username()).addAll(deleteGameFromLobby);
+            		
+            	}
+            }
             
 	        return returnCommands;
 		} catch (Exception e) {
@@ -448,7 +474,7 @@ public class ServerFacade implements IServer {
             {
             	UserModel.User newUser = (UserModel.User) iterator.next();
             	if (!newUser.get_S_token().equals(str_authentication_code)) {
-            		ClientProxy.SINGLETON.get_m_usersCommands().get(username).addAll(commands);
+            		ClientProxy.SINGLETON.get_m_usersCommands().get(newUser.get_S_username()).addAll(commands);
             		
             	}
             }
@@ -476,11 +502,9 @@ public class ServerFacade implements IServer {
     @Override
     public List<ICommand> addWaitingGame(Game game) {
         // send to user who called this function only
-        ICommand deleteGameCommand = new DeleteGameCommand(game.get_i_gameId());
 //        ICommand addWaitingToClientCommand = new AddWaitingToClientCommand(game);
         
         List<ICommand> commands = new ArrayList<>();
-        commands.add(deleteGameCommand);
 //        commands.add(addWaitingToClientCommand);
         
         return commands;
@@ -498,12 +522,11 @@ public class ServerFacade implements IServer {
 	 */
     @Override
     public List<ICommand> logout(String str_authentication_code) {
-        ServerModel.SINGLETON.logOut(str_authentication_code);
-
         List<ICommand> commands = new ArrayList<>();
         
         try {
         	UserModel.User user = DAO._SINGLETON.getUserByAccessToken(str_authentication_code);
+
             System.out.println("Logging out user: " + user.get_S_username());
             System.out.println("Authorization code: " + user.get_S_token());
             
@@ -558,18 +581,55 @@ public class ServerFacade implements IServer {
 		
 		return returnCommands;
 	}
+	
+	//Nathan: Changes route color string to train card type color string
+	private void convertToCardType(List<TrainCard> cardsUsedToClaimRoute) {
+		for (int i = 0; i < cardsUsedToClaimRoute.size(); i++) {
+			switch (cardsUsedToClaimRoute.get(i).getType()) {
+			case "RED":
+				cardsUsedToClaimRoute.get(i).setType("redcard");
+				break;
+			case "ORANGE":
+				cardsUsedToClaimRoute.get(i).setType("orangecard");
+				break;
+			case "YELLOW":
+				cardsUsedToClaimRoute.get(i).setType("yellowcard");
+				break;
+			case "GREEN":
+				cardsUsedToClaimRoute.get(i).setType("greencard");
+				break;
+			case "BLUE":
+				cardsUsedToClaimRoute.get(i).setType("bluecard");
+				break;
+			case "WHITE":
+				cardsUsedToClaimRoute.get(i).setType("whitecard");
+				break;
+			case "BLACK":
+				cardsUsedToClaimRoute.get(i).setType("blackcard");
+				break;
+			case "RAINBOW":
+				cardsUsedToClaimRoute.get(i).setType("rainbowcard");
+				break;
+			case "PINK":
+				cardsUsedToClaimRoute.get(i).setType("pinkcard");
+				break;
+			}
+		}
+	}
+	
 
 	/*
 	* Ryan
 	* Allows a player to claim a route, route color will be set on the client side
 	*/
-	
 	@Override
 	public List<ICommand> claimRoute(int gameId, String authenticationCode, Route theRoute, List<TrainCard> cardsUsedToClaimRoute) {
 		List<ICommand> returnCommands = new ArrayList<>();
+		List<ICommand> commandsForOthers = new ArrayList<>();
 		Game theGame = Game.getGameWithId(gameId);
 		String username = "";
 		UserModel.User theUser = null;
+		convertToCardType(cardsUsedToClaimRoute);
 		try {
 			theUser = DAO._SINGLETON.getUserByAccessToken(authenticationCode);
 			username = theUser.get_S_username();
@@ -580,16 +640,48 @@ public class ServerFacade implements IServer {
 		// gets the route from the list in the game and sets the owner
 		Route route = theGame.getAllRoutes().get_RoutesMap().get(theRoute.get_S_MappingName());
 		route.set_Owner(username);
+		route.setClaimed(true);
+		
+        List<DestCard> destCardsofPlayer = theGame.get_M_usernameToDestCards().get(username);
+		Graph playerGraph = theGame.get_M_usernameToGraph().get(username);
+		
+		//Ensures nodes are only added once to the list
+		if (!playerGraph.doesNodeExist(route.get_ConnectingCities().getLeft())) {
+			playerGraph.addNode(route.get_ConnectingCities().getLeft());			
+		}
+		if (!playerGraph.doesNodeExist(route.get_ConnectingCities().getRight())) {
+			playerGraph.addNode(route.get_ConnectingCities().getRight());			
+		}
+		
+		Node rightCity = playerGraph.getNode(route.get_ConnectingCities().getRight());
+		Node leftCity = playerGraph.getNode(route.get_ConnectingCities().getLeft());
+		
+		rightCity.addEdge(new Edge(route.get_Weight(), leftCity)); //Each city between one route must connect to each other both ways
+		leftCity.addEdge(new Edge(route.get_Weight(), rightCity));
+		
+		for (int i = 0; i < destCardsofPlayer.size(); i++) {
+			if (theGame.get_M_usernameToGraph().get(username).evaluateDestCard(destCardsofPlayer.get(i)) && !destCardsofPlayer.get(i).get_isCompleted()) {
+				destCardsofPlayer.get(i).set_isCompleted(true); //update the player's cards to be sent back
+				returnCommands.add(new NotifyDestCardCompletedCommand("You completed the\n" + destCardsofPlayer.get(i).get_destination() + " path!"));
+			}
+			playerGraph.resetNodeVisited(); //Need to reset the visited nodes for evaluateDestCard to work properly
+		}
 		
 		// tells the other players that the route was claimed (maybe make a toast with the message)
-		returnCommands.add(new NotifyRouteClaimedCommand("The route from " + route.get_ConnectingCities().getLeft() + " to "
-							+ route.get_ConnectingCities().getRight() + " has been claimed by " + username + ".", route));
+		String message = "The route from " + route.get_ConnectingCities().getLeft() + " to "
+				+ route.get_ConnectingCities().getRight() + " has been claimed by " + username + ".";
+		returnCommands.add(new NotifyRouteClaimedCommand(message, route));
+		commandsForOthers.add(new NotifyRouteClaimedCommand(message, route));
+		
 		theGame.get_M_PlayerScoreboards().get(username).addPoints(route.get_i_pointValue());
 		// subtracts the number of cards used from the players total on the scoreboard
 		theGame.get_M_PlayerScoreboards().get(username).addTrainCards(-cardsUsedToClaimRoute.size());
+		//Subtracts the number of cars used from the player's total on the scoreboard
+		theGame.get_M_PlayerScoreboards().get(username).subPlayerCarCount(route.get_Weight());
 		
 		// updates the scoreboard
 		returnCommands.add(new UpdateScoreboardCommand(new ArrayList<>(theGame.get_M_PlayerScoreboards().values())));
+		commandsForOthers.add(new UpdateScoreboardCommand(new ArrayList<>(theGame.get_M_PlayerScoreboards().values())));
 		
 		// puts the cards used to claim the route in the discard pile
 		theGame.getDeck().getDiscardPile().addAll(cardsUsedToClaimRoute);
@@ -602,7 +694,7 @@ public class ServerFacade implements IServer {
 			String newUsername = player.get_S_username();
 			if (!newUsername.equals(username))
 			{
-				ClientProxy.SINGLETON.get_m_usersCommands().get(newUsername).addAll(returnCommands);
+				ClientProxy.SINGLETON.get_m_usersCommands().get(newUsername).addAll(commandsForOthers);
 			}
 			else
 			{
@@ -622,7 +714,7 @@ public class ServerFacade implements IServer {
 		ClientProxy.SINGLETON.get_m_usersCommands().get(theGame.getPlayer(currentPlayerNumber).get_S_username()).add(new NotifyTurnCommand());
 		
 		// decrease car count of player who claimed route by the weight of the route claimed, updates player hand
-		returnCommands.add(new UpdateCarCountAndHandCommand(route.get_Weight(), cardsUsedToClaimRoute));
+		returnCommands.add(new UpdateCarCountAndHandCommand(route.get_Weight(), cardsUsedToClaimRoute, destCardsofPlayer));
 		returnCommands.add(new EndTurnCommand());
 		
 		return returnCommands;
@@ -637,12 +729,14 @@ public class ServerFacade implements IServer {
 		Game theGame = Game.getGameWithId(gameId);
 		UserModel.User theUser = null;
 		String username = "";
-		try {
-			theUser = DAO._SINGLETON.getUserByAccessToken(authenticationCode);
+		
+//		try {
+//			theUser = DAO._SINGLETON.getUserByAccessToken(authenticationCode);
+			theUser = UserModel.User.get_M_authenticationToLoggedInUser().get(authenticationCode);
 			username = theUser.get_S_username();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+//		} catch (SQLException e) {
+//			e.printStackTrace();
+//		}
 		
 		// TODO: update player count for that card on the server
 		
@@ -682,7 +776,8 @@ public class ServerFacade implements IServer {
 		}
 		else
 		{
-			returnCommands.add(new NotifyTurnCommand()); // the current player can draw another card
+//			returnCommands.add(new NotifyTurnCommand()); // the current player can draw another card
+			returnCommands.add(new NotifyTrainCardPickedCommand()); // the current player can draw another card
 		}
 		
 		return returnCommands;
@@ -695,12 +790,14 @@ public class ServerFacade implements IServer {
 		Game theGame = Game.getGameWithId(gameId);
 		String username = "";
 		UserModel.User theUser = null;
-		try {
-			theUser = DAO._SINGLETON.getUserByAccessToken(authenticationCode);
-			username = theUser.get_S_username();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} 
+		
+//		try {
+//		theUser = DAO._SINGLETON.getUserByAccessToken(authenticationCode);
+		theUser = UserModel.User.get_M_authenticationToLoggedInUser().get(authenticationCode);
+		username = theUser.get_S_username();
+//		} catch (SQLException e) {
+//			e.printStackTrace();
+//		}
 		
 		TrainCardDeck theDeck = theGame.getDeck();
 		TrainCard theCard = theDeck.getFromTheFiveCards(cardIndex);
@@ -726,11 +823,10 @@ public class ServerFacade implements IServer {
 			}
 		}
 		
-		// adds the card sele
-		// TODO: update the card count of that type for that player on the server
+		// adds the card selected
 		returnCommands.add(new UpdatePlayerTrainCardsCommand(theCard));
 		
-		if (turnNumber == 2)
+		if (turnNumber == 2 || isWild)
 		{
 			if (currentPlayerNumber == theGame.get_numberOfPlayers())
 			{
@@ -745,7 +841,8 @@ public class ServerFacade implements IServer {
 		}
 		else
 		{
-			returnCommands.add(new NotifyTurnCommand()); // the current player can draw another card
+//			returnCommands.add(new NotifyTurnCommand()); // the current player can draw another card
+			returnCommands.add(new NotifyTrainCardPickedCommand()); // the current player can draw another card
 		}
 		
 		return returnCommands;
@@ -757,12 +854,14 @@ public class ServerFacade implements IServer {
     	Game theGame = Game.getGameWithId(gameId);
     	UserModel.User theUser;
     	String username = "";
-		try {
-			theUser = DAO._SINGLETON.getUserByAccessToken(authenticationCode);
-			username = theUser.get_S_username();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+    	
+//		try {
+//		theUser = DAO._SINGLETON.getUserByAccessToken(authenticationCode);
+		theUser = UserModel.User.get_M_authenticationToLoggedInUser().get(authenticationCode);
+		username = theUser.get_S_username();
+//		} catch (SQLException e) {
+//			e.printStackTrace();
+//		}
 		
 		//returns the card to the DestCardDeck in the game
 		theGame.getDestCards().returnCard(rejectedCard);
@@ -782,16 +881,19 @@ public class ServerFacade implements IServer {
     	Game theGame = Game.getGameWithId(gameId);
     	UserModel.User theUser;
     	String username = "";
-		try {
-			theUser = DAO._SINGLETON.getUserByAccessToken(authenticationCode);
-			username = theUser.get_S_username();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+    	
+//		try {
+//		theUser = DAO._SINGLETON.getUserByAccessToken(authenticationCode);
+		theUser = UserModel.User.get_M_authenticationToLoggedInUser().get(authenticationCode);
+		username = theUser.get_S_username();
+//		} catch (SQLException e) {
+//			e.printStackTrace();
+//		}
 		
 		// gets the three top cards
 		DestCardDeck theDeck = theGame.getDestCards();
-		returnCommands.add(new UpdatePlayerDestinationCardsCommand(theDeck.drawTop3()));
+		returnCommands.add(new UpdateServerDestCardsCommand(theDeck.drawTop3()));
+		returnCommands.add(new NotifyDestCardCommand());
 		
 		// updates the scoreboard, but doesn't send until all destination cards are kept/rejected
 		theGame.get_M_PlayerScoreboards().get(username).addDestCards(3);
@@ -799,18 +901,27 @@ public class ServerFacade implements IServer {
     	return returnCommands;
     }
     
-    public List<ICommand> keepAllDestCards(int gameId, String authenticationCode)
+    public List<ICommand> keepAllDestCards(int gameId, String authenticationCode, List<DestCard> cardsKept)
     {
     	List<ICommand> returnCommands = new ArrayList<>();
     	Game theGame = Game.getGameWithId(gameId);
-    	UserModel.User theUser;
+    	UserModel.User theUser = null;
     	String username = "";
-		try {
-			theUser = DAO._SINGLETON.getUserByAccessToken(authenticationCode);
-			username = theUser.get_S_username();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+    	
+//		try {
+//		theUser = DAO._SINGLETON.getUserByAccessToken(authenticationCode);
+		theUser = UserModel.User.get_M_authenticationToLoggedInUser().get(authenticationCode);
+		username = theUser.get_S_username();
+//		} catch (SQLException e) {
+//			e.printStackTrace();
+//		}
+		
+		//Nathan: Every new destination card kept will get added to the map in theGame variable
+        Map<String, List<DestCard>> destCardsMap = theGame.get_M_usernameToDestCards();
+        for (int i = 0; i < cardsKept.size(); i++) {
+            destCardsMap.get(username).add(cardsKept.get(i));
+
+        }
     	
 		returnCommands.add(new UpdateScoreboardCommand(new ArrayList<>(theGame.get_M_PlayerScoreboards().values())));
 
@@ -837,7 +948,9 @@ public class ServerFacade implements IServer {
 		{
 			currentPlayerNumber++; // goes to next player
 		}
+		
 		ClientProxy.SINGLETON.get_m_usersCommands().get(theGame.getPlayer(currentPlayerNumber).get_S_username()).add(new NotifyTurnCommand());
+		returnCommands.add(new UpdatePlayerDestinationCardsCommand(cardsKept));
 		returnCommands.add(new EndTurnCommand()); // ends current player's turn
 		
 		return returnCommands;
@@ -848,15 +961,32 @@ public class ServerFacade implements IServer {
     	Game theGame = Game.getGameWithId(gameId);
     	UserModel.User theUser;
     	String username = "";
-		try {
-			theUser = DAO._SINGLETON.getUserByAccessToken(authenticationCode);
-			username = theUser.get_S_username();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+    	
+//		try {
+//		theUser = DAO._SINGLETON.getUserByAccessToken(authenticationCode);
+		theUser = UserModel.User.get_M_authenticationToLoggedInUser().get(authenticationCode);
+		username = theUser.get_S_username();
+//		} catch (SQLException e) {
+//			e.printStackTrace();
+//		}
 		
 		if (type.equals("KEEP"))
 		{
+			
+	        Map<String, List<DestCard>> destCardsMap = theGame.get_M_usernameToDestCards();
+	        for (int i = 0; i < destCards.size(); i++) {
+	            if (destCardsMap.containsKey(username) && !destCardsMap.get(username).contains(destCards.get(i))) { //If that destCard isn't in the list
+	            	destCardsMap.get(username).add(destCards.get(i));
+	            }
+	            else if (!destCardsMap.containsKey(username)) { //If List of DestCards doesn't exist yet
+	                List<DestCard> destCardsList = new ArrayList<>();
+	                destCardsList.add(destCards.get(i)); //Need to make a new List<String> for Map.put()
+	                destCardsMap.put(username, destCardsList);
+	            }
+	        }
+	        
+	        
+	        
 			theGame.get_M_PlayerScoreboards().get(username).addDestCards(destCards.size());
 			returnCommands.add(new UpdateScoreboardCommand(new ArrayList<>(theGame.get_M_PlayerScoreboards().values())));
 			
@@ -879,14 +1009,170 @@ public class ServerFacade implements IServer {
 			{
 				ClientProxy.SINGLETON.get_m_usersCommands().get(theGame.getPlayer1().get_S_username()).add(new NotifyTurnCommand());
 			}
+			returnCommands.add(new UpdatePlayerDestinationCardsCommand(destCards));
 			returnCommands.add(new EndTurnCommand());
 		}
 		else
 		{
 			theGame.getDestCards().returnCard(destCards.get(0));
-			
 		}
 		
+		return returnCommands;
+	}
+	
+	public List<ICommand> initiateLastTurn(int gameId, String authenticationCode) {
+		List<ICommand> returnCommands = new ArrayList<>();
+
+		Game theGame = Game.getGameWithId(gameId);
+    	UserModel.User theUser;
+    	String username = "";
+    	
+//		try {
+//		theUser = DAO._SINGLETON.getUserByAccessToken(authenticationCode);
+		theUser = UserModel.User.get_M_authenticationToLoggedInUser().get(authenticationCode);
+		username = theUser.get_S_username();
+//		} catch (SQLException e) {
+//			e.printStackTrace();
+//		}
+		
+		int currPlayer = -1;
+		
+		returnCommands.add(new NotifyLastTurnCommand());
+		for (int i = 1; i <= theGame.get_numberOfPlayers(); i++)
+		{
+			UserModel.User player = theGame.getPlayer(i);
+			String newUsername = player.get_S_username();
+			if (!newUsername.equals(username))
+			{
+				ClientProxy.SINGLETON.get_m_usersCommands().get(newUsername).addAll(returnCommands);
+			}
+			else 
+			{
+				currPlayer = i;
+			}
+			
+		}
+		if (currPlayer == theGame.get_numberOfPlayers())
+		{
+			currPlayer = 1; // starts over at player 1
+		}
+		else
+		{
+			currPlayer++; // goes to next player
+		}
+		ClientProxy.SINGLETON.get_m_usersCommands().get(theGame.getPlayer(currPlayer).get_S_username()).add(new NotifyTurnCommand());
+		
+		
+		return returnCommands;
+	}
+	
+	public List<ICommand> lastTurnCompleted(int gameId, String authenticationCode) {
+		List<ICommand> returnCommands = new ArrayList<>();
+		
+		Game theGame = Game.getGameWithId(gameId);
+		theGame.set_i_playersThatHaveCompletedLastTurn(theGame.get_i_playersThatHaveCompletedLastTurn()+1);
+	
+		if (theGame.get_i_playersThatHaveCompletedLastTurn() == theGame.get_numberOfPlayers()) {
+	    	UserModel.User theUser;
+	    	String username = "";
+	    	
+//			try {
+//			theUser = DAO._SINGLETON.getUserByAccessToken(authenticationCode);
+			theUser = UserModel.User.get_M_authenticationToLoggedInUser().get(authenticationCode);
+			username = theUser.get_S_username();
+//			} catch (SQLException e) {
+//				e.printStackTrace();
+//			}
+			
+			//Find who has the longest path of routes in the game
+			TreeMap<Integer, String> longestRoute = new TreeMap<>(Collections.reverseOrder());
+			int holder = 0;
+			int longestPath = 0;
+			for (int i = 1; i <= theGame.get_numberOfPlayers(); i++)
+			{
+		        Graph graphOfPlayer = theGame.get_M_usernameToGraph().get(theGame.getPlayer(i).get_S_username());
+		        if (!graphOfPlayer.get_nodes().isEmpty()) {
+		        	List<Node> nodesOfPlayer = graphOfPlayer.get_nodes();
+		        	longestPath = graphOfPlayer.getLongestPath();
+		        	graphOfPlayer.resetNodeVisited(); //Reset for every node so it recurses through all nodes no matter what
+		        }
+		        
+		        longestRoute.put(longestPath, theGame.getPlayer(i).get_S_username());
+			}
+			
+			int pointsKey = 0;
+            Iterator iterator = longestRoute.keySet().iterator();
+	        if (iterator.hasNext()) { //Only do this once since there's only one player that can have the longest path
+	        	pointsKey = (Integer) iterator.next();
+    			for (int i = 1; i <= theGame.get_numberOfPlayers(); i++) {
+    				if (theGame.getPlayer(i).get_S_username().equals(longestRoute.get(pointsKey))) {
+    					theGame.get_M_PlayerScoreboards().get(theGame.getPlayer(i).get_S_username()).addPoints(10); //10 points for longest route
+    				}
+	        	}
+	        }
+
+			
+			//Calculate the destination card points of player
+			for (int i = 1; i <= theGame.get_numberOfPlayers(); i++) {
+				List<DestCard> destCardsofPlayer = theGame.get_M_usernameToDestCards().get(theGame.getPlayer(i).get_S_username());
+				for (DestCard card : destCardsofPlayer) {
+					if (card.get_isCompleted()) { //If the route was completed, add points to the player 
+						theGame.get_M_PlayerScoreboards().get(theGame.getPlayer(i).get_S_username()).addPoints(card.getPoints());
+					}
+					else { //If the route wasn't completed, subtract points from the player
+						theGame.get_M_PlayerScoreboards().get(theGame.getPlayer(i).get_S_username()).addPoints(-card.getPoints());
+					}
+				
+				}
+				
+			}
+
+				
+			returnCommands.add(new UpdateScoreboardCommand(new ArrayList<>(theGame.get_M_PlayerScoreboards().values())));
+			
+			
+			returnCommands.add(new SwitchToEndGameViewCommand(longestRoute.get(pointsKey))); //person with highest path is in first index
+			for (int i = 1; i <= theGame.get_numberOfPlayers(); i++)
+			{
+				UserModel.User player = theGame.getPlayer(i);
+				String newUsername = player.get_S_username();
+				if (!newUsername.equals(username))
+				{
+					ClientProxy.SINGLETON.get_m_usersCommands().get(newUsername).addAll(returnCommands);
+				}
+			}
+		}
+		
+		return returnCommands;
+	}
+	
+	public List<ICommand> endGame(int gameId, String authenticationCode) {
+		List<ICommand> returnCommands = new ArrayList<>();
+		
+		Game theGame = Game.getGameWithId(gameId); //Get the game data first
+		
+    	UserModel.User theUser;
+    	String username = "";
+    	
+//		try {
+//		theUser = DAO._SINGLETON.getUserByAccessToken(authenticationCode);
+		theUser = UserModel.User.get_M_authenticationToLoggedInUser().get(authenticationCode);
+		username = theUser.get_S_username();
+//		} catch (SQLException e) {
+//			e.printStackTrace();
+//		}
+		
+		
+		
+		//Sends command to switch the client back to the lobby
+        if (Game._M_idToGame.containsKey(gameId)) {
+    		Game._M_idToGame.remove(gameId); //Delete game from server
+    		
+    		//TODO: Delete game from databases in phase 4
+        }
+
+		returnCommands.add(new SwitchBackToLobbyViewCommand());
+        
 		return returnCommands;
 	}
 

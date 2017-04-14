@@ -90,7 +90,7 @@ public class TrainCardDeck {
     	int numOfWilds = 0;
     	for (TrainCard card : _fiveCards)
     	{
-    		if (card.getType() == "RAINBOW")
+    		if (card.getType() == "rainbowcard")
     		{
     			numOfWilds++;
     		}
