@@ -64,7 +64,7 @@ public class MongoUserDAO implements IUserDAO {
             }
 
         } catch (Exception e) {
-            System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+            System.err.println( e.getClass().getName() + ": LOGIN MONGO " + e.getMessage() );
         }
         return false;
     }
@@ -80,7 +80,7 @@ public class MongoUserDAO implements IUserDAO {
 
             _usersCollection.insertOne(newUserDoc);
         } catch (Exception e) {
-            System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+            System.err.println( e.getClass().getName() + ": REGISTERUSER MONGO " + e.getMessage() );
             return false;
         }
         return true;
@@ -88,7 +88,6 @@ public class MongoUserDAO implements IUserDAO {
 
     @Override
     public void updateUserToken(String username, String authenticationCode) {
-        User user = new User();
         try {
             BasicDBObject newDocument = new BasicDBObject();
             newDocument.put("token", authenticationCode);
@@ -96,7 +95,7 @@ public class MongoUserDAO implements IUserDAO {
             BasicDBObject searchQuery = new BasicDBObject().append("username", username);
             _usersCollection.updateOne(searchQuery, newDocument);
         } catch (Exception e) {
-            System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+            System.err.println( e.getClass().getName() + ": UPDATEUSERTOKEN MONGO " + e.getMessage() );
         }
     }
 
@@ -107,6 +106,7 @@ public class MongoUserDAO implements IUserDAO {
             BasicDBObject query = new BasicDBObject();
             query.put("username", username);
             MongoCursor cursor = _usersCollection.find(query).iterator();
+            if(!cursor.hasNext()){return user;}
 
             Document row = (Document)cursor.next();
             user.set_S_username(row.getString("username"));
@@ -114,7 +114,7 @@ public class MongoUserDAO implements IUserDAO {
             user.set_S_token(row.getString("token"));
 
         } catch (Exception e) {
-            System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+            System.err.println( e.getClass().getName() + ": GETUSERBYUSERNAME MONGO " + e.getMessage() );
         }
         return user;
     }
@@ -153,7 +153,7 @@ public class MongoUserDAO implements IUserDAO {
                  }
              }
         } catch (Exception e) {
-            System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+            System.err.println( e.getClass().getName() + ": GETALLUSERS MONGO " + e.getMessage() );
         }
         return listOfUsers;
     }
