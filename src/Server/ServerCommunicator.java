@@ -8,11 +8,9 @@ import Command.Phase1.LoginCommand;
 import Command.Phase1.LogoutCommand;
 import Command.Phase1.RegisterCommand;
 import Command.Phase1.StartGameCommand;
-import Database.AbstractFactory;
-import Database.DAO;
-import Database.IFactory;
 import Deserializers.PairDeserializer;
 import GameModels.Game;
+import RelationalDatabase.DAO;
 import Serializers.PairSerializer;
 import Server.IServer.GameIsFullException;
 import Server.IServer.UserAlreadyLoggedIn;
@@ -66,10 +64,6 @@ public class ServerCommunicator {
     
     private ObjectMapper objectMapper = new ObjectMapper();
     
-    
-    private static class InvalidAuthenticationCodeException extends Exception {
-        
-    }
     
     public static void main(String[] args)
     {

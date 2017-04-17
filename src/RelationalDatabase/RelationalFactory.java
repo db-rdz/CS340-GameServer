@@ -1,4 +1,6 @@
-package Database;
+package RelationalDatabase;
+
+import Server.IFactory;
 
 public class RelationalFactory implements IFactory{
 	

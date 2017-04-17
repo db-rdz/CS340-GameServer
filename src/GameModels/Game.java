@@ -11,7 +11,7 @@ import UserModel.User;
 import com.sun.org.apache.xpath.internal.operations.Bool;
 import com.sun.security.ntlm.Server;
 
-import Database.DAO;
+import RelationalDatabase.DAO;
 
 import java.sql.SQLException;
 import java.util.ArrayList;

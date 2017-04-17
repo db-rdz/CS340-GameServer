@@ -1,8 +1,8 @@
 package ServerModel;
 
-import Database.DAO;
 import GameModels.Game;
 import GameModels.iGame;
+import RelationalDatabase.DAO;
 import UserModel.User;
 import UserModel.iUser;
 

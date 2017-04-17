@@ -1,4 +1,4 @@
-package Database;
+package RelationalDatabase;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -13,9 +13,12 @@ import UserModel.User;
 
 public class RelationalUserDAO implements IUserDAO {
 	
-    public static iDAO _SINGLETON = new DAO();
-    private static DataBase _db;
+    private static RelationalDB _db;
     private int AUTH_TOKEN_LENGTH = 15;
+    
+    public RelationalUserDAO(RelationalDB _db) {
+		this._db = _db;
+	}
 
 	@Override
 	public Boolean login(String userName, String password)

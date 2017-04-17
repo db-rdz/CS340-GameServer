@@ -1,4 +1,4 @@
-package Database;
+package RelationalDatabase;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -21,7 +21,7 @@ import UserModel.User;
  */
 public class DAO implements iDAO {
     public static iDAO _SINGLETON = new DAO();
-    private static DataBase _db;
+    private static RelationalDB _db;
     private int AUTH_TOKEN_LENGTH = 15;
     private static int int_gameId = 1; //must initialize to 1 so the server properly counts games
 
@@ -650,7 +650,7 @@ public class DAO implements iDAO {
 
     @Override
     public void initializeDB() {
-        _db = new DataBase();
+        _db = new RelationalDB();
         try {
 			int_gameId = getAllGames().size();
 		} catch (SQLException e) {
@@ -691,5 +691,5 @@ public class DAO implements iDAO {
     }
     
     @Override
-    public DataBase getDb() { return _db; }
+    public RelationalDB getDb() { return _db; }
 }

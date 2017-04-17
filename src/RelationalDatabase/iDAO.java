@@ -1,4 +1,4 @@
-package Database;
+package RelationalDatabase;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -43,7 +43,7 @@ public interface iDAO {
 
     public List<User> getAllUsers() throws SQLException;
 
-	public DataBase getDb();
+	public RelationalDB getDb();
 
 	public Boolean addGame(Game game) throws SQLException;
 	

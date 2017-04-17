@@ -1,13 +1,16 @@
-package Database;
+package RelationalDatabase;
 
 public class RelationalDAO implements iDAO2 {
 	
-	public static RelationalDAO _SINGLETON = new RelationalDAO();
-
+	private static RelationalDB _db;
 	private RelationalGameDAO gameDAO;
 	private RelationalUserDAO userDAO;
 	
-	private RelationalDAO() {}
+	public RelationalDAO() {
+		_db = new RelationalDB(); //Set the database in the constructor
+		gameDAO = new RelationalGameDAO(_db); //Each DAO needs access to the singlar created Database
+		userDAO = new RelationalUserDAO(_db);
+	}
 	
 	public RelationalGameDAO getGameDAO() {
 		return gameDAO;

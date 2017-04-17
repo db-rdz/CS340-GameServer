@@ -1,4 +1,7 @@
-package Database;
+package Server;
+
+import MongoDatabase.MongoFactory;
+import RelationalDatabase.RelationalFactory;
 
 public class AbstractFactory {
 

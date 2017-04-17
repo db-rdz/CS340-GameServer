@@ -1,4 +1,6 @@
-package Database;
+package MongoDatabase;
+
+import Server.IFactory;
 
 public class MongoFactory implements IFactory {
 	

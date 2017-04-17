@@ -1,4 +1,4 @@
-package Database;
+package Server;
 
 public interface IFactory {
 

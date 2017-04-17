@@ -10,9 +10,9 @@ import Command.Phase1.LoginRegisterResponseCommand;
 import Command.Phase1.LogoutResponseCommand;
 import Command.Phase1.SwitchToWaitingActivityCommand;
 import Command.Phase2.*;
-import Database.DAO;
-import Database.iDAO2;
 import GameModels.Game;
+import RelationalDatabase.DAO;
+import RelationalDatabase.iDAO2;
 import ServerModel.*;
 import ServerModel.GameModels.BoardModel.Scoreboard;
 import ServerModel.GameModels.CardsModel.DestCard;
@@ -85,7 +85,7 @@ public class ServerFacade implements IServer {
 
     	try {
             // tries to retrieve the user from the database
-            if (DAO._SINGLETON.login(username, password))
+            if (dao.getUserDAO().login(username, password))
             {
                 UserModel.User theUser = DAO._SINGLETON.getUserByUserName(username);
                 User user = new User();
@@ -178,7 +178,7 @@ public class ServerFacade implements IServer {
         List<ICommand> commands = new ArrayList<>();
 
     	try {
-            if (!DAO._SINGLETON.registerUser(username, password)) {
+            if (!dao.getUserDAO().registerUser(username, password)) {
             	commands.clear();
             	commands.add(new LoginRegisterResponseCommand(null, true, true, true));
                 return commands;
@@ -366,8 +366,8 @@ public class ServerFacade implements IServer {
     	
         // sent to all users                       
         try {
-        	UserModel.User theUser = DAO._SINGLETON.getUserByAccessToken(str_authentication_code);
-        	Game theGame = DAO._SINGLETON.getGamebyGameId(intGameId); //get the game from id
+        	UserModel.User theUser = dao.getUserDAO().getUserByAccessToken(str_authentication_code);
+        	Game theGame = dao.getGameDAO().getGamebyGameId(intGameId); //get the game from id
         	
         	if (!ServerModel.SINGLETON.addPlayerToGame(theUser.get_S_username(), intGameId)) { // not allowed to join
         		throw new GameIsFullException();
@@ -378,10 +378,10 @@ public class ServerFacade implements IServer {
                 
 //                theGame = DAO._SINGLETON.getGamebyGameId(intGameId); //Get the game from id
                 theGame.addPlayerToGame(theUser.get_S_username(), theUser); //Adds creator to the game
-              	DAO._SINGLETON.updateGameNumberOfPlayers(intGameId, theGame.get_numberOfPlayers());
-                DAO._SINGLETON.UpdateGamePlayer(theGame.get_i_gameId(), theUser.get_S_username(), theGame.get_numberOfPlayers());
+              	dao.getGameDAO().updateGameNumberOfPlayers(intGameId, theGame.get_numberOfPlayers());
+                dao.getGameDAO().UpdateGamePlayer(theGame.get_i_gameId(), theUser.get_S_username(), theGame.get_numberOfPlayers());
                 theGame.setPlayer(theGame.get_numberOfPlayers(), theUser);
-                theGame = DAO._SINGLETON.getGamebyGameId(intGameId);
+                theGame = dao.getGameDAO().getGamebyGameId(intGameId);
                 theGame.get_M_idToGame().replace(theGame.get_i_gameId(), theGame);
 
                 List<UserModel.User> users = new ArrayList<>(); //The users in the game
@@ -441,21 +441,21 @@ public class ServerFacade implements IServer {
         
         try {
             @SuppressWarnings("unused")
-			Boolean value = DAO._SINGLETON.addGame(new Game());
+			Boolean value = dao.getGameDAO().addGame(new Game());
             Game theGame = new Game();
             
-            Integer gameId = DAO._SINGLETON.getAllGames().size(); //The size == gameid
-            UserModel.User theUser = DAO._SINGLETON.getUserByAccessToken(str_authentication_code);
+            Integer gameId = dao.getGameDAO().getAllGames().size(); //The size == gameid
+            UserModel.User theUser = dao.getUserDAO().getUserByAccessToken(str_authentication_code);
                         
             try {
             	theUser.set_B_isInGame(true);
             	theUser.addGameToJoinedGames(gameId);
-            	theGame = DAO._SINGLETON.getGamebyGameId(gameId);
+            	theGame = dao.getGameDAO().getGamebyGameId(gameId);
             	
               	theGame.addPlayerToGame(theUser.get_S_username(), theUser); //Adds creator to the game
               	theGame.set_i_gameOwner(1); //The creator/player1
-              	DAO._SINGLETON.updateGameNumberOfPlayers(gameId, theGame.get_numberOfPlayers());
-                DAO._SINGLETON.UpdateGamePlayer(theGame.get_i_gameId(), theUser.get_S_username(), theGame.get_numberOfPlayers());
+              	dao.getGameDAO().updateGameNumberOfPlayers(gameId, theGame.get_numberOfPlayers());
+              	dao.getGameDAO().UpdateGamePlayer(theGame.get_i_gameId(), theUser.get_S_username(), theGame.get_numberOfPlayers());
                 theGame.setPlayer1(theUser);
 
             	
@@ -528,12 +528,12 @@ public class ServerFacade implements IServer {
         List<ICommand> commands = new ArrayList<>();
         
         try {
-        	UserModel.User user = DAO._SINGLETON.getUserByAccessToken(str_authentication_code);
+        	UserModel.User user = dao.getUserDAO().getUserByAccessToken(str_authentication_code);
 
             System.out.println("Logging out user: " + user.get_S_username());
             System.out.println("Authorization code: " + user.get_S_token());
             
-            DAO._SINGLETON.updateUserToken(user.get_S_username(), null);
+            dao.getUserDAO().updateUserToken(user.get_S_username(), null);
             commands.add(new LogoutResponseCommand());
         } catch (SQLException e) {
         	System.err.println("@logout");
@@ -559,13 +559,15 @@ public class ServerFacade implements IServer {
 		Game theGame = Game.getGameWithId(gameId);
 		UserModel.User theUser;
 		String username = "";
-		try {
-			theUser = DAO._SINGLETON.getUserByAccessToken(authenticationToken);
-			username = theUser.get_S_username();
-			message = username + ": " + message;
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+		
+//		try {
+//		theUser = DAO._SINGLETON.getUserByAccessToken(authenticationCode);
+		theUser = UserModel.User.get_M_authenticationToLoggedInUser().get(authenticationToken);
+		username = theUser.get_S_username();
+//		} catch (SQLException e) {
+//			e.printStackTrace();
+//		}
+		message = username + ": " + message;
 		
 		List<String> chatRoom = theGame.getChatRoom();
 		chatRoom.add(message);
@@ -633,12 +635,14 @@ public class ServerFacade implements IServer {
 		String username = "";
 		UserModel.User theUser = null;
 		convertToCardType(cardsUsedToClaimRoute);
-		try {
-			theUser = DAO._SINGLETON.getUserByAccessToken(authenticationCode);
-			username = theUser.get_S_username();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+		
+//		try {
+//		theUser = DAO._SINGLETON.getUserByAccessToken(authenticationCode);
+		theUser = UserModel.User.get_M_authenticationToLoggedInUser().get(authenticationCode);
+		username = theUser.get_S_username();
+//		} catch (SQLException e) {
+//			e.printStackTrace();
+//		}
 		
 		// gets the route from the list in the game and sets the owner
 		Route route = theGame.getAllRoutes().get_RoutesMap().get(theRoute.get_S_MappingName());

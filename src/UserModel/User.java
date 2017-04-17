@@ -1,7 +1,7 @@
 package UserModel;
 
-import Database.DAO;
 import GameModels.Game;
+import RelationalDatabase.DAO;
 
 import java.util.ArrayList;
 import java.util.HashMap;

@@ -1,6 +1,8 @@
-package Database;
+package MongoDatabase;
 
 import GameModels.Game;
+import RelationalDatabase.IGameDAO;
+import RelationalDatabase.IUserDAO;
 import ServerModel.GameModels.PlayerModel.Player;
 import UserModel.User;
 import com.mongodb.BasicDBList;
@@ -9,6 +11,7 @@ import com.mongodb.DBObject;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
+
 import org.bson.Document;
 
 import java.sql.PreparedStatement;

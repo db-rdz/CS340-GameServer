@@ -1,4 +1,4 @@
-package Database;
+package RelationalDatabase;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -11,9 +11,12 @@ import ServerModel.GameModels.PlayerModel.Player;
 
 public class RelationalGameDAO implements IGameDAO {
 	
-    public static iDAO _SINGLETON = new DAO();
-    private static DataBase _db;
+    private static RelationalDB _db;
     private static int int_gameId = 1; //must initialize to 1 so the server properly counts games
+
+	public RelationalGameDAO(RelationalDB _db) {
+		this._db = _db;
+	}
 
 	@Override
 	public void UpdateGamePlayer(int gameId, String username, int numberOfPlayersInGame) throws SQLException {

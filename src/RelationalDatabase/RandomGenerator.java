@@ -1,4 +1,4 @@
-package Database;
+package RelationalDatabase;
 
 import java.util.Random;
 

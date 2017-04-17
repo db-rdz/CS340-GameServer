@@ -1,4 +1,4 @@
-package Database;
+package RelationalDatabase;
 
 /**
  * Created by raulbr on 2/12/17.
@@ -12,10 +12,10 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-public class DataBase {
+public class RelationalDB {
     Connection connection;
 
-    public DataBase(){
+    public RelationalDB(){
         loadDriver();
     }
 

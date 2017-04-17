@@ -1,4 +1,4 @@
-package Database;
+package MongoDatabase;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoException;
 import com.mongodb.WriteConcern;
