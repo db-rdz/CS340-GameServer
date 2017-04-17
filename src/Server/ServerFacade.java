@@ -11,6 +11,8 @@ import Command.Phase1.LogoutResponseCommand;
 import Command.Phase1.SwitchToWaitingActivityCommand;
 import Command.Phase2.*;
 import Database.DAO;
+import Database.MongoDAO;
+import Database.RelationalDAO;
 import Database.iDAO2;
 import GameModels.Game;
 import ServerModel.*;
@@ -50,6 +52,11 @@ public class ServerFacade implements IServer {
 	public static int commandsBeforeCheckpont = 1;
 	private iDAO2 dao;
 	
+	private ServerFacade() {
+		dao = new RelationalDAO();
+		
+	}
+	
 	/**
 	 * Nathan: simply gets all the game ids from the server
 	 * @return A List of Integers which contain gameIds
@@ -85,7 +92,8 @@ public class ServerFacade implements IServer {
 
     	try {
             // tries to retrieve the user from the database
-            if (DAO._SINGLETON.login(username, password))
+//            if (DAO._SINGLETON.login(username, password))
+            	if (dao.getUserDAO().login(username, password))
             {
                 UserModel.User theUser = DAO._SINGLETON.getUserByUserName(username);
                 User user = new User();
@@ -178,7 +186,8 @@ public class ServerFacade implements IServer {
         List<ICommand> commands = new ArrayList<>();
 
     	try {
-            if (!DAO._SINGLETON.registerUser(username, password)) {
+//            if (!DAO._SINGLETON.registerUser(username, password)) {
+            	if (dao.getUserDAO().registerUser(username, password)) {
             	commands.clear();
             	commands.add(new LoginRegisterResponseCommand(null, true, true, true));
                 return commands;

@@ -2,12 +2,13 @@ package Database;
 
 public class RelationalDAO implements iDAO2 {
 	
-	public static RelationalDAO _SINGLETON = new RelationalDAO();
-
 	private RelationalGameDAO gameDAO;
 	private RelationalUserDAO userDAO;
 	
-	private RelationalDAO() {}
+	public RelationalDAO() {
+		gameDAO = new RelationalGameDAO();
+		userDAO = new RelationalUserDAO();
+	}
 	
 	public RelationalGameDAO getGameDAO() {
 		return gameDAO;
