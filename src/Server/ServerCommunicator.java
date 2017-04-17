@@ -8,7 +8,9 @@ import Command.Phase1.LoginCommand;
 import Command.Phase1.LogoutCommand;
 import Command.Phase1.RegisterCommand;
 import Command.Phase1.StartGameCommand;
+import Database.AbstractFactory;
 import Database.DAO;
+import Database.IFactory;
 import Deserializers.PairDeserializer;
 import GameModels.Game;
 import Serializers.PairSerializer;
@@ -73,7 +75,13 @@ public class ServerCommunicator {
     {
 
         //   	SERVER_PORT_NUMBER = Integer.parseInt(args[0]);
-
+    	if (args[0].length() > 0) { //which database to use
+    		IFactory factory = AbstractFactory.loadProvider(args[0]);
+    		factory.startTransaction();
+    	}
+    	if (args[1].length() > 0) { //How many commands received before storing a checkpoint
+    		ServerFacade.commandsBeforeCheckpont = Integer.valueOf(args[1]);
+    	}
         SERVER_PORT_NUMBER = 8081;
         SINGLETON.run();
     }
