@@ -558,7 +558,7 @@ public class ServerFacade implements IServer {
 		String username = "";
 //		try {
 //			theUser = DAO._SINGLETON.getUserByAccessToken(authenticationCode);
-			theUser = UserModel.User.get_M_authenticationToLoggedInUser().get(authenticationCode);
+			theUser = UserModel.User.get_M_authenticationToLoggedInUser().get(authenticationToken);
 			username = theUser.get_S_username();
 //		} catch (SQLException e) {
 //			e.printStackTrace();
