@@ -11,6 +11,7 @@ import Command.Phase1.LogoutResponseCommand;
 import Command.Phase1.SwitchToWaitingActivityCommand;
 import Command.Phase2.*;
 import Database.DAO;
+import Database.iDAO2;
 import GameModels.Game;
 import ServerModel.*;
 import ServerModel.GameModels.BoardModel.Scoreboard;
@@ -46,6 +47,8 @@ public class ServerFacade implements IServer {
      * public static ServerFacade SINGLETON
      */
 	public static ServerFacade SINGLETON = new ServerFacade();
+	public static int commandsBeforeCheckpont = 1;
+	private iDAO2 dao;
 	
 	/**
 	 * Nathan: simply gets all the game ids from the server
@@ -1174,6 +1177,13 @@ public class ServerFacade implements IServer {
 		returnCommands.add(new SwitchBackToLobbyViewCommand());
         
 		return returnCommands;
+	}
+	
+	public iDAO2 getDao() {
+		return dao;
+	}
+	public void setDao(iDAO2 dao) {
+		this.dao = dao;
 	}
 
 }

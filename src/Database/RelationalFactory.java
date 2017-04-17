@@ -2,8 +2,14 @@ package Database;
 
 public class RelationalFactory implements IFactory{
 	
-	private RelationalDAO relationalDAO;
+	private RelationalDAO relationalDAO; //TODO: change to dynamic for pass off
 
+	@Override
+	public void startTransaction() {
+		// TODO Use class loader
+		
+	}
+	
 	@Override
 	public void closeTransaction() {
 		// TODO Auto-generated method stub
@@ -22,5 +28,7 @@ public class RelationalFactory implements IFactory{
 	public void setRelationalDAO(RelationalDAO relationalDAO) {
 		this.relationalDAO = relationalDAO;
 	}
+
+
 
 }
