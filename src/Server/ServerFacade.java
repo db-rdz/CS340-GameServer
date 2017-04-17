@@ -556,14 +556,14 @@ public class ServerFacade implements IServer {
 		Game theGame = Game.getGameWithId(gameId);
 		UserModel.User theUser;
 		String username = "";
-		try {
-			theUser = DAO._SINGLETON.getUserByAccessToken(authenticationToken);
+//		try {
+//			theUser = DAO._SINGLETON.getUserByAccessToken(authenticationCode);
+			theUser = UserModel.User.get_M_authenticationToLoggedInUser().get(authenticationCode);
 			username = theUser.get_S_username();
-			message = username + ": " + message;
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		
+//		} catch (SQLException e) {
+//			e.printStackTrace();
+//		}
+		message = username + ": " + message;
 		List<String> chatRoom = theGame.getChatRoom();
 		chatRoom.add(message);
 		returnCommands.add(new ShowMessageCommand(chatRoom));
@@ -630,12 +630,14 @@ public class ServerFacade implements IServer {
 		String username = "";
 		UserModel.User theUser = null;
 		convertToCardType(cardsUsedToClaimRoute);
-		try {
-			theUser = DAO._SINGLETON.getUserByAccessToken(authenticationCode);
+		
+//		try {
+//			theUser = DAO._SINGLETON.getUserByAccessToken(authenticationCode);
+			theUser = UserModel.User.get_M_authenticationToLoggedInUser().get(authenticationCode);
 			username = theUser.get_S_username();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+//		} catch (SQLException e) {
+//			e.printStackTrace();
+//		}
 		
 		// gets the route from the list in the game and sets the owner
 		Route route = theGame.getAllRoutes().get_RoutesMap().get(theRoute.get_S_MappingName());
