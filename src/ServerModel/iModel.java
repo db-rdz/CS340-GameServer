@@ -2,6 +2,7 @@ package ServerModel;
 
 import GameModels.Game;
 import GameModels.iGame;
+import UserModel.User;
 import UserModel.iUser;
 
 import java.util.List;
@@ -52,8 +53,9 @@ public interface iModel {
 
     /**
      *  Gets a game from the database, add it to the Game model, and adds it to the user joined games
+     * @param game TODO
      */
-    public Boolean initializeGameFromDB( String username, int gameId );
+    public Boolean initializeGameFromDB( String username, int gameId, Game game );
 
     /**
      *  addPlayerToGame:
@@ -85,12 +87,14 @@ public interface iModel {
     //-------------------------------
     /**
      *  It pulls information from the database and adds the logged in user to the model.
+     * @param user TODO
      */
-    public Boolean logIn(String username);
+    public Boolean logIn(String username, User user);
 
     /**
      *  It syncs the user info with the database and deletes its instance from the model.
      */
     public Boolean logOut(String username);
+
 
 }

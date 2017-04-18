@@ -1,8 +1,7 @@
 package MongoDatabase;
 
 import Client.IClient;
-import RelationalDatabase.IUserDAO;
-import RelationalDatabase.RandomGenerator;
+import DatabaseInterfaces.IUserDAO;
 import Server.IServer;
 import UserModel.User;
 import com.mongodb.BasicDBObject;

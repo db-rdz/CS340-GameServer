@@ -9,7 +9,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import Client.User;
 import Command.ICommand;
 import GameModels.Game;
-import RelationalDatabase.DAO;
 public class GetCommandsCommand implements ICommand{
     private String username;
     private int lastCommandRecievedIndex;

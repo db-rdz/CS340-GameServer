@@ -1,4 +1,4 @@
-package RelationalDatabase;
+package DatabaseInterfaces;
 
 /**
  * Will change the class to iDAO once everything is up to date.

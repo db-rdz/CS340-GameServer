@@ -1,7 +1,6 @@
 package UserModel;
 
 import GameModels.Game;
-import RelationalDatabase.DAO;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -48,11 +47,10 @@ public class User implements iUser {
     //-----------------------------------------STATIC FUNCTIONS------------------------------------------------//
     public static User getUserWithUsername(String username){ return _M_usernameToLoggedInUser.get(username); }
 
-    public static Boolean addLoggedInUser(String username){
+    public static Boolean addLoggedInUser(String username, User user){
         try {
-            User loggedUser = DAO._SINGLETON.getUserByUserName(username);
-            loggedUser.set_B_isLoggedIn(true);
-            mapUsernameToLoggedInUser(username, loggedUser);
+            user.set_B_isLoggedIn(true);
+            mapUsernameToLoggedInUser(username, user);
             return true;
         }
         catch (Exception e){
@@ -163,9 +161,8 @@ public class User implements iUser {
 
     }
 
-    public Boolean initializeGame(int gameId ){
-        Game createdGame = DAO._SINGLETON.getGameFromId( gameId );
-        Game.addGame(createdGame, gameId);
+    public Boolean initializeGame(int gameId, Game game ){
+        Game.addGame(game, gameId);
         addGameToJoinedGames(gameId);
         return true;
     }

@@ -8,9 +8,9 @@ import Command.Phase1.LoginCommand;
 import Command.Phase1.LogoutCommand;
 import Command.Phase1.RegisterCommand;
 import Command.Phase1.StartGameCommand;
+import DatabaseInterfaces.IFactory;
 import Deserializers.PairDeserializer;
 import GameModels.Game;
-import RelationalDatabase.DAO;
 import Serializers.PairSerializer;
 import Server.IServer.GameIsFullException;
 import Server.IServer.UserAlreadyLoggedIn;
@@ -71,7 +71,9 @@ public class ServerCommunicator {
         //   	SERVER_PORT_NUMBER = Integer.parseInt(args[0]);
     	if (args[0].length() > 0) { //which database to use
     		IFactory factory = AbstractFactory.loadProvider(args[0]);
-    		factory.startTransaction();
+    		if (factory.startTransaction()) {
+//    			ServerFacade.SINGLETON.setDao(factory.getDAO());
+    		}
     	}
     	if (args[1].length() > 0) { //How many commands received before storing a checkpoint
     		ServerFacade.commandsBeforeCheckpont = Integer.valueOf(args[1]);
@@ -91,27 +93,27 @@ public class ServerCommunicator {
         objectMapper.registerModule(module);
     }
     
-    private void eraseAllAuthenticationTokens() {
-    	try {
-    		List<UserModel.User> allUsers = DAO._SINGLETON.getAllUsers();
-			int amountOfUsers = DAO._SINGLETON.getAllUsers().size();
-			for (int i = 0; i < amountOfUsers; i++) {
-				DAO._SINGLETON.updateUserToken(allUsers.get(i).get_S_username(), "");
-			}
-		} catch (SQLException e) {
-		
-			e.printStackTrace();
-		}
-    }
-    
-    private void deleteAllServerGames() { 
-    	try {
-            DAO._SINGLETON.deleteAllGames();
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-    }
+//    private void eraseAllAuthenticationTokens() {
+//    	try {
+//    		List<UserModel.User> allUsers = DAO._SINGLETON.getAllUsers();
+//			int amountOfUsers = DAO._SINGLETON.getAllUsers().size();
+//			for (int i = 0; i < amountOfUsers; i++) {
+//				DAO._SINGLETON.updateUserToken(allUsers.get(i).get_S_username(), "");
+//			}
+//		} catch (SQLException e) {
+//		
+//			e.printStackTrace();
+//		}
+//    }
+//    
+//    private void deleteAllServerGames() { 
+//    	try {
+//            DAO._SINGLETON.deleteAllGames();
+//
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
+//    }
     
     //Nathan: Checks if the database crashed while open, and deletes the journal file
     private void checkIfDbHasJournal() {
@@ -128,7 +130,7 @@ public class ServerCommunicator {
     	checkIfDbHasJournal();
     	addPairModule();
 //    	eraseAllAuthenticationTokens();
-    	deleteAllServerGames();
+//    	deleteAllServerGames();
     	
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         try {

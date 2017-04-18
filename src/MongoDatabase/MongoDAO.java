@@ -1,14 +1,15 @@
 package MongoDatabase;
 
-import RelationalDatabase.iDAO2;
+import DatabaseInterfaces.iDAO2;
 
 public class MongoDAO implements iDAO2 {
 	
 	private MongoGameDAO gameDAO;
 	private MongoUserDAO userDAO;
 	
-	private MongoDAO() {
-		
+	public MongoDAO() {
+		gameDAO = new MongoGameDAO();
+		userDAO = new MongoUserDAO();
 	}
 	
 	public MongoGameDAO getGameDAO() {

@@ -39,8 +39,7 @@ public class RelationalDB {
      */
     public void openConnection()
     {
-        //String dbName = "database.sqlite";
-        File directory = new File("db");
+        File directory = new File("assets");
         if(!directory.exists())
         {
             try

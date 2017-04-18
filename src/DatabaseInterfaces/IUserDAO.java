@@ -1,4 +1,4 @@
-package RelationalDatabase;
+package DatabaseInterfaces;
 
 import java.sql.SQLException;
 import java.util.List;

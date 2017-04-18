@@ -6,6 +6,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import DatabaseInterfaces.IGameDAO;
+import DatabaseInterfaces.IUserDAO;
 import GameModels.Game;
 import ServerModel.GameModels.PlayerModel.Player;
 
@@ -151,7 +153,7 @@ public class RelationalGameDAO implements IGameDAO {
 	}
 
 	@Override
-	public Game getGamebyGameId(int gameId) throws SQLException {
+	public Game getGamebyGameId(int gameId, IUserDAO userDao) throws SQLException {
 		_db.openConnection(); //This allows the database to be accessed everytime this method is called.
     	
         PreparedStatement statement = null;
@@ -167,11 +169,11 @@ public class RelationalGameDAO implements IGameDAO {
 
             readGame.set_i_gameId(resultSet.getInt(1));
             readGame.set_numberOfPlayers(resultSet.getInt(2));
-            readGame.setPlayer1(DAO._SINGLETON.getUserByUserName(resultSet.getString(3)));
-            readGame.setPlayer2(DAO._SINGLETON.getUserByUserName(resultSet.getString(4)));
-            readGame.setPlayer3(DAO._SINGLETON.getUserByUserName(resultSet.getString(5)));
-            readGame.setPlayer4(DAO._SINGLETON.getUserByUserName(resultSet.getString(6)));
-            readGame.setPlayer5(DAO._SINGLETON.getUserByUserName(resultSet.getString(7)));
+            readGame.setPlayer1(userDao.getUserByUserName(resultSet.getString(3)));
+            readGame.setPlayer2(userDao.getUserByUserName(resultSet.getString(4)));
+            readGame.setPlayer3(userDao.getUserByUserName(resultSet.getString(5)));
+            readGame.setPlayer4(userDao.getUserByUserName(resultSet.getString(6)));
+            readGame.setPlayer5(userDao.getUserByUserName(resultSet.getString(7)));
         }
         catch(SQLException e)
         {

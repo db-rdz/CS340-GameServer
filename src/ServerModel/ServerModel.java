@@ -2,7 +2,6 @@ package ServerModel;
 
 import GameModels.Game;
 import GameModels.iGame;
-import RelationalDatabase.DAO;
 import UserModel.User;
 import UserModel.iUser;
 
@@ -38,8 +37,8 @@ public class ServerModel implements iModel {
     }
 
     @Override
-    public Boolean initializeGameFromDB( String username, int gameId ){
-        User.getUserWithUsername(username).initializeGame(gameId);
+    public Boolean initializeGameFromDB( String username, int gameId, Game game ){
+        User.getUserWithUsername(username).initializeGame(gameId, game);
         return true;
     }
 
@@ -79,8 +78,8 @@ public class ServerModel implements iModel {
     }
 
     @Override
-    public Boolean logIn(String username) {
-        return User.addLoggedInUser(username);
+    public Boolean logIn(String username, User user) {
+        return User.addLoggedInUser(username, user);
     }
 
     @Override

@@ -8,6 +8,7 @@ import java.util.List;
 
 import Client.IClient.InvalidPassword;
 import Client.IClient.InvalidUsername;
+import DatabaseInterfaces.IUserDAO;
 import Server.IServer.UserAlreadyLoggedIn;
 import UserModel.User;
 

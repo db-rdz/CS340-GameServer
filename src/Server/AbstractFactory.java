@@ -1,7 +1,6 @@
 package Server;
 
-import MongoDatabase.MongoFactory;
-import RelationalDatabase.RelationalFactory;
+import DatabaseInterfaces.IFactory;
 
 public class AbstractFactory {
 

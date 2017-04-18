@@ -1,16 +1,16 @@
 package MongoDatabase;
 
 import GameModels.Game;
-import RelationalDatabase.IGameDAO;
-import RelationalDatabase.IUserDAO;
 import ServerModel.GameModels.PlayerModel.Player;
-import UserModel.User;
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
+
+import DatabaseInterfaces.IGameDAO;
+import DatabaseInterfaces.IUserDAO;
 
 import org.bson.Document;
 
@@ -117,7 +117,7 @@ public class MongoGameDAO implements IGameDAO {
     }
 
     @Override
-    public Game getGamebyGameId(int gameId) throws SQLException {
+    public Game getGamebyGameId(int gameId, IUserDAO userDao) throws SQLException {
         Game game = new Game();
         try {
             BasicDBObject query = new BasicDBObject();

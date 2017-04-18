@@ -1,10 +1,13 @@
 package RelationalDatabase;
 
+import DatabaseInterfaces.iDAO2;
+
 public class RelationalDAO implements iDAO2 {
 	
-	private static RelationalDB _db;
+	private RelationalDB _db;
 	private RelationalGameDAO gameDAO;
 	private RelationalUserDAO userDAO;
+
 	
 	public RelationalDAO() {
 		_db = new RelationalDB(); //Set the database in the constructor
