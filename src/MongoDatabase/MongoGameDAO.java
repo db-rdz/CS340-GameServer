@@ -24,7 +24,6 @@ import java.util.List;
  * Created by raulbr on 4/15/17.
  */
 public class MongoGameDAO implements IGameDAO {
-    public static IUserDAO _SINGLETON = new MongoUserDAO();
     private MongoDatabase _mongoDatabase;
     private MongoCollection _gamesCollection;
     private MongoCollection _playersCollection;
@@ -33,9 +32,14 @@ public class MongoGameDAO implements IGameDAO {
 
     public MongoGameDAO() {
         _mongoDatabase = MongoDB.get_mongoDB();
-        _gamesCollection = _mongoDatabase.getCollection("games");
-        _playersCollection = _mongoDatabase.getCollection("players");
-        _usergamesCollection = _mongoDatabase.getCollection("usergames");
+        try {
+        	_gamesCollection = _mongoDatabase.getCollection("games");
+        	_playersCollection = _mongoDatabase.getCollection("players");
+        	_usergamesCollection = _mongoDatabase.getCollection("usergames");
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
         System.out.println("MongoGameDAO constructor done");
     }
 
@@ -51,11 +55,13 @@ public class MongoGameDAO implements IGameDAO {
         }
         String playerNumber = String.valueOf(numberOfPlayersInGame); //PlayerNumber == number of players in the game.
         try {
-            BasicDBObject newDocument = new BasicDBObject();
-            newDocument.put("player" + playerNumber, username);
+            //BasicDBObject newDocument = new BasicDBObject();
+            //newDocument.put("player" + playerNumber, username);
 
-            BasicDBObject searchQuery = new BasicDBObject().append("gameid", gameId);
-            _gamesCollection.updateOne(searchQuery, newDocument);
+            _gamesCollection.updateOne(new Document("gameid", gameId), new Document("$set", new Document("player" + playerNumber, username)));
+            
+            //BasicDBObject searchQuery = new BasicDBObject().append("gameid", gameId);
+            //_gamesCollection.updateOne(searchQuery, newDocument);
         } catch (Exception e) {
             System.err.println( e.getClass().getName() + ": UPDATEGAMEPLAYER MONGO " + e.getMessage() );
         }
@@ -86,15 +92,17 @@ public class MongoGameDAO implements IGameDAO {
 
     @Override
     public void updateGameNumberOfPlayers(int gameId, int numberOfPlayersInGame) throws SQLException {
-        if (gameId == 0 || numberOfPlayersInGame > 5) {
+        if (gameId == -1 || numberOfPlayersInGame > 5) {
             return;
         }
         try {
             BasicDBObject newDocument = new BasicDBObject();
             newDocument.put("numberofplayers", numberOfPlayersInGame);
+            
+            _gamesCollection.updateOne(new Document("gameid", gameId), new Document("$set", new Document("numberofplayers", numberOfPlayersInGame)));
 
-            BasicDBObject searchQuery = new BasicDBObject().append("gameid", gameId);
-            _gamesCollection.updateOne(searchQuery, newDocument);
+            //BasicDBObject searchQuery = new BasicDBObject().append("gameid", 1);
+            //_gamesCollection.updateOne(searchQuery, newDocument);
         } catch (Exception e) {
             System.err.println( e.getClass().getName() + ": UPDATEGAMENUMBEROFPLAYERS MONGO " + e.getMessage() );
         }
@@ -104,9 +112,16 @@ public class MongoGameDAO implements IGameDAO {
     public Boolean addGame(Game game) throws SQLException {
         if (game == null) { return false; }
         try {
+        	//deleteAllGames();
+        	int gameIdHelper = getAllGames().size();
             Document newUserDoc = new Document().
-                    append("gameid", int_gameId++).
-                    append("numberofplayers", game.get_numberOfPlayers());
+                    append("gameid", gameIdHelper).
+                    append("numberofplayers", game.get_numberOfPlayers()).
+            		append("player1", "").
+            		append("player2", "").
+            		append("player3", "").
+            		append("player4", "").
+            		append("player5", "");
 
             _gamesCollection.insertOne(newUserDoc);
         } catch (Exception e) {
@@ -123,7 +138,7 @@ public class MongoGameDAO implements IGameDAO {
             BasicDBObject query = new BasicDBObject();
             query.put("gameid", gameId);
             MongoCursor cursor = _gamesCollection.find(query).iterator();
-            if(!cursor.hasNext()){return game;}
+            //if(!cursor.hasNext()){return game;}
 
             Document row = (Document)cursor.next();
             game.set_i_gameId(row.getInteger("gameid"));
@@ -201,10 +216,12 @@ public class MongoGameDAO implements IGameDAO {
         try {
             BasicDBObject newDocument = new BasicDBObject();
             int newNumberOfCards = getCards(userName, cardColor) + Integer.parseInt(number);
-            newDocument.put(cardColor, newNumberOfCards);
+            //newDocument.put(cardColor, newNumberOfCards);
+            
+            _playersCollection.updateOne(new Document("username", userName), new Document("$set", new Document(cardColor, newNumberOfCards)));
 
-            BasicDBObject searchQuery = new BasicDBObject().append("username", userName);
-            _playersCollection.updateOne(searchQuery, newDocument);
+            //BasicDBObject searchQuery = new BasicDBObject().append("username", userName);
+            //_playersCollection.updateOne(searchQuery, newDocument);
         } catch (Exception e) {
             System.err.println( e.getClass().getName() + ": UPDATEPLAYERTRAINCARDS MONGO " + e.getMessage() );
             return false;
@@ -231,11 +248,13 @@ public class MongoGameDAO implements IGameDAO {
     @Override
     public boolean updatePlayerDestCards(String userName, String cardColumn, Integer newCardType) throws SQLException {
         try {
-            BasicDBObject newDocument = new BasicDBObject();
-            newDocument.put(cardColumn, newCardType);
+            //BasicDBObject newDocument = new BasicDBObject();
+            //newDocument.put(cardColumn, newCardType);
+            
+            _playersCollection.updateOne(new Document("username", userName), new Document("$set", new Document(cardColumn, newCardType)));
 
-            BasicDBObject searchQuery = new BasicDBObject().append("username", userName);
-            _playersCollection.updateOne(searchQuery, newDocument);
+            //BasicDBObject searchQuery = new BasicDBObject().append("username", userName);
+            //_playersCollection.updateOne(searchQuery, newDocument);
         } catch (Exception e) {
             System.err.println( e.getClass().getName() + ": UPDATEPLAYERDESTCARDS MONGO " + e.getMessage() );
             return false;

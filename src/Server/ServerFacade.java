@@ -12,6 +12,7 @@ import Command.Phase1.SwitchToWaitingActivityCommand;
 import Command.Phase2.*;
 import DatabaseInterfaces.iDAO2;
 import GameModels.Game;
+import MongoDatabase.MongoDAO;
 import ServerModel.*;
 import ServerModel.GameModels.BoardModel.Scoreboard;
 import ServerModel.GameModels.CardsModel.DestCard;
@@ -47,7 +48,7 @@ public class ServerFacade implements IServer {
      */
 	public static ServerFacade SINGLETON = new ServerFacade();
 	public static int commandsBeforeCheckpont = 1;
-	private iDAO2 dao;
+	private iDAO2 dao = new MongoDAO();
 	
 	/**
 	 * Nathan: simply gets all the game ids from the server
@@ -443,7 +444,7 @@ public class ServerFacade implements IServer {
 			Boolean value = dao.getGameDAO().addGame(new Game());
             Game theGame = new Game();
             
-            Integer gameId = dao.getGameDAO().getAllGames().size(); //The size == gameid
+            Integer gameId = dao.getGameDAO().getAllGames().size() - 1; //The size == gameid
             UserModel.User theUser = dao.getUserDAO().getUserByAccessToken(str_authentication_code);
                         
             try {

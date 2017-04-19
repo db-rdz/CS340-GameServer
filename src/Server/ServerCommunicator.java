@@ -68,15 +68,15 @@ public class ServerCommunicator {
     public static void main(String[] args)
     {
 
-    	if (args[0].length() > 0) { //which database to use
-    		IFactory factory = AbstractFactory.loadProvider(args[0]);
-    		if (factory.startTransaction()) {
-    			ServerFacade.SINGLETON.setDao(factory.getDAO());
-    		}
-    	}
-    	if (args[1].length() > 0) { //How many commands received before storing a checkpoint
-    		ServerFacade.commandsBeforeCheckpont = Integer.valueOf(args[1]);
-    	}
+//    	if (args[0].length() > 0) { //which database to use
+//    		IFactory factory = AbstractFactory.loadProvider(args[0]);
+//    		if (factory.startTransaction()) {
+//    			ServerFacade.SINGLETON.setDao(factory.getDAO());
+//    		}
+//    	}
+//    	if (args[1].length() > 0) { //How many commands received before storing a checkpoint
+//    		ServerFacade.commandsBeforeCheckpont = Integer.valueOf(args[1]);
+//    	}
         SERVER_PORT_NUMBER = 8081;
         SINGLETON.run();
     }
@@ -129,7 +129,7 @@ public class ServerCommunicator {
     	checkIfDbHasJournal();
     	addPairModule();
 //    	eraseAllAuthenticationTokens();
-    	deleteAllServerGames();
+//    	deleteAllServerGames();
     	
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         try {

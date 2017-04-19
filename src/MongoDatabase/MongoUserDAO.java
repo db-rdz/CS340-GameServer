@@ -22,7 +22,7 @@ import java.util.List;
  * Created by raulbr on 4/15/17.
  */
 public class MongoUserDAO implements IUserDAO {
-    public static IUserDAO _SINGLETON = new MongoUserDAO();
+	public static MongoUserDAO _SINGLETON = new MongoUserDAO();
     private MongoDatabase _mongoDatabase;
     private MongoCollection _usersCollection;
     private int AUTH_TOKEN_LENGTH = 15;
