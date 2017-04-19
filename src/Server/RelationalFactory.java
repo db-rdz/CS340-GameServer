@@ -39,6 +39,7 @@ public class RelationalFactory implements IFactory{
 			    	Object object = c.newInstance(); //Get the class and cast it to an object
 			    	iDAO2 holder = (iDAO2)object; //Cast to a DAO interface object
 			    	relationalDao = holder.initDAO(); //call the interface method that creates a new DAO class
+			    	break;
 			    }
 			}
 						

@@ -12,7 +12,6 @@ import Command.Phase1.SwitchToWaitingActivityCommand;
 import Command.Phase2.*;
 import DatabaseInterfaces.iDAO2;
 import GameModels.Game;
-import MongoDatabase.MongoDAO;
 import ServerModel.*;
 import ServerModel.GameModels.BoardModel.Scoreboard;
 import ServerModel.GameModels.CardsModel.DestCard;
@@ -48,7 +47,7 @@ public class ServerFacade implements IServer {
      */
 	public static ServerFacade SINGLETON = new ServerFacade();
 	public static int commandsBeforeCheckpont = 1;
-	private iDAO2 dao = new MongoDAO();
+	private iDAO2 dao;
 	
 	/**
 	 * Nathan: simply gets all the game ids from the server

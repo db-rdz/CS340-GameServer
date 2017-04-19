@@ -1,10 +1,14 @@
 //package RelationalDatabase;
 //
+//import java.io.BufferedReader;
+//
 ///**
 // * Created by raulbr on 2/12/17.
 // */
 //
 //import java.io.File;
+//import java.io.InputStream;
+//import java.io.InputStreamReader;
 //import java.net.InetAddress;
 //import java.net.UnknownHostException;
 //import java.sql.Connection;
@@ -39,8 +43,7 @@
 //     */
 //    public void openConnection()
 //    {
-////        File directory = new File("assets");
-//        File directory = new File("db");
+//    	File directory = new File("assets");
 //        if(!directory.exists())
 //        {
 //            try
@@ -52,12 +55,10 @@
 //                System.out.println("Error creating the folder for the DB files! The server can not work correctly with out this!");
 //                return;
 //            }
-//        }
+//        }  
 //
-//		String dbName = "db" + File.separator + "database.sqlite";
-//		String connectionURL = "jdbc:sqlite:" + dbName;
-////		String connectionURL = "jdbc:sqlite::resource:db";
-//        connection = null;
+//  		String dbName = "assets/relationalDB" + File.separator + "database.sqlite";
+//  		String connectionURL = "jdbc:sqlite:" + dbName;
 //        try
 //        {
 //            connection = DriverManager.getConnection(connectionURL);

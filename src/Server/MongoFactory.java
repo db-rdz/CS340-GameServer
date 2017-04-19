@@ -11,7 +11,6 @@ import java.util.jar.JarFile;
 
 import DatabaseInterfaces.IFactory;
 import DatabaseInterfaces.iDAO2;
-import MongoDatabase.MongoDAO;
 
 public class MongoFactory implements IFactory {
 	
@@ -40,6 +39,7 @@ public class MongoFactory implements IFactory {
 			    	Object object = c.newInstance(); //Get the class and cast it to an object
 			    	iDAO2 holder = (iDAO2)object; //Cast to a DAO interface object
 			    	mongoDAO = holder.initDAO(); //call the interface method that creates a new DAO class
+			    	break;
 			    }
 			}
 						
@@ -64,7 +64,7 @@ public class MongoFactory implements IFactory {
 	}
 	
 	public iDAO2 getDAO() {
-		return new MongoDAO();
+		return mongoDAO.initDAO();
 	}
 
 }
