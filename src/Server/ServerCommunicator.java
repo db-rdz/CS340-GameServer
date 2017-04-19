@@ -105,14 +105,14 @@ public class ServerCommunicator {
 //		}
 //    }
 //    
-//    private void deleteAllServerGames() { 
-//    	try {
-//            DAO._SINGLETON.deleteAllGames();
-//
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
-//    }
+    private void deleteAllServerGames() { 
+    	try {
+    		ServerFacade.SINGLETON.getDao().getGameDAO().deleteAllGames();
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+    }
     
     //Nathan: Checks if the database crashed while open, and deletes the journal file
     private void checkIfDbHasJournal() {
@@ -129,7 +129,7 @@ public class ServerCommunicator {
     	checkIfDbHasJournal();
     	addPairModule();
 //    	eraseAllAuthenticationTokens();
-//    	deleteAllServerGames();
+    	deleteAllServerGames();
     	
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         try {
