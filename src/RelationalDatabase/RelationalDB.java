@@ -39,7 +39,8 @@ public class RelationalDB {
      */
     public void openConnection()
     {
-        File directory = new File("assets");
+//        File directory = new File("assets");
+        File directory = new File("db");
         if(!directory.exists())
         {
             try
@@ -55,6 +56,7 @@ public class RelationalDB {
 
 		String dbName = "db" + File.separator + "database.sqlite";
 		String connectionURL = "jdbc:sqlite:" + dbName;
+//		String connectionURL = "jdbc:sqlite::resource:db";
         connection = null;
         try
         {

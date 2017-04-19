@@ -68,11 +68,10 @@ public class ServerCommunicator {
     public static void main(String[] args)
     {
 
-        //   	SERVER_PORT_NUMBER = Integer.parseInt(args[0]);
     	if (args[0].length() > 0) { //which database to use
     		IFactory factory = AbstractFactory.loadProvider(args[0]);
     		if (factory.startTransaction()) {
-//    			ServerFacade.SINGLETON.setDao(factory.getDAO());
+    			ServerFacade.SINGLETON.setDao(factory.getDAO());
     		}
     	}
     	if (args[1].length() > 0) { //How many commands received before storing a checkpoint

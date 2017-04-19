@@ -33,7 +33,8 @@ public class RelationalUserDAO implements IUserDAO {
         } catch (Exception e) { throw new InvalidUsername(); }
                 
         if(password.equals(dbUser.get_S_password())) {
-        	if (dbUser.get_S_token().length() <= 0) { //no need to override existing authentication code
+        	String token = dbUser.get_S_token();
+        	if (token == null || token.length() <= 0) { //no need to override existing authentication code
         		updateUserToken(userName, makeToken());
         		
         	}

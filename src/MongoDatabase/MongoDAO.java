@@ -12,6 +12,11 @@ public class MongoDAO implements iDAO2 {
 		userDAO = new MongoUserDAO();
 	}
 	
+	@Override
+	public iDAO2 initDAO() {
+		return new MongoDAO();
+	}
+	
 	public MongoGameDAO getGameDAO() {
 		return gameDAO;
 	}

@@ -8,6 +8,7 @@ package DatabaseInterfaces;
 
 public interface iDAO2 {
 
+	public iDAO2 initDAO();
 	public IUserDAO getUserDAO();
 	public IGameDAO getGameDAO();
 }

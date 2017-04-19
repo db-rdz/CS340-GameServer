@@ -15,6 +15,12 @@ public class RelationalDAO implements iDAO2 {
 		userDAO = new RelationalUserDAO(_db);
 	}
 	
+	@Override
+	public iDAO2 initDAO() {
+		return new RelationalDAO();
+	}
+	
+	@Override
 	public RelationalGameDAO getGameDAO() {
 		return gameDAO;
 	}
@@ -22,6 +28,7 @@ public class RelationalDAO implements iDAO2 {
 		this.gameDAO = gameDAO;
 	}
 	
+	@Override
 	public RelationalUserDAO getUserDAO() {
 		return userDAO;
 	}
